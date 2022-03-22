@@ -1,0 +1,373 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
+
+import React, {useMemo, useEffect, useState, createRef} from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  StatusBar,
+} from 'react-native';
+
+import {ThemeProvider, Icon} from 'react-native-elements';
+import * as RNLocalize from 'react-native-localize';
+import i18n from 'i18n-js';
+import {applyMiddleware, combineReducers, createStore} from 'redux';
+import {Provider, useSelector} from 'react-redux';
+import ReduxThunk from 'redux-thunk';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import StorageKey from './src/constants/StorageKey';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {default as Splash} from 'react-native-splash-screen';
+import {ModalPortal} from 'react-native-modals';
+import {ToastProvider} from 'react-native-toast-notifications';
+import {navigationRef} from './src/navigation/RootNavigation';
+import * as RootNavigation from './src/navigation/RootNavigation';
+
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
+
+import translate from './src/locales/translate';
+
+import SplashScreen from './src/views/SplashScreen';
+import LoginScreen from './src/views/LoginScreen';
+import RegisterScreen from './src/views/RegisterScreen';
+import ForgotPasswordScreen from './src/views/ForgotPasswordScreen';
+import ForgotPasswordSentScreen from './src/views/ForgotPasswordSentScreen';
+import SuccessScreen from './src/views/SuccessScreen';
+import HomeScreen from './src/views/maintab/HomeScreen';
+import MyProfileScreen from './src/views/MyProfileScreen';
+import ChangePasswordScreen from './src/views/ChangePasswordScreen';
+import NewsListScreen from './src/views/NewsListScreen';
+import TeamScreen from './src/views/TeamScreen';
+import ProjectListScreen from './src/views/ProjectListScreen';
+import SingleWebScreen from './src/views/SingleWebScreen';
+
+import Colors from './src/constants/Colors';
+import messaging from '@react-native-firebase/messaging';
+import {Freshchat} from 'react-native-freshchat-sdk';
+import CustomisableAlert from 'react-native-customisable-alert';
+import Config from './src/constants/Config';
+import MainTabScreen from './src/views/maintab/MainTabScreen';
+
+// const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+
+const theme = {
+  colors: {
+    primary: Colors.primary,
+    colorPrimary: Colors.primary,
+    primaryColor: Colors.primary,
+  },
+};
+
+const translationGetters = {
+  en: () => require('./src/locales/en.json'),
+  jp: () => require('./src/locales/jp.json'),
+};
+
+const setI18nConfig = () => {
+  const fallback = {languageTag: 'en'};
+  const {languageTag} =
+    RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters)) ||
+    fallback;
+  translate.cache.clear();
+  i18n.translations = {[languageTag]: translationGetters[languageTag]()};
+  i18n.locale = languageTag;
+};
+
+const Stack = createNativeStackNavigator();
+export const AuthContext = React.createContext();
+
+const App = ({navigation, route}) => {
+  const [state, dispatch] = React.useReducer(
+    (prevState, action) => {
+      switch (action.type) {
+        case 'RESTORE_TOKEN':
+          return {
+            ...prevState,
+            userToken: action.token,
+          };
+        case 'SIGN_IN':
+          return {
+            ...prevState,
+            isSignout: false,
+            userToken: action.token,
+          };
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignout: true,
+            userToken: null,
+          };
+        case 'LOADING_COMPLETE':
+          return {
+            ...prevState,
+            isLoading: false,
+          };
+      }
+    },
+    {
+      isLoading: true,
+      isSignout: false,
+      userToken: null,
+    },
+  );
+
+  const [initialRoute, setInitialRoute] = useState('Home');
+  const [loading, setLoading] = useState(true);
+  const [pushNotifParam, setpushNotifParam] = useState(undefined);
+  const enableAnimation = false;
+
+  setI18nConfig();
+
+  const authContextValue = useMemo(
+    () => ({
+      signIn: async data => {
+        console.log('dispatch login');
+        try {
+          const uid = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
+          if (Config.isMockDesign) {
+            dispatch({type: 'SIGN_IN', token: "mock"});
+          } else {
+            dispatch({type: 'SIGN_IN', token: uid});
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      signOut: async data => {
+        await AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN)
+        dispatch({type: 'SIGN_OUT'});
+      },
+      doneLoading: async data => {
+        dispatch({type: 'LOADING_COMPLETE'});
+      },
+    }),
+    [],
+  );
+
+  const saveFirebaseToken = token => {
+    AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token);
+
+    Freshchat.setPushRegistrationToken(token);
+  };
+
+  useEffect(() => {
+    Splash.hide();
+
+    const bootstrapAsync = async () => {
+      let userToken;
+
+      try {
+        userToken = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
+        console.log('token' + userToken);
+      } catch (e) {
+        // Restoring token failed
+        console.log(e);
+      }
+
+      dispatch({type: 'RESTORE_TOKEN', token: userToken});
+    };
+
+    bootstrapAsync();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Freshchat.isFreshchatNotification(
+        remoteMessage.data,
+        freshchatNotification => {
+          if (freshchatNotification) {
+            Freshchat.handlePushNotification(remoteMessage.data);
+          } else {
+            console.log(`forground notification ${remoteMessage}`);
+          }
+        },
+      );
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    // Get the device token
+    messaging()
+      .getToken()
+      .then(token => {
+        return saveFirebaseToken(token);
+      });
+
+    // If using other push notification providers (ie Amazon SNS, etc)
+    // you may need to get the APNs token instead for iOS:
+    // if(Platform.OS == 'ios') { messaging().getAPNSToken().then(token => { return saveTokenToDatabase(token); }); }
+
+    // Listen to whether the token changes
+    return messaging().onTokenRefresh(token => {
+      saveFirebaseToken(token);
+    });
+  }, []);
+
+  useEffect(() => {
+    // Assume a message-notification contains a "type" property in the data payload of the screen to open
+
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log(
+        'Notification caused app to open from background state:',
+        remoteMessage.notification,
+      );
+      RootNavigation.navigate('NewsDetail', {
+        data: {id: remoteMessage.data.news_id},
+      });
+
+      // navigation.navigate(remoteMessage.data.type);
+    });
+
+    // Check whether an initial notification is available
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log(
+            'Notification caused app to open from quit state:',
+            remoteMessage.notification,
+          );
+          setInitialRoute('Home');
+          setpushNotifParam({id: remoteMessage.data.news_id}); // e.g. "Settings"
+        }
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return null;
+  }
+
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider theme={theme}>
+        <CustomisableAlert
+          titleStyle={{
+            fontSize: 18,
+            fontWeight: 'bold',
+          }}
+        />
+        <ToastProvider
+          renderType={{
+            custom: toast => (
+              <View
+                style={{
+                  padding: 15,
+                  backgroundColor: Colors.darkPrimary,
+                  borderRadius: 32,
+                }}>
+                <Text style={{color: 'white', fontFamily: 'Lato-Regular'}}>
+                  {toast.message}
+                </Text>
+              </View>
+            ),
+          }}>
+          <NavigationContainer ref={navigationRef}>
+            <AuthContext.Provider value={authContextValue}>
+              <Stack.Navigator initialRouteName={initialRoute}>
+                {state.isLoading ? (
+                  <Stack.Screen
+                    name="Splash"
+                    component={SplashScreen}
+                    options={{headerShown: false}}
+                  />
+                ) : !state.userToken ? (
+                  <>
+                    <Stack.Screen
+                      name="Login"
+                      component={LoginScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
+                      name="Register"
+                      component={RegisterScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
+                      name="ForgotPassword"
+                      component={ForgotPasswordScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
+                      name="ForgotPasswordSent"
+                      component={ForgotPasswordSentScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
+                      name="Success"
+                      component={SuccessScreen}
+                      options={{headerShown: false}}
+                    />
+                        <Stack.Screen
+                          name="SingleWeb"
+                          component={SingleWebScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+                  </>
+                ) : (
+                      <>
+                        <Stack.Screen
+                          name="MainTab"
+                          component={MainTabScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                          initialParams={{ news: pushNotifParam }}
+                        />
+                        <Stack.Screen
+                          name="Team"
+                          component={TeamScreen}
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="ProjectList"
+                          component={ProjectListScreen}
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="MyProfile"
+                          component={MyProfileScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+                        <Stack.Screen
+                          name="ChangePassword"
+                          component={ChangePasswordScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+                        <Stack.Screen
+                          name="SingleWeb"
+                          component={SingleWebScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+                        <Stack.Screen
+                          name="NewsList"
+                          component={NewsListScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+                        <Stack.Screen
+                          name="Success"
+                          component={SuccessScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation, gestureEnabled: false }}
+                        />
+                      </>
+                    )}
+              </Stack.Navigator>
+              <ModalPortal />
+            </AuthContext.Provider>
+          </NavigationContainer>
+        </ToastProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+};
+
+export default App;

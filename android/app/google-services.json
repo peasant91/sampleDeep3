@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "623422295303",
+    "project_id": "schott-pbi",
+    "storage_bucket": "schott-pbi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623422295303:android:87a9d261c9afa67f3e09a2",
+        "android_client_info": {
+          "package_name": "com.schott.pbsaving.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623422295303-id0flpkjcait5om0r7a6l3m9qgi3veql.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsGj96xD9qRqnUnampDHBDJDXEKYkNGjs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623422295303-id0flpkjcait5om0r7a6l3m9qgi3veql.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

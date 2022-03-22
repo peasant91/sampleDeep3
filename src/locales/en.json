@@ -1,0 +1,97 @@
+{
+    "pb_saving_app": "PB SAVING APP",
+    "app_name": "PB Saving App",
+    "ok": "Ok",
+    "yes": "Ya",
+    "login": "Masuk",
+    "back": "Kembali",
+    "sign_out": "Sign Out",
+    "tap_here": "TAP Disini",
+    "see_project": "Lihat Proyek",
+    
+    "fullname_placeholder": "e.g. Sri Sedana",
+    "email_title": "Email",
+    "email_placeholder": "e.g. nama@email.com",
+    "phone_title": "Nomor Telepon",
+    "phone_placeholder": "e.g. 89318913819",
+    "password_title": "Kata Sandi",
+    "password_placeholder": "e.g. Abc1!23?",
+    "forgot_password": "Forgot Password",
+    "setting_password_title": "Atur kata sandi Anda",
+    "re_password_title": "Konfirmasi Kata Sandi",
+    "old_password_title": "Kata Sandi Lama",
+    "new_password_title": "Kata Sandi Baru",
+    "name_title": "Nama Lengkap",
+    "name_placeholder": "cth: Indra Lesmana",
+    "register_now": "Daftar Sekarang",
+    "save": "Simpan",
+    "go_to_login": "Ke Halaman Login",
+    "register_success_title": "Pendaftaran Berhasil",
+    "register_success_desc": "Terimakasih sudah melakukan pendaftaran di Aplikasi Schott PB Saving. Tunggu admin untuk melakukan verifikasi akun Anda.",
+
+    "forgot_password_title": "Lupa Kata Sandi?",
+    "forgot_password_desc": "Silakan masukan email Anda dan tunggu instruksi selanjutnya.",
+
+    "register_form": "Formulir Daftar",
+    "register_form_title": "Daftarkan diri sebagai member OTO Media ",
+    "register_form_desc" : "Silahkan Isi Data diri Anda dengan lengkap.",
+
+    "back_to_login": "Kembali ke Login",
+    "back_to_home": "Kembali ke Beranda",
+
+    "my_profile": "Profilku",
+    "change_password": "Ganti Kata Sandi",
+    "password_setting": "Atur Kata Sandi",
+
+    "must_not_empty": "%{s} tidak boleh kosong.",
+    "retry": "Coba Lagi",
+    "cancel": "Batalkan",
+    "invalid_phone": "Nomor telepon tidak valid",
+    "invalid_email": "Email tidak valid",
+    "password_not_match": "Kata Sandi tidak sama",
+    "enable_push_notif": "Mohon ijinkan pemberitahuan untuk mendapatkan berita terbaru.",
+
+    "logout_confirmation": "Yakin untuk Log Out ?",
+    "sure": "Yakin",
+
+    "wanna_join": "Tertarik menjadi",
+    "oto_media_member": "Member OTO Media?",
+    "login_desc": "Mempunyai kendaraan untuk dijadikan penghasilan tambahan dan bersedia mengikuti layanan kami.",
+    "see_term_and_condition": "Lihat Syarat & ketentuan disini.",
+    "register_here": "Daftar Disini",
+
+    "home_info": "Selalu nyalakan GPS ketika berkendara agar jarak tempuh tercatat disistem",
+    "do_job": "Melakukan Pekerjaan",
+    "active_contract": "Kontrak Aktif",
+    "see_contract": "Lihat Kontrak",
+    "no_active_contract": "Belum ada kontrak aktif. \nSilahkan cari penawaran yang terbaik untuk Anda.",
+    "see_offer": "Lihat Penawaran",
+    "travel_report": "Laporan Perjalanan",
+    "verified": "Sudah di verifikasi",
+    "on_verifying": "Masih Dalam Tahap Verifikasi",
+    "status": "Status",
+    "travel_total": "Total Perjalanan",
+    "travel_today": "Perjalanan Hari Ini",
+    "change_vehicle": "Ubah Kendaraan",
+    "vehicle": "Kendaraan",
+    "verification_success": "Lulus Verifikasi",
+    "vehicle_can_be_change": "Kendaraan bisa di ubah ketika kontrak berakhir & \n status kendaraan akan di verifikasi ulang.",
+    "info_not_verified": "Tambahkan kendaraan agar mendapatkan penawaran pekerjaan dari Kami.",
+    "see_this_offer": "Lihat Penawaran Ini",
+
+    "my_contract": "Kontrak Saya",
+    "change_profile": "Ubah Profil",
+    "bank_account": "Rekening Bank",
+    "contact_us": "Hubungi Kami",
+    "logout": "Log Out",
+
+    "find_offer_here": "Cari Penawaran Disini",
+    "offer_detail": "Detail Penawaran",
+    "offer_type": "Jenis Iklan",
+    "contract_length": "Lama Kontrak",
+    "estimated_profit": ""
+
+
+
+
+}
