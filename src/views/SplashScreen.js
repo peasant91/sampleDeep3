@@ -30,7 +30,7 @@ import pkg from '../../package.json';
 import {AuthContext} from '../../App';
 import translate from '../locales/translate';
 import ImageTopLogo from '../assets/images/img_top_logo.svg';
-import {getDivisionApi, getProvince} from '../services/utilities';
+import {getCompanies, getDivisionApi, getGender, getProvince} from '../services/utilities';
 import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
 import Constant from '../constants/Constant';
 import {postFreshchat} from '../services/freshchat';
@@ -93,13 +93,38 @@ const SplashScreen = props => {
     getProvince()
       .then(response => {
         AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
-          .then(response => doneLoading())
+          .then(response => getCompaniesApi())
           .catch(err => console.log(err));
       })
       .catch(err => {
         showDialog(err.message);
       });
   };
+
+
+  const getCompaniesApi = async () => {
+    getCompanies()
+      .then(response => {
+        AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
+          .then(response => getGenderApi())
+          .catch(err => console.log(err));
+      })
+      .catch(err => {
+        showDialog(err.message);
+      });
+  }
+
+  const getGenderApi = async () => {
+    getGender()
+      .then(response => {
+        AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
+          .then(response => doneLoading())
+          .catch(err => console.log(err));
+      })
+      .catch(err => {
+        showDialog(err.message);
+      });
+  }
 
   const initFreshchat = () => {
     const freshchatConfig = new FreshchatConfig(

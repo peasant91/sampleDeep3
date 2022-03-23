@@ -1,15 +1,15 @@
 import React, { useReducer, useState } from 'react'
 import { SafeAreaView, StyleSheet, ScrollView, View, Keyboard } from 'react-native';
-import Colors from '../constants/Colors';
-import NavBar from '../components/atoms/NavBar';
-import translate from '../locales/translate';
-import CustomButton from '../components/atoms/CustomButton';
-import { Subtitle1 } from '../components/atoms/CustomText';
-import { PasswordInput } from '../components/atoms/CustomInput';
-import formReducer from '../reducers/formReducer';
-import { changePassword } from '../services/user';
+import Colors from '../../constants/Colors';
+import NavBar from '../../components/atoms/NavBar';
+import translate from '../../locales/translate';
+import CustomButton from '../../components/atoms/CustomButton';
+import { Subtitle1 } from '../../components/atoms/CustomText';
+import { PasswordInput } from '../../components/atoms/CustomInput';
+import formReducer from '../../reducers/formReducer';
+import { changePassword } from '../../services/user';
 import { useToast } from 'react-native-toast-notifications';
-import { showDialog } from '../actions/commonActions';
+import { showDialog } from '../../actions/commonActions';
 
 const ChangePasswordScreen = ({ navigation, route }) => {
 

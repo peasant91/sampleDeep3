@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {LatoBold} from './CustomText';
 import IndonesiaFlag from '../../assets/images/ic_indonesia_flag.svg';
-import ArrowDown from '../../assets/images/ic_arrow_down.svg';
+import ArrowDown from '../../assets/images/ic_arrow_dropdown.svg';
 import PasswordHide from '../../assets/images/ic_password_hide.svg';
 import PasswordUnhide from '../../assets/images/ic_password_unhide.svg';
 import translate from '../../locales/translate';

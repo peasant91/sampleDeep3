@@ -37,18 +37,14 @@ import {NavigationContainer} from '@react-navigation/native';
 import translate from './src/locales/translate';
 
 import SplashScreen from './src/views/SplashScreen';
-import LoginScreen from './src/views/LoginScreen';
-import RegisterScreen from './src/views/RegisterScreen';
-import ForgotPasswordScreen from './src/views/ForgotPasswordScreen';
-import ForgotPasswordSentScreen from './src/views/ForgotPasswordSentScreen';
+import LoginScreen from './src/views/membership/LoginScreen';
+import RegisterScreen from './src/views/membership/RegisterScreen';
+import ForgotPasswordScreen from './src/views/membership/ForgotPasswordScreen';
 import SuccessScreen from './src/views/SuccessScreen';
-import HomeScreen from './src/views/maintab/HomeScreen';
 import MyProfileScreen from './src/views/MyProfileScreen';
-import ChangePasswordScreen from './src/views/ChangePasswordScreen';
-import NewsListScreen from './src/views/NewsListScreen';
-import TeamScreen from './src/views/TeamScreen';
-import ProjectListScreen from './src/views/ProjectListScreen';
+import ChangePasswordScreen from './src/views/membership/ChangePasswordScreen';
 import SingleWebScreen from './src/views/SingleWebScreen';
+import PickerScreen from './src/views/PickerScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -300,8 +296,8 @@ const App = ({navigation, route}) => {
                       options={{headerShown: false}}
                     />
                     <Stack.Screen
-                      name="ForgotPasswordSent"
-                      component={ForgotPasswordSentScreen}
+                      name="Picker"
+                      component={PickerScreen}
                       options={{headerShown: false}}
                     />
                     <Stack.Screen
@@ -324,16 +320,6 @@ const App = ({navigation, route}) => {
                           initialParams={{ news: pushNotifParam }}
                         />
                         <Stack.Screen
-                          name="Team"
-                          component={TeamScreen}
-                          options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                          name="ProjectList"
-                          component={ProjectListScreen}
-                          options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
                           name="MyProfile"
                           component={MyProfileScreen}
                           options={{ headerShown: false, animationEnabled: enableAnimation }}
@@ -346,11 +332,6 @@ const App = ({navigation, route}) => {
                         <Stack.Screen
                           name="SingleWeb"
                           component={SingleWebScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
-                        <Stack.Screen
-                          name="NewsList"
-                          component={NewsListScreen}
                           options={{ headerShown: false, animationEnabled: enableAnimation }}
                         />
                         <Stack.Screen

@@ -79,7 +79,7 @@ export const getErrorMessage = (err) => {
     if (err.response) {
         console.log('ERROR RESPONSE:', JSON.stringify(err.response.data, null, 2))
         const errorData = err.response.data;
-        const errorMessage = errorData.message
+        const errorMessage = errorData.error.errors[0].message
         switch (errorMessage) {
             case "Unauthenticated":
                 throw Error("Data Anda Belum Terdaftar");

@@ -5,5 +5,7 @@ export default {
     KEY_DIVISION: 'division',
     KEY_FIREBASE_TOKEN: 'firebase_token',
     KEY_SETTINGS: 'settings',
-    KEY_PROVINCE: 'province'
+    KEY_PROVINCE: 'province',
+    KEY_COMPANY: 'company',
+    KEY_GENDER: 'gender'
 }

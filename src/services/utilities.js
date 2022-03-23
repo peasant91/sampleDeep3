@@ -25,3 +25,7 @@ export const getGender = () => {
 export const getBank = () => {
     return get(`${Config.apiVersion}/bank`, {})
 }
+
+export const getCompanies = () => {
+    return get(`${Config.apiVersion}/driver/company`, {})
+}

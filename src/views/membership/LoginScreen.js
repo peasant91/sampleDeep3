@@ -11,34 +11,29 @@ import {
   KeyboardAvoidingView,
   Image,
 } from 'react-native';
-import translate from '../locales/translate';
 import CustomText, {
-  Headline2,
-  Headline1,
-  Subtitle2,
   LatoRegular,
-} from '../components/atoms/CustomText';
-import CustomButton from '../components/atoms/CustomButton';
-import Colors from '../constants/Colors';
+} from '../../components/atoms/CustomText';
+import CustomButton from '../../components/atoms/CustomButton';
+import Colors from '../../constants/Colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
-import {showDialog, dismissDialog} from '../actions/commonActions';
+import {showDialog, dismissDialog} from '../../actions/commonActions';
 import CustomInput, {
   PasswordInput,
   PhoneInput,
-} from '../components/atoms/CustomInput';
-import {LatoBold} from '../components/atoms/CustomText';
-import ImageTopLogo from '../assets/images/img_top_logo.svg';
-import CloseIcon from '../assets/images/ic_close.svg';
-import {login} from '../services/auth';
-import formReducer from '../reducers/formReducer';
+} from '../../components/atoms/CustomInput';
+import {LatoBold} from '../../components/atoms/CustomText';
+import {login} from '../../services/auth';
+import formReducer from '../../reducers/formReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import StorageKey from '../constants/StorageKey';
-import {getProfile} from '../services/user';
-import {AuthContext} from '../../App';
-import {getFreshchat} from '../services/freshchat';
+import StorageKey from '../../constants/StorageKey';
+import {getProfile} from '../../services/user';
+import {AuthContext} from '../../../App';
+import {getFreshchat} from '../../services/freshchat';
 import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
 import {useKeyboard} from '@react-native-community/hooks';
+import translate from '../../locales/translate';
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
@@ -177,7 +172,7 @@ const LoginScreen = ({navigation, route}) => {
             <View style={style.container}>
               <View style={{flex: 1}}>
                 <Image
-                  source={require('../assets/images/ic_login.png')}
+                  source={require('../../assets/images/ic_login.png')}
                   style={{
                     width: '100%',
                     height: undefined,
@@ -223,7 +218,7 @@ const LoginScreen = ({navigation, route}) => {
                             fontWeight: '700',
                             textDecorationLine: 'underline',
                           }}>
-                          {translate('tap_here')}
+                          {translate('tap_here') }
                         </LatoBold>
                     </TouchableOpacity>
                   </View>
