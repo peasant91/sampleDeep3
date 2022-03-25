@@ -7,5 +7,6 @@ export default {
     KEY_SETTINGS: 'settings',
     KEY_PROVINCE: 'province',
     KEY_COMPANY: 'company',
-    KEY_GENDER: 'gender'
+    KEY_GENDER: 'gender',
+    KEY_BANK: 'bank'
 }

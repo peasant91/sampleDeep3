@@ -6,26 +6,30 @@ import {LatoBold} from './CustomText';
 import IconArrowRight from '../../assets/images/ic_arrow_right_id.svg';
 import IconIDCard from '../../assets/images/ic_id_card.svg';
 import { Image } from 'react-native-elements';
+import translate from '../../locales/translate';
 
 const borderRadius = 8;
 
-const IDCard = ({title, onPress, imageUri}) => {
+const IDCard = ({title, onPress, imageUri, required, isCheck}) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      {imageUri ? 
-      <View>
-        <Image source={{uri: imageUri}} style={{width: '100%', height: undefined, aspectRatio: 1.5, resizeMode: 'cover'}}/>
-      </View>
-      : 
       <View style={styles.container}>
+        {imageUri ?
+
+      <View style={{flex: 1}}>
+        <Image source={{uri: imageUri}} style={{height: '100%', width: '100%', resizeMode: 'cover', borderTopLeftRadius: borderRadius, borderBottomLeftRadius: borderRadius}}/>
+      </View> :
         <View style={styles.idContainer}>
           <IconIDCard />
-          <LatoBold style={{color: Colors.primary}}>{title}</LatoBold>
+          <LatoBold style={{color: Colors.primary}}>{translate('take_picture', {string: title})}{required && <LatoBold style={{color: 'red'}}>*</LatoBold>}</LatoBold>
         </View>
+}
         <View style={styles.rightArrowContainer}>
           <IconArrowRight />
         </View>
       </View>
+      {
+        isCheck && required && !imageUri && <LatoBold style={{color: 'red', marginTop: 10}}>{translate('please_take_picture', {string: title})}</LatoBold>
       }
     </TouchableOpacity>
   );

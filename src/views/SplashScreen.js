@@ -30,7 +30,7 @@ import pkg from '../../package.json';
 import {AuthContext} from '../../App';
 import translate from '../locales/translate';
 import ImageTopLogo from '../assets/images/img_top_logo.svg';
-import {getCompanies, getDivisionApi, getGender, getProvince} from '../services/utilities';
+import {getBank, getCompanies, getDivisionApi, getGender, getProvince} from '../services/utilities';
 import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
 import Constant from '../constants/Constant';
 import {postFreshchat} from '../services/freshchat';
@@ -118,6 +118,18 @@ const SplashScreen = props => {
     getGender()
       .then(response => {
         AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
+          .then(response => getBankApi())
+          .catch(err => console.log(err));
+      })
+      .catch(err => {
+        showDialog(err.message);
+      });
+  }
+
+  const getBankApi = async () => {
+    getBank()
+      .then(response => {
+        AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(response))
           .then(response => doneLoading())
           .catch(err => console.log(err));
       })

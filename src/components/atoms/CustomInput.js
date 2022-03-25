@@ -28,7 +28,7 @@ const CustomInput = ({
   maxChar,
   multiline,
   keyboardType,
-  optional,
+  required,
   viewOnly,
   disabled,
   minChar,
@@ -52,8 +52,8 @@ const CustomInput = ({
         text = text.replace(/[^0-9]/g, '');
       }
 
-      if (!optional) {
-        if (text == undefined || text.trim().length <= 0) {
+      if (required) {
+        if (text == undefined || text?.trim().length <= 0) {
           isValid = false;
           setError(translate('must_not_empty', {s: title.replaceAll('?', '')}));
         }
@@ -93,7 +93,7 @@ const CustomInput = ({
   return (
     <View style={containerStyle} pointerEvents={viewOnly ? 'none' : 'auto'}>
       <LatoBold style={{fontFamily: 'Lato-Bold'}}>
-        {title + (optional ? translate('optional') : '')}
+        {title}{required && <LatoBold style={{color: 'red' }}>*</LatoBold>}
       </LatoBold>
       <TextInput
         value={value}
@@ -134,6 +134,7 @@ export const PhoneInput = ({
   onChangeText,
   isCheck,
   dispatcher,
+  optional,
   viewOnly
 }) => {
   const [errorText, setError] = useState(error);
@@ -168,7 +169,9 @@ export const PhoneInput = ({
 
   return (
     <View style={containerStyle} pointerEvents={viewOnly ? 'none' : 'auto'}>
-      <LatoBold style={{fontFamily: 'Lato-Bold'}}>{title}</LatoBold>
+      <LatoBold style={{fontFamily: 'Lato-Bold'}}>
+        {title}{!optional && <LatoBold style={{color: 'red' }}>*</LatoBold>}
+      </LatoBold>
       <View style={{flexDirection: 'row'}}>
         <View
           style={[
@@ -340,7 +343,7 @@ export const PickerInput = ({
   isCheck,
   dispatcher,
   viewOnly,
-  optional,
+  required,
   disabled,
 }) => {
   const [errorText, setError] = useState(error);
@@ -349,7 +352,7 @@ export const PickerInput = ({
     let isValid = true;
     setError(null);
 
-    if (!optional) {
+    if (!required) {
       if (text == undefined || text.trim().length <= 0) {
         isValid = false;
         setError(translate('must_not_empty', {s: title}));
@@ -363,7 +366,9 @@ export const PickerInput = ({
 
   return (
     <View style={containerStyle} pointerEvents={viewOnly && !onPress ? 'none' : 'auto'}>
-      <LatoBold style={{fontFamily: 'Lato-Bold'}}>{title}</LatoBold>
+      <LatoBold style={{fontFamily: 'Lato-Bold'}}>
+        {title}{required && <LatoBold style={{color: 'red' }}>*</LatoBold>}
+      </LatoBold>
       <TouchableOpacity onPress={onPress}>
         <View
           pointerEvents="none"

@@ -23,6 +23,15 @@ export const LatoBold = ({children, style, numOfLines, Icon, containerStyle, ico
   );
 };
 
+export const LatoMedium = ({children, style, numOfLines, Icon, containerStyle, iconTint}) => {
+  return (
+      <View style={[{flexDirection: 'row', alignItems: 'center'}, containerStyle]}>
+        {Icon ? <Icon style={{paddingRight: 10, color: iconTint}}/> : null}
+      <Text ellipsizeMode='tail' numberOfLines={numOfLines} style={[{fontFamily: 'Lato-Black', color: Colors.primaryText, fontSize: 14, paddingLeft: Icon ? 5 : 0}, style]}>{children}</Text>
+      </View>
+  );
+};
+
 export const MainTitle = ({children, style = {}, numOfLines}) => {
   return (
       <Text style={[{fontFamily: 'Raleway-Bold', color: Colors.primaryText, fontSize: 18}, style]}>{children}</Text>

@@ -12,7 +12,6 @@ const GenderComponents = ({selectedId, onPress, containerStyle, isCheck}) => {
 
     useEffect(async() => {
       AsyncStorage.getItem(StorageKey.KEY_GENDER).then(value => {
-          console.log(value)
           setgender(JSON.parse(value))
       })
     
@@ -20,7 +19,7 @@ const GenderComponents = ({selectedId, onPress, containerStyle, isCheck}) => {
     
 
     return <View style={containerStyle}>
-        <LatoBold>{translate('gender')}</LatoBold>
+        <LatoBold>{translate('gender')}<LatoBold style={{color: 'red'}}>*</LatoBold></LatoBold>
         <FlatList
         style={{paddingTop: 10}}
         horizontal={true}
@@ -29,7 +28,7 @@ const GenderComponents = ({selectedId, onPress, containerStyle, isCheck}) => {
         keyExtractor={item => item.id}
         renderItem={({item, index}) => {
             console.log(item)
-            return <GenderButton title={translate(item.value)} onPress={() => onPress(item.id)} isSelected={selectedId == item.value}/>
+            return <GenderButton title={translate(item.value)} onPress={() => onPress(item.value)} isSelected={selectedId == item.value}/>
         }}
         />
         {isCheck && selectedId == '' && <LatoBold style={{color: 'red', marginTop: 5}}>{translate('error_pick_one')}</LatoBold>}

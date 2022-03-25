@@ -11,11 +11,11 @@ export const getCity = (id) => {
 }
 
 export const getDistrict = (id) => {
-    return get(`${Config.apiVersion}/region/province`, {city_id: id})
+    return get(`${Config.apiVersion}/region/district`, {city_id: id})
 }
 
 export const getVillage = (id) => {
-    return get(`${Config.apiVersion}/region/province`, {district_id: id})
+    return get(`${Config.apiVersion}/region/village`, {district_id: id})
 }
 
 export const getGender = () => {
