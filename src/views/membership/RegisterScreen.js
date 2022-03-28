@@ -38,9 +38,13 @@ import CustomSheet from '../../components/atoms/CustomSheet';
 
 import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.svg';
 import IconProfileAddImage from '../../assets/images/ic_profile_add_image.svg';
+import IconGallery from '../../assets/images/ic_gallery_picker.svg';
+import IconCamera from '../../assets/images/ic_camera_picker.svg';
+import IconDelete from '../../assets/images/ic_trash_black.svg';
+
 import GenderComponents from '../../components/molecules/GenderComponents';
 import IDCard from '../../components/atoms/IDCard';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
 import {getCity, getDistrict, getVillage} from '../../services/utilities';
@@ -69,11 +73,13 @@ const RegisterScreen = ({navigation, route}) => {
   const [districtData, setdistrictData] = useState();
   const [villageData, setvillageData] = useState();
   const [bankData, setbankData] = useState();
+  const [selectedPicker, setselectedPicker] = useState();
+  const [imagePickerId, setimagePickerId] = useState(99);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [openDate, setopenDate] = useState(false)
+  const [openDate, setopenDate] = useState(false);
 
-  const pickerSheet = useRef()
+  const pickerSheet = useRef();
 
   const [formStateBank, dispatchBank] = useReducer(formReducer, {
     inputValues: {},
@@ -146,17 +152,18 @@ const RegisterScreen = ({navigation, route}) => {
 
     console.log(navigation);
 
-    if (formState.formIsValid) {
-      setIsLoading(true);
-      register(formState.inputValues)
-        .then(response => {
-          setIsLoading(false);
-          goToSuccess();
-        })
-        .catch(err => {
-          setIsLoading(false);
-          showDialog(err.message, false);
-        });
+    if (!formState.formIsValid) {
+      navigation.navigate('RegisterPassword', {data: formState.inputValues});
+      // setIsLoading(true);
+      // register(formState.inputValues)
+      //   .then(response => {
+      //     setIsLoading(false);
+      //     goToSuccess();
+      //   })
+      //   .catch(err => {
+      //     setIsLoading(false);
+      //     showDialog(err.message, false);
+      //   });
     }
   };
 
@@ -170,56 +177,166 @@ const RegisterScreen = ({navigation, route}) => {
   };
 
   const onPickDate = date => {
-    console.log(moment(date).format('YYYY-MM-DD'))
-    setopenDate(false)
+    console.log(moment(date).format('YYYY-MM-DD'));
+    setopenDate(false);
     dispatchDetail({
       type: 'picker',
       id: 'birth_date',
       input: moment(date).format('YYYY-MM-DD'),
       desc: moment(date).format('DD MMMM YYYY'),
-      isValid: true
-    })
-  }
+      isValid: true,
+    });
+  };
 
-  const openImagePicker = async (id, location) => {
-    pickerSheet.current.expand()
-    // const result = await launchImageLibrary({
-    //   quality: 0.5,
-    //   includeBase64: true,
-    //   mediaType: 'photo',
-    // });
-    // if (result) {
-    //   if (location == 'card') {
-    //     dispatchCard({
-    //       type: 'input',
-    //       id: id,
-    //       input: result.assets[0].base64,
-    //       isValid: true,
-    //     });
-    //     dispatchCard({
-    //       type: 'input',
-    //       id: id + '_uri',
-    //       input: result.assets[0].uri,
-    //       isValid: true,
-    //     });
-    //   } else {
-    //     dispatchDetail({
-    //       type: 'input',
-    //       id: id,
-    //       input: result.assets[0].base64,
-    //       isValid: true,
-    //     });
-    //     dispatchDetail({
-    //       type: 'input',
-    //       id: id + '_uri',
-    //       input: result.assets[0].uri,
-    //       isValid: true,
-    //     });
-    //   }
-    // }
+  useEffect(() => {
+    pickerSheet.current.close();
+    setTimeout(() => {
+      if (imagePickerId == 0) {
+        openCameraPicker(selectedPicker);
+      } else if (imagePickerId == 1) {
+        openGalleryPicker(selectedPicker);
+      } else if (imagePickerId == 2){
+        deleteImage(selectedPicker);
+      }
+
+      setimagePickerId(99);
+    }, 100);
+  }, [imagePickerId]);
+
+  const deleteImage = selectedPicker => {
+      if (selectedPicker.location == 'card') {
+        dispatchCard({
+          type: 'input',
+          id: selectedPicker.id,
+          input: undefined,
+          isValid: false,
+        });
+        dispatchCard({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: undefined,
+          isValid: false,
+        });
+      } else {
+        dispatchDetail({
+          type: 'input',
+          id: selectedPicker.id,
+          input: undefined,
+          isValid: false,
+        });
+        dispatchDetail({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: undefined,
+          isValid: false,
+        });
+  }
+}
+
+  const openCameraPicker = async selectedPicker => {
+    const result = await launchCamera({
+      quality: 0.5,
+      includeBase64: true,
+      mediaType: 'photo',
+    });
+    if (result) {
+      if (selectedPicker.location == 'card') {
+        dispatchCard({
+          type: 'input',
+          id: selectedPicker.id,
+          input: result.assets[0].base64,
+          isValid: true,
+        });
+        dispatchCard({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: result.assets[0].uri,
+          isValid: true,
+        });
+      } else {
+        dispatchDetail({
+          type: 'input',
+          id: selectedPicker.id,
+          input: result.assets[0].base64,
+          isValid: true,
+        });
+        dispatchDetail({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: result.assets[0].uri,
+          isValid: true,
+        });
+      }
+    }
 
     console.log(result);
     console.log(formStateBank);
+  };
+
+  const openGalleryPicker = async selectedPicker => {
+    const result = await launchImageLibrary({
+      quality: 0.5,
+      includeBase64: true,
+      mediaType: 'photo',
+    });
+    if (result) {
+      if (selectedPicker.location == 'card') {
+        dispatchCard({
+          type: 'input',
+          id: selectedPicker.id,
+          input: result.assets[0].base64,
+          isValid: true,
+        });
+        dispatchCard({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: result.assets[0].uri,
+          isValid: true,
+        });
+      } else {
+        dispatchDetail({
+          type: 'input',
+          id: selectedPicker.id,
+          input: result.assets[0].base64,
+          isValid: true,
+        });
+        dispatchDetail({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: result.assets[0].uri,
+          isValid: true,
+        });
+      }
+    }
+
+    console.log(result);
+    console.log(formStateBank);
+  };
+
+  const openImagePicker = async (id, location) => {
+    pickerSheet.current.expand();
+    setselectedPicker({
+      id,
+      location,
+    });
+  };
+
+  const isPickedImageEmpty = () => {
+    if (selectedPicker) {
+      if (selectedPicker.location == 'card') {
+        return (
+          formStateCard.inputValues[selectedPicker.id] == '' ||
+          formStateCard.inputValues[selectedPicker.id] == undefined
+        );
+      } else {
+        return (
+          formStateDetail.inputValues[selectedPicker.id] == '' ||
+          formStateDetail.inputValues[selectedPicker.id] == undefined
+        );
+      }
+    } else {
+      return false;
+    }
   };
 
   const goToSuccess = () => {
@@ -302,9 +419,8 @@ const RegisterScreen = ({navigation, route}) => {
           input: route.params.id,
           desc: route.params.name,
           isValid: true,
-        })
-      }
-      else {
+        });
+      } else {
         dispatchAddress({
           type: 'picker',
           id: id,
@@ -322,8 +438,8 @@ const RegisterScreen = ({navigation, route}) => {
           });
         } else if (id == 'district_id') {
           getVillage(route.params.id).then(villageData => {
-            setvillageData(villageData)
-          })
+            setvillageData(villageData);
+          });
         }
       }
     }
@@ -359,8 +475,6 @@ const RegisterScreen = ({navigation, route}) => {
       isValid: false,
     });
   }, [cityData, districtData, villageData]);
-
-
 
   //if state detail change, change also in parent state
   useEffect(() => {
@@ -404,7 +518,7 @@ const RegisterScreen = ({navigation, route}) => {
         style={{flex: 1}}
         behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
         <ScrollView style={styles.container}>
-          <View style={{flex: 1}}>
+          <View style={{paddingBottom: 40}}>
             <LatoBold>{translate('register_form_title')}</LatoBold>
             <LatoRegular containerStyle={{marginTop: 5}}>
               {translate('register_form_desc')}
@@ -519,7 +633,9 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('district_placeholder')}
               value={formStateAddress.inputValues.district_id_value}
               isCheck={formState.isChecked}
-              onPress={() => openPicker('district_id', 'district_title', districtData)}
+              onPress={() =>
+                openPicker('district_id', 'district_title', districtData)
+              }
             />
 
             <PickerInput
@@ -529,7 +645,9 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('village_placeholder')}
               value={formStateAddress.inputValues.village_id_value}
               isCheck={formState.isChecked}
-              onPress={() => openPicker('village_id', 'village_title', villageData)}
+              onPress={() =>
+                openPicker('village_id', 'village_title', villageData)
+              }
             />
 
             <CustomInput
@@ -559,50 +677,51 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() => setopenDate(true)}
             />
 
-              {!formState.inputValues.detail.driver_company_id &&
+            {!formState.inputValues.detail.driver_company_id && (
               <View>
-            <PickerInput
-              id={'bank_id'}
-              title={translate('bank_title')}
-              placeholder={translate('bank_placeholder')}
-              containerStyle={{paddingVertical: 16}}
-              value={formStateBank.inputValues.bank_id_value}
-              isCheck={formState.isChecked}
-              required
-              onPress={() => openPicker('bank_id', 'bank_title', bankData)}
-            />
+                <PickerInput
+                  id={'bank_id'}
+                  title={translate('bank_title')}
+                  placeholder={translate('bank_placeholder')}
+                  containerStyle={{paddingVertical: 16}}
+                  value={formStateBank.inputValues.bank_id_value}
+                  isCheck={formState.isChecked}
+                  required
+                  onPress={() => openPicker('bank_id', 'bank_title', bankData)}
+                />
 
-            <CustomInput
-              id={'number'}
-              title={translate('bank_no_title')}
-              placeholder={translate('bank_no_placeholder')}
-              value={formStateBank.inputValues.number}
-              dispatcher={dispatchBank}
-              isCheck={formState.isChecked}
-              required
-            />
+                <CustomInput
+                  id={'number'}
+                  title={translate('bank_no_title')}
+                  placeholder={translate('bank_no_placeholder')}
+                  value={formStateBank.inputValues.number}
+                  dispatcher={dispatchBank}
+                  isCheck={formState.isChecked}
+                  required
+                />
 
-            <CustomInput
-              id={'branch'}
-              title={translate('branch_title')}
-              placeholder={translate('branch_placeholder')}
-              containerStyle={{paddingVertical: 16}}
-              value={formStateBank.inputValues.branch}
-              dispatcher={dispatchBank}
-              isCheck={formState.isChecked}
-              required
-            />
+                <CustomInput
+                  id={'branch'}
+                  title={translate('branch_title')}
+                  placeholder={translate('branch_placeholder')}
+                  containerStyle={{paddingVertical: 16}}
+                  value={formStateBank.inputValues.branch}
+                  dispatcher={dispatchBank}
+                  isCheck={formState.isChecked}
+                  required
+                />
 
-            <CustomInput
-              id={'name'}
-              title={translate('bank_owner_title')}
-              placeholder={translate('bank_owner_placeholder')}
-              value={formStateBank.inputValues.name}
-              dispatcher={dispatchBank}
-              isCheck={formState.isChecked}
-              required
-            />
-            </View>}
+                <CustomInput
+                  id={'name'}
+                  title={translate('bank_owner_title')}
+                  placeholder={translate('bank_owner_placeholder')}
+                  value={formStateBank.inputValues.name}
+                  dispatcher={dispatchBank}
+                  isCheck={formState.isChecked}
+                  required
+                />
+              </View>
+            )}
 
             <CustomInput
               id={'identity_card'}
@@ -617,6 +736,7 @@ const RegisterScreen = ({navigation, route}) => {
 
             <IDCard
               title={translate('ktp')}
+              navigation={navigation}
               onPress={() => openImagePicker('identity_card_image', 'card')}
               imageUri={formStateCard.inputValues.identity_card_image_uri}
               isCheck={formState.isChecked}
@@ -634,8 +754,10 @@ const RegisterScreen = ({navigation, route}) => {
               required
             />
 
+              
             <IDCard
               title={translate('sim_a')}
+              navigation={navigation}
               onPress={() => openImagePicker('driver_license_a_image', 'card')}
               imageUri={formStateCard.inputValues.driver_license_a_image_uri}
               isCheck={formState.isChecked}
@@ -653,6 +775,7 @@ const RegisterScreen = ({navigation, route}) => {
             />
 
             <IDCard
+              navigation={navigation}
               title={translate('sim_b')}
               onPress={() => openImagePicker('driver_license_b_image', 'card')}
               imageUri={formStateCard.inputValues.driver_license_b_image_uri}
@@ -670,41 +793,57 @@ const RegisterScreen = ({navigation, route}) => {
       </KeyboardAvoidingView>
 
       <DatePicker
-      open={openDate}
-      mode='date'
-      modal
-      androidVariant='iosClone'
-      date={new Date()}
-      maximumDate={new Date()}
-      onConfirm={onPickDate}
-      onCancel={() => setopenDate(false)}
+        open={openDate}
+        mode="date"
+        modal
+        androidVariant="iosClone"
+        date={new Date()}
+        maximumDate={new Date()}
+        onConfirm={onPickDate}
+        onCancel={() => setopenDate(false)}
       />
 
-<CustomSheet ref={pickerSheet}>
-        <View style={{alignItems: 'center', padding: 16}}>
-          <LatoBold style={{alignSelf: 'center', marginTop: 16}}>
-            {translate('operational_time_title')}
-          </LatoBold>
-          <LatoRegular
+      <CustomSheet ref={pickerSheet}>
+        <View style={{padding: 16}}>
+          <LatoBold>{translate('pick_photo')}</LatoBold>
+          <TouchableOpacity
+            onPress={() => setimagePickerId(1)}
+            style={{marginVertical: 10}}>
+            <LatoRegular Icon={IconGallery}>
+              {translate('pick_gallery')}
+            </LatoRegular>
+          </TouchableOpacity>
+          <View
             style={{
-              alignSelf: 'center',
-              marginTop: 16,
-              color: Colors.secondText,
-              textAlign: 'center',
-            }}>
-            {translate('operational_time_desc')}
-          </LatoRegular>
-          <CustomButton
-            title={translate('send_whatsapp')}
-            containerStyle={{width: '100%', marginTop: 12}}
-            onPress={openPicker}
+              height: 1,
+              backgroundColor: Colors.divider,
+              marginBottom: 10,
+              marginLeft: 28,
+            }}
           />
-          <CustomButton
-            types="primary"
-            title={translate('i_understand')}
-            containerStyle={{marginTop: 12, width: '100%'}}
-            onPress={openPicker}
-          />
+          <TouchableOpacity onPress={() => setimagePickerId(0)}>
+            <LatoRegular Icon={IconCamera}>
+              {translate('pick_camera')}
+            </LatoRegular>
+          </TouchableOpacity>
+          {!isPickedImageEmpty() && (
+            <View>
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: Colors.divider,
+                  marginTop: 10,
+                  marginBottom: 10,
+                  marginLeft: 28,
+                }}
+              />
+              <TouchableOpacity onPress={() => setimagePickerId(2)}>
+                <LatoRegular Icon={IconDelete}>
+                  {translate('pick_delete')}
+                </LatoRegular>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </CustomSheet>
     </SafeAreaView>

@@ -39,12 +39,14 @@ import translate from './src/locales/translate';
 import SplashScreen from './src/views/SplashScreen';
 import LoginScreen from './src/views/membership/LoginScreen';
 import RegisterScreen from './src/views/membership/RegisterScreen';
+import RegisterPasswordScreen from './src/views/membership/RegisterPasswordScreen';
 import ForgotPasswordScreen from './src/views/membership/ForgotPasswordScreen';
 import SuccessScreen from './src/views/SuccessScreen';
 import MyProfileScreen from './src/views/MyProfileScreen';
 import ChangePasswordScreen from './src/views/membership/ChangePasswordScreen';
 import SingleWebScreen from './src/views/SingleWebScreen';
 import PickerScreen from './src/views/PickerScreen';
+import ImageViewerScreen from './src/views/ImageViewerScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -291,8 +293,18 @@ const App = ({navigation, route}) => {
                       options={{headerShown: false}}
                     />
                     <Stack.Screen
+                      name="RegisterPassword"
+                      component={RegisterPasswordScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
                       name="ForgotPassword"
                       component={ForgotPasswordScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
+                      name="ImageViewer"
+                      component={ImageViewerScreen}
                       options={{headerShown: false}}
                     />
                     <Stack.Screen

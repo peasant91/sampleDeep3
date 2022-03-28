@@ -19,10 +19,12 @@
     "password_placeholder": "cth: Abc1!23?",
     "forgot_password": "Forgot Password",
     "setting_password_title": "Atur kata sandi Anda",
-    "re_password_title": "Konfirmasi Kata Sandi",
+    "repassword_title": "Konfirmasi Kata Sandi",
     "old_password_title": "Kata Sandi Lama",
     "new_password_title": "Kata Sandi Baru",
     "address_title": "Alamat Tempat Tinggal",
+    "referral_code_title": "Kode Referal",
+    "referral_code_placeholder": "cth: DL090900",
     "address_placeholder": "cth: Jl. Gatot Subroto XXVI no. 999",
     "province_title": "Provinsi",
     "province_placeholder": "cth: Bali",
@@ -61,6 +63,9 @@
     "go_to_login": "Ke Halaman Login",
     "register_success_title": "Pendaftaran Berhasil",
     "register_success_desc": "Terimakasih sudah melakukan pendaftaran di Aplikasi Schott PB Saving. Tunggu admin untuk melakukan verifikasi akun Anda.",
+    "register_password_page_title": "Silahkan Isi Password dan jika Anda punya Code Referral bisa isi dibawah ini.",
+    "i_have_read": "Saya telah membaca dan menyetujui",
+    "term_and_condition": "Syarat & Ketentuan",
 
     "forgot_password_title": "Lupa Kata Sandi?",
     "forgot_password_desc": "Silakan masukan email Anda dan tunggu instruksi selanjutnya.",
@@ -127,7 +132,11 @@
     "male": "Pria",
     "female": "Wanita",
     "gender": "Gender",
-    "error_pick_one": "Mohon pilih salah satu"
+    "error_pick_one": "Mohon pilih salah satu",
+    "pick_photo": "Pilih Foto",
+    "pick_gallery": "Pilih dari Galeri",
+    "pick_camera": "Ambil foto dari kamera",
+    "pick_delete": "Hapus Foto"
 
 
 
