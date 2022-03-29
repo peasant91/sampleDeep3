@@ -47,6 +47,7 @@ import ChangePasswordScreen from './src/views/membership/ChangePasswordScreen';
 import SingleWebScreen from './src/views/SingleWebScreen';
 import PickerScreen from './src/views/PickerScreen';
 import ImageViewerScreen from './src/views/ImageViewerScreen';
+import OtpScreen from './src/views/membership/OtpScreen'
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -295,6 +296,11 @@ const App = ({navigation, route}) => {
                     <Stack.Screen
                       name="RegisterPassword"
                       component={RegisterPasswordScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
+                      name="OtpScreen"
+                      component={OtpScreen}
                       options={{headerShown: false}}
                     />
                     <Stack.Screen

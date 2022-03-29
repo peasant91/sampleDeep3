@@ -8,6 +8,11 @@
     "sign_out": "Sign Out",
     "tap_here": "TAP Disini",
     "see_project": "Lihat Proyek",
+    "register": "Daftar",
+    "otp_code": "Kode OTP",
+    "please_enter_otp": "SIlahkan Masukan Kode OTP dibawah ini",
+    "otp_desc": "Untuk memastikan email anda bisa kami hubungi. \nKami sudah mengirimkan Kode OTP ke %{email}",
+    "resend_otp_code_id": "Kirim ulang Kode OTP (%{string})",
     
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",

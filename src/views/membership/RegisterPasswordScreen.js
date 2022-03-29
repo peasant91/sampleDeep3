@@ -48,9 +48,9 @@ const RegisterPasswordScreen = ({navigation, route}) => {
             type: 'check'
         })
 
-        if (!formState.formIsValid) {
+        // if (!formState.formIsValid) {
             navigation.navigate('OtpScreen', {isRegister: true, data: formState.inputValues})
-        }
+        // }
     }
     
 
@@ -103,7 +103,7 @@ const RegisterPasswordScreen = ({navigation, route}) => {
                 keyboardType={'default'}
               />
 
-              <CustomCheckbox isChecked={isChecked} title={<LatoRegular style={{paddingLeft: 16}}>{translate('i_have_read')} <LatoBold style={{paddingLeft: 16}}>{translate('term_and_condition')}</LatoBold></LatoRegular>} onPress={() => setisChecked(!isChecked)}/>
+              <CustomCheckbox isChecked={isChecked} title={<LatoRegular style={{paddingLeft: 16}}>{translate('i_have_read')} <LatoBold>{translate('term_and_condition')}</LatoBold></LatoRegular>} onPress={() => setisChecked(!isChecked)}/>
             </View>
           </ScrollView>
           <CustomButton  types='primary' containerStyle={{padding: 16}} title={translate('register')} onPress={goToOtp}/>
