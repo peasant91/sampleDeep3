@@ -12,7 +12,8 @@
     "otp_code": "Kode OTP",
     "please_enter_otp": "SIlahkan Masukan Kode OTP dibawah ini",
     "otp_desc": "Untuk memastikan email anda bisa kami hubungi. \nKami sudah mengirimkan Kode OTP ke %{email}",
-    "resend_otp_code_id": "Kirim ulang Kode OTP (%{string})",
+    "resend_otp_code_id": "Kirim ulang Kode OTP %{string}",
+    "validate": "Validasi",
     
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",

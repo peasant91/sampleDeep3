@@ -16,3 +16,11 @@ export const logout = (data) => {
 export const forgotPassword = (data) => {
     return post('v1/password/email', data)
 }
+
+export const verifyOtp = ({code, otpId}) => {
+    return post('v1/otp/verify', {code: code, otp_id: otpId})
+}
+
+export const sendOtp = (data) => {
+    return post('v1/otp/send', data)
+}

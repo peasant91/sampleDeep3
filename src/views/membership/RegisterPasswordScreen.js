@@ -48,9 +48,9 @@ const RegisterPasswordScreen = ({navigation, route}) => {
             type: 'check'
         })
 
-        // if (!formState.formIsValid) {
+        if (formState.formIsValid) {
             navigation.navigate('OtpScreen', {isRegister: true, data: formState.inputValues})
-        // }
+        }
     }
     
 

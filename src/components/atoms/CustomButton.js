@@ -21,7 +21,7 @@ const CustomButton = ({
       <TouchableOpacity>
         <View >
           <Button
-            title={title}
+            title={title.toUpperCase()}
             style={style}
             onPress={onPress}
             pointer

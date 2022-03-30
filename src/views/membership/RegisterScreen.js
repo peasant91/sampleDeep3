@@ -142,7 +142,7 @@ const RegisterScreen = ({navigation, route}) => {
           isValid: true,
         });
       }
-    }, 600);
+    }, 1000);
   };
 
   const doRegister = () => {
@@ -152,7 +152,7 @@ const RegisterScreen = ({navigation, route}) => {
 
     console.log(navigation);
 
-    if (!formState.formIsValid) {
+    if (formState.formIsValid) {
       navigation.navigate('RegisterPassword', {data: formState.inputValues});
       // setIsLoading(true);
       // register(formState.inputValues)
