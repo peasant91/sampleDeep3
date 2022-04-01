@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 import React, { useState, useEffect } from 'react'
 import { View, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
@@ -8,6 +9,7 @@ import CustomInput from '../../components/atoms/CustomInput'
 import { LatoBold, LatoRegular } from '../../components/atoms/CustomText'
 import NavBar from '../../components/atoms/NavBar'
 import Colors from '../../constants/Colors'
+import StorageKey from '../../constants/StorageKey'
 import translate from '../../locales/translate'
 import { register, sendOtp, verifyOtp} from '../../services/auth'
 
@@ -27,6 +29,7 @@ const OtpScreen = ({ navigation, route }) => {
       type: 'email',
       otp_id: otpId
     }).then(response => {
+      console.log(response)
       setotpId(response.id)
     })
   }
@@ -50,7 +53,13 @@ const OtpScreen = ({ navigation, route }) => {
   const doRegister = () => {
         register({
           ...data,
-          otp_id: ot
+          otp_id: otpId
+        }).then((response) => {
+          AsyncStorage.setItem(StorageKey.KEY_ACCESS_TOKEN, response.access_token)
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'RegisterSuccess'}],
+    });
         })
   }
 

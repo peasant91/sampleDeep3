@@ -48,6 +48,9 @@ import SingleWebScreen from './src/views/SingleWebScreen';
 import PickerScreen from './src/views/PickerScreen';
 import ImageViewerScreen from './src/views/ImageViewerScreen';
 import OtpScreen from './src/views/membership/OtpScreen'
+import RegisterSuccessScreen from './src/views/membership/RegisterSuccessScreen';
+import RegisterVehicleScreen from './src/views/membership/RegisterVehicleScreen';
+import RegisterVehicleSuccessScreen from './src/views/membership/RegisterVehicleSuccessScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -284,10 +287,22 @@ const App = ({navigation, route}) => {
                 ) : !state.userToken ? (
                   <>
                     <Stack.Screen
+                      name="ForgotPassword"
+                      component={ForgotPasswordScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen
                       name="Login"
                       component={LoginScreen}
                       options={{headerShown: false}}
                     />
+
+                    <Stack.Screen
+                      name="RegisterSuccess"
+                      component={RegisterSuccessScreen}
+                      options={{headerShown: false}}
+                    />
+
                     <Stack.Screen
                       name="Register"
                       component={RegisterScreen}
@@ -298,14 +313,24 @@ const App = ({navigation, route}) => {
                       component={RegisterPasswordScreen}
                       options={{headerShown: false}}
                     />
+
+                    <Stack.Screen
+                      name="RegisterVehicle"
+                      component={RegisterVehicleScreen}
+                      options={{headerShown: false}}
+                    />
+
+                    <Stack.Screen
+                      name="RegisterVehicleSuccess"
+                      component={RegisterVehicleSuccessScreen}
+                      options={{headerShown: false}}
+                    />
+
+
+
                     <Stack.Screen
                       name="OtpScreen"
                       component={OtpScreen}
-                      options={{headerShown: false}}
-                    />
-                    <Stack.Screen
-                      name="ForgotPassword"
-                      component={ForgotPasswordScreen}
                       options={{headerShown: false}}
                     />
                     <Stack.Screen

@@ -17,8 +17,8 @@ export const forgotPassword = (data) => {
     return post('v1/password/email', data)
 }
 
-export const verifyOtp = ({code, otpId}) => {
-    return post('v1/otp/verify', {code: code, otp_id: otpId})
+export const verifyOtp = (data) => {
+    return post('v1/otp/verify', data)
 }
 
 export const sendOtp = (data) => {

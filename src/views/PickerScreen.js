@@ -14,7 +14,7 @@ const PickerScreen = ({navigation, route}) => {
   const {pickerId, title, data, selectedId} = route.params;
 
   const onPressList = (id, name) => {
-    navigation.navigate('Register', {pickerId: pickerId, id: id, name: name}, true)
+    navigation.navigate(route.params.previousRoute, {pickerId: pickerId, id: id, name: name}, true)
   }
 
   return (

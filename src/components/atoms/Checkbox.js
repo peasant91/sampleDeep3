@@ -7,13 +7,14 @@ import IconUnchecked from '../../assets/images/ic_unchecked_box.svg'
 
 const CustomCheckbox = ({isChecked, title, onPress}) => {
 
+
     return <CheckBox
     checkedIcon={<IconChecked/>}
     uncheckedIcon={<IconUnchecked/>}
     checked={isChecked}
     title={title}
     onPress={onPress}
-    containerStyle={{backgroundColor: 'white', borderWidth: 0, marginLeft: 0, paddingLeft: 0}}
+    containerStyle={{backgroundColor: 'white', borderWidth: 0, marginLeft: 0, paddingLeft: 0, marginRight: 0, marginBottom: 0}}
     />
 }
 

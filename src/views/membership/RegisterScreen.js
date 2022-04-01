@@ -50,6 +50,7 @@ import StorageKey from '../../constants/StorageKey';
 import {getCity, getDistrict, getVillage} from '../../services/utilities';
 import moment from 'moment';
 import Colors from '../../constants/Colors';
+import Config from '../../constants/Config';
 
 const dummyDivision = [
   {
@@ -124,26 +125,7 @@ const RegisterScreen = ({navigation, route}) => {
     isChecked: false,
   });
 
-  const onSaveDivision = () => {
-    closeDivision();
-
-    setTimeout(() => {
-      if (tempDivision.id) {
-        dispatch({
-          type: 'input',
-          id: 'division_id',
-          input: tempDivision.id,
-          isValid: true,
-        });
-        dispatch({
-          type: 'input',
-          id: 'division_name',
-          input: tempDivision.name,
-          isValid: true,
-        });
-      }
-    }, 1000);
-  };
+  
 
   const doRegister = () => {
     dispatch({
@@ -152,8 +134,7 @@ const RegisterScreen = ({navigation, route}) => {
 
     console.log(navigation);
 
-    if (formState.formIsValid) {
-      navigation.navigate('RegisterPassword', {data: formState.inputValues});
+    if (formState.formIsValid && formStateCard.formIsValid) {
       // setIsLoading(true);
       // register(formState.inputValues)
       //   .then(response => {
@@ -164,8 +145,31 @@ const RegisterScreen = ({navigation, route}) => {
       //     setIsLoading(false);
       //     showDialog(err.message, false);
       //   });
+
+      buildCard(formState)
     }
   };
+
+  const buildCard = (formState) => {
+    var card = []
+    for (item in Config.cardList) {
+      console.log('pisang', item)
+      if (formStateCard.inputValues[Config.cardList[item]]) {
+      card.push({
+        type: item,
+        number: formStateCard.inputValues[Config.cardList[item]],
+        image: formStateCard.inputValues[`${Config.cardList[item]}_image`]
+      })
+      }
+    }
+
+    const data = {
+      ...formState,
+      card: card
+    }
+
+      navigation.navigate('RegisterPassword', {data: formState.inputValues});
+  }
 
   const onGenderPicked = value => {
     dispatchDetail({
@@ -339,17 +343,7 @@ const RegisterScreen = ({navigation, route}) => {
     }
   };
 
-  const goToSuccess = () => {
-    navigation.replace('Success', {
-      title: translate('register_success_title'),
-      desc: translate('register_success_desc'),
-      image: require('../../assets/images/img_register_success.png'),
-      buttonTitle: translate('go_to_login'),
-      onPress: () => {
-        navigation.pop();
-      },
-    });
-  };
+
 
   const openPicker = (id, title, data) => {
     var selectedId;
@@ -369,11 +363,7 @@ const RegisterScreen = ({navigation, route}) => {
     });
   };
 
-  const openDivision = () => {
-    setTimeout(() => {
-      bottomSheetModalRef.current.expand();
-    }, 100);
-  };
+ 
 
   const closeDivision = () => {
     console.log('closing');
@@ -616,7 +606,6 @@ const RegisterScreen = ({navigation, route}) => {
                 openPicker('province_id', 'province_title', provinceData)
               }
             />
-
             <PickerInput
               id={'city_id'}
               title={translate('city_title')}
@@ -737,18 +726,18 @@ const RegisterScreen = ({navigation, route}) => {
             <IDCard
               title={translate('ktp')}
               navigation={navigation}
-              onPress={() => openImagePicker('identity_card_image', 'card')}
-              imageUri={formStateCard.inputValues.identity_card_image_uri}
+              onPress={() => openImagePicker('ktp_image', 'card')}
+              imageUri={formStateCard.inputValues.ktp_image_uri}
               isCheck={formState.isChecked}
               required
             />
 
             <CustomInput
-              id={'driver_license_a'}
+              id={'sim_a'}
               title={translate('number', {string: translate('sim_a')})}
               placeholder={translate('sim_placeholder')}
               containerStyle={{paddingVertical: 16}}
-              value={formStateCard.inputValues.driver_license_a}
+              value={formStateCard.inputValues.sim_a}
               dispatcher={dispatchCard}
               isCheck={formState.isChecked}
               required
@@ -758,18 +747,18 @@ const RegisterScreen = ({navigation, route}) => {
             <IDCard
               title={translate('sim_a')}
               navigation={navigation}
-              onPress={() => openImagePicker('driver_license_a_image', 'card')}
-              imageUri={formStateCard.inputValues.driver_license_a_image_uri}
+              onPress={() => openImagePicker('sim_a_image', 'card')}
+              imageUri={formStateCard.inputValues.sim_a_image_uri}
               isCheck={formState.isChecked}
               required
             />
 
             <CustomInput
-              id={'driver_license_b'}
+              id={'sim_b'}
               title={translate('number', {string: translate('sim_b')})}
               placeholder={translate('sim_placeholder')}
               containerStyle={{paddingVertical: 16}}
-              value={formStateCard.inputValues.driver_license_b}
+              value={formStateCard.inputValues.sim_b}
               dispatcher={dispatchCard}
               isCheck={formState.isChecked}
             />
@@ -777,8 +766,8 @@ const RegisterScreen = ({navigation, route}) => {
             <IDCard
               navigation={navigation}
               title={translate('sim_b')}
-              onPress={() => openImagePicker('driver_license_b_image', 'card')}
-              imageUri={formStateCard.inputValues.driver_license_b_image_uri}
+              onPress={() => openImagePicker('sim_b_image', 'card')}
+              imageUri={formStateCard.inputValues.sim_b_image_uri}
             />
 
             <CustomButton
