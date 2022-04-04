@@ -1,5 +1,5 @@
 import React, {useReducer, useState, useEffect} from 'react'
-import { SafeAreaView, ScrollView,View } from 'react-native'
+import { Platform, SafeAreaView, ScrollView,View } from 'react-native'
 import Animated from 'react-native-reanimated';
 import CustomCheckbox from '../../components/atoms/Checkbox';
 import CustomButton from '../../components/atoms/CustomButton';
@@ -103,7 +103,7 @@ const RegisterPasswordScreen = ({navigation, route}) => {
                 keyboardType={'default'}
               />
 
-              <CustomCheckbox isChecked={isChecked} title={<LatoRegular style={{paddingLeft: 16}}>{translate('i_have_read')} <LatoBold>{translate('term_and_condition')}</LatoBold></LatoRegular>} onPress={() => setisChecked(!isChecked)}/>
+              <CustomCheckbox isChecked={isChecked} title={<LatoRegular style={{paddingLeft: 16}}>{translate('i_have_read')} <LatoBold style={{paddingLeft: Platform.OS === 'ios' ? 16 : 0}}>{translate('term_and_condition')}</LatoBold></LatoRegular>} onPress={() => setisChecked(!isChecked)}/>
             </View>
           </ScrollView>
           <CustomButton  types='primary' containerStyle={{padding: 16}} title={translate('register')} onPress={goToOtp}/>

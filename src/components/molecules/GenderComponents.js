@@ -27,7 +27,6 @@ const GenderComponents = ({selectedId, onPress, containerStyle, isCheck}) => {
         data={gender}
         keyExtractor={item => item.id}
         renderItem={({item, index}) => {
-            console.log(item)
             return <GenderButton title={translate(item.value)} onPress={() => onPress(item.value)} isSelected={selectedId == item.value}/>
         }}
         />

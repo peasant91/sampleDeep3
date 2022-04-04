@@ -153,22 +153,26 @@ const RegisterScreen = ({navigation, route}) => {
   const buildCard = (formState) => {
     var card = []
     for (item in Config.cardList) {
-      console.log('pisang', item)
       if (formStateCard.inputValues[Config.cardList[item]]) {
       card.push({
-        type: item,
+        type: Config.cardList[item],
         number: formStateCard.inputValues[Config.cardList[item]],
         image: formStateCard.inputValues[`${Config.cardList[item]}_image`]
       })
       }
     }
 
-    const data = {
-      ...formState,
+    const detail = {
+      ...formState.inputValues.detail,
       card: card
     }
 
-      navigation.navigate('RegisterPassword', {data: formState.inputValues});
+    const data = {
+      ...formState.inputValues,
+      detail: detail
+    }
+
+      navigation.navigate('RegisterPassword', {data: data});
   }
 
   const onGenderPicked = value => {
@@ -360,6 +364,7 @@ const RegisterScreen = ({navigation, route}) => {
       title: title,
       data: data,
       selectedId: selectedId,
+      previousRoute: 'Register'
     });
   };
 
@@ -505,7 +510,7 @@ const RegisterScreen = ({navigation, route}) => {
         shadowEnabled={true}
       />
       <KeyboardAvoidingView
-        style={{flex: 1}}
+        style={{flex: 1, zIndex: -1}}
         behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
         <ScrollView style={styles.container}>
           <View style={{paddingBottom: 40}}>
@@ -772,7 +777,7 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomButton
               types="primary"
-              title={translate('register_now')}
+              title={translate('next')}
               containerStyle={{marginTop: 16}}
               onPress={doRegister}
               isLoading={isLoading}

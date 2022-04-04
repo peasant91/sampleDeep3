@@ -1,7 +1,7 @@
 import { get, post, patch } from "./baseApi"
 
 export const getProfile = () => {
-    return get('v1/user/profile', {})
+    return get('v1/driver/profile', {})
 }
 
 export const updateProfile = (data) => {

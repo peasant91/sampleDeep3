@@ -13,16 +13,16 @@ const ForgotPasswordScreen = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formState, dispatch] = useReducer(formReducer, {
     inputValues: {
-      phone: '',
+      credential: '',
     },
     inputValidites: {
-      phone: false,
+      credential: false,
     },
     isChecked: false,
     formIsValid: false,
   });
 
-  const onEmailSend = () => {
+  const onOtpSend = () => {
     dispatch({
       type: 'check',
     });
@@ -32,7 +32,7 @@ const ForgotPasswordScreen = ({navigation, route}) => {
       forgotPassword(formState.inputValues)
         .then(response => {
           setIsLoading(false);
-          goToSuccess();
+          goToOtp();
         })
         .catch(err => {
           setIsLoading(false);
@@ -41,28 +41,34 @@ const ForgotPasswordScreen = ({navigation, route}) => {
     }
   };
 
-  const goToSuccess = () => {
-    navigation.navigate('ForgotPasswordSent', {
-      email: formState.inputValues.email,
+  const goToOtp = () => {
+    navigation.navigate('OtpScreen', {
+      data: {
+        email: formState.inputValues.credential
+      },
+      isRegister: false
     });
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
-      <NavBar title={translate('forgot_password')}/>
+      <NavBar title={translate('forgot_password')} navigation={navigation}/>
       <ScrollView style={{flex: 1}}>
         <View style={{padding: 16}}>
           <LatoRegular>{translate('forgot_password_desc')}</LatoRegular>
           <PhoneInput 
+          id={'credential'}
           containerStyle={{paddingTop: 16}}
           title={translate('phone_title')}
           dispatcher={dispatch}
+          value={formState.inputValues.credential}
           placeholder={translate('phone_placeholder')}
+          isCheck={formState.isChecked}
           />
         </View>
       </ScrollView>
-      <CustomButton containerStyle={{padding: 16}} types={'primary'} title={translate('next')}/>
+      <CustomButton containerStyle={{padding: 16}} types={'primary'} title={translate('next')} onPress={onOtpSend} isLoading={isLoading}/>
     </SafeAreaView>
   );
 };

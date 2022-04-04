@@ -15,6 +15,7 @@
     "resend_otp_code_id": "Kirim ulang Kode OTP %{string}",
     "validate": "Validasi",
     "next": "Lanjutkan",
+    "notification": "Notifikasi",
     
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",

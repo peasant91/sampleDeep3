@@ -8,7 +8,7 @@ const NavBar = ({navigation, title, style, shadowEnabled, RightView}) => {
   return (
     <View
       style={[
-        {flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'white', width: '100%', zIndex: 1},
+        {flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'white', width: '100%', zIndex: 0},
         style, shadowEnabled ? styles.bottomShadow : null
       ]}>
       <TouchableOpacity onPress={() => navigation.pop()}>

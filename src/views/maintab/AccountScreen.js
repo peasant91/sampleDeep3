@@ -20,22 +20,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
 import { AuthContext } from '../../../App';
 import { showDialog } from '../../actions/commonActions';
+import { getProfile } from '../../services/user';
 
 
 
-const accountDummyData = {
-  imageUrl:
-    'https://static.republika.co.id/uploads/member/images/news/avwkgphlic.jpg',
-  name: 'Vladimir Putin',
-  isVerified: true,
-};
+// const profileData = {
+//   imageUrl:
+//     'https://static.republika.co.id/uploads/member/images/news/avwkgphlic.jpg',
+//   name: 'Vladimir Putin',
+//   isVerified: true,
+// };
 
-const dummyCardData = {
-  car: 'Kirov Airship',
-  licensePlate: 'A 27 BLYAT',
-  travelDistance: 14,
-  todayTravel: 1,
-};
+// const dummyCardData = {
+//   car: 'Kirov Airship',
+//   licensePlate: 'A 27 BLYAT',
+//   travelDistance: 14,
+//   todayTravel: 1,
+// };
 
 const AccountScreen = ({navigation, route}) => {
 
@@ -49,6 +50,15 @@ const AccountScreen = ({navigation, route}) => {
   
   }, [route.params])
 
+  useEffect(async () => {
+    getProfile().then(response => {
+      setprofileData(response)
+    }).catch(error => {
+
+    })
+  }, [])
+  
+
   const logout = () => {
     showDialog(translate('logout_confirmation'), true, signOut, null, translate('yes'), translate('cancel'))
   }
@@ -59,7 +69,7 @@ const AccountScreen = ({navigation, route}) => {
       <AccountTopHeader data={profileData} />
       <ScrollView>
         <View>
-          {accountDummyData.isVerified ? (
+          {profileData.isVerified ? (
             <View>
               <AccountCardInfo
                 containerStyle={{margin: 16}}

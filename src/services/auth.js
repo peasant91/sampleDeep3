@@ -14,7 +14,7 @@ export const logout = (data) => {
 }
 
 export const forgotPassword = (data) => {
-    return post('v1/password/email', data)
+    return post('v1/forgot-password', data)
 }
 
 export const verifyOtp = (data) => {
