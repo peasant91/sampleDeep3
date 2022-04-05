@@ -13,10 +13,10 @@ const ForgotPasswordScreen = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formState, dispatch] = useReducer(formReducer, {
     inputValues: {
-      credential: '',
+      address: '',
     },
     inputValidites: {
-      credential: false,
+      address: false,
     },
     isChecked: false,
     formIsValid: false,
@@ -32,7 +32,7 @@ const ForgotPasswordScreen = ({navigation, route}) => {
       forgotPassword(formState.inputValues)
         .then(response => {
           setIsLoading(false);
-          goToOtp();
+          goToOtp(response);
         })
         .catch(err => {
           setIsLoading(false);
@@ -41,10 +41,12 @@ const ForgotPasswordScreen = ({navigation, route}) => {
     }
   };
 
-  const goToOtp = () => {
+  const goToOtp = (response) => {
     navigation.navigate('OtpScreen', {
       data: {
-        email: formState.inputValues.credential
+        email: response.address,
+        phone: formState.inputValues.address,
+        otpId: response.id
       },
       isRegister: false
     });
@@ -58,11 +60,11 @@ const ForgotPasswordScreen = ({navigation, route}) => {
         <View style={{padding: 16}}>
           <LatoRegular>{translate('forgot_password_desc')}</LatoRegular>
           <PhoneInput 
-          id={'credential'}
+          id={'address'}
           containerStyle={{paddingTop: 16}}
           title={translate('phone_title')}
           dispatcher={dispatch}
-          value={formState.inputValues.credential}
+          value={formState.inputValues.address}
           placeholder={translate('phone_placeholder')}
           isCheck={formState.isChecked}
           />

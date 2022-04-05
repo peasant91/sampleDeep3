@@ -424,7 +424,7 @@ export const PasswordInput = ({
     let isValid = true;
     setError(null);
 
-    if (id === 'repassword') {
+    if (id === 'repassword' || id === 'password_confirmation') {
       console.log(`text ${text}`);
       console.log(`password ${match}`);
       if (text !== match) {

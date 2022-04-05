@@ -52,6 +52,8 @@ import RegisterSuccessScreen from './src/views/membership/RegisterSuccessScreen'
 import RegisterVehicleScreen from './src/views/membership/RegisterVehicleScreen';
 import RegisterVehicleSuccessScreen from './src/views/membership/RegisterVehicleSuccessScreen';
 import NotificationScreen from './src/views/NotificationScreen';
+import ResetPasswordScreen from './src/views/membership/ResetPasswordScreen';
+import ForgotPasswordSuccessScreen from './src/views/membership/ForgotPasswordSuccessScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -305,8 +307,20 @@ const App = ({navigation, route}) => {
                     />
 
                     <Stack.Screen
+                      name="ForgotPasswordSuccess"
+                      component={ForgotPasswordSuccessScreen}
+                      options={{headerShown: false}}
+                    />
+
+                    <Stack.Screen
                       name="RegisterSuccess"
                       component={RegisterSuccessScreen}
+                      options={{headerShown: false}}
+                    />
+
+                    <Stack.Screen
+                      name="ResetPassword"
+                      component={ResetPasswordScreen}
                       options={{headerShown: false}}
                     />
 

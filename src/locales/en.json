@@ -182,7 +182,10 @@
     "is_commit_law_title": "Bersedia Berkomitmen Mentaati Peraturan",
     "register_vehicle_success": "Registrasi Kendaraan Berhasil",
     "register_vehicle_success_desc": "Terima kasih sudah mendaftarkan kendaraan Anda. \nLanjutkan ke home page untuk melihat penawaran dari kami.",
-    "go_to_home": "Masuk Ke Home"
+    "go_to_home": "Masuk Ke Home",
+    "forgot_password_success": "Password sudah selesai diubah. Silahkan login untuk bisa menggunakan fitur dari Oto Media.",
+    "confirm_password_placeholder": "Re-type Password",
+    "reset_password:": "Reset Password"
 
 
 

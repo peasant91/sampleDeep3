@@ -11,60 +11,101 @@ import NavBar from '../../components/atoms/NavBar'
 import Colors from '../../constants/Colors'
 import StorageKey from '../../constants/StorageKey'
 import translate from '../../locales/translate'
-import { register, sendOtp, verifyOtp} from '../../services/auth'
+import { forgotPassword, register, sendOtp, verifyForgotPassword, verifyOtp } from '../../services/auth'
 
 
 
 
 const OtpScreen = ({ navigation, route }) => {
 
-  const { data, isRegister } = route.params
+  const { isRegister } = route.params
 
-  const [otpId, setotpId] = useState()
+  const [otpId, setotpId] = useState(route.params.data.otpId)
   const [otpCode, setotpCode] = useState()
+  const [data, setData] = useState(route.params.data)
+  const [isLoading, setisLoading] = useState(false)
 
   const sendOtpApi = async () => {
+    setisLoading(true)
+    if (isRegister) {
     sendOtp({
       address: data.email,
-      type: 'email',
+      type: isRegister,
       otp_id: otpId
     }).then(response => {
+      setisLoading(false)
       console.log(response)
       setotpId(response.id)
+    }).catch(error => {
+      console.log(error)
     })
+    } else {
+      forgotPassword({
+        address: data.phone,
+        otp_id: otpId
+      }).then(response => {
+        setisLoading(false)
+        setotpId(response.id)
+      }).catch(error => {
+        console.log(error)
+      })
+    }
   }
-  
+
+
 
   const onValidate = () => {
-    if (isRegister) {
-      if (otpCode && otpCode.length > 5) {
+    if (otpCode && otpCode.length > 5) {
+      setisLoading(true)
+      if (isRegister) {
         verifyOtp({
           code: otpCode,
           otp_id: otpId
         }).then(() => {
+          setisLoading(false)
           doRegister()
         }).catch(error => {
 
         })
+      } else {
+        verifyForgotPassword({
+          code: otpCode,
+          otp_id: otpId
+        }).then(() => {
+          setisLoading(false)
+          goToForgotPassword()
+        }).catch(error => {
+
+        })
       }
-    }
+    } 
+  }
+
+  const goToForgotPassword = () => {
+    navigation.navigate('ResetPassword', {otpId: otpId})
   }
 
   const doRegister = () => {
-        register({
-          ...data,
-          otp_id: otpId
-        }).then((response) => {
-          AsyncStorage.setItem(StorageKey.KEY_ACCESS_TOKEN, response.access_token)
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'RegisterSuccess'}],
-    });
-        })
+    setisLoading(true)
+    register({
+      ...data,
+      otp_id: otpId
+    }).then((response) => {
+      setisLoading(false)
+      AsyncStorage.setItem(StorageKey.KEY_ACCESS_TOKEN, response.access_token)
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'RegisterSuccess' }],
+      });
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   useEffect(() => {
-    sendOtpApi()
+    if (isRegister) {
+      sendOtpApi()
+    }
   }, [])
 
 
@@ -87,17 +128,18 @@ const OtpScreen = ({ navigation, route }) => {
         <LatoRegular style={{ textAlign: 'center' }} containerStyle={{ alignSelf: 'center' }}>{translate('otp_desc', { email: data.email })}</LatoRegular>
 
         <CustomButton
-          containerStyle={{paddingTop: 40}}
+          containerStyle={{ paddingTop: 40 }}
           types={'primary'}
           title={translate('validate')}
           onPress={onValidate}
+          isLoading={isLoading}
         />
 
 
       </View>
 
     </ScrollView>
-    <CountdownOtp onPress={sendOtpApi}/>
+    <CountdownOtp onPress={sendOtpApi} />
   </SafeAreaView>
 }
 
