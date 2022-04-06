@@ -9,6 +9,10 @@ export const register = (data) => {
     return post('v1/register', data)
 }
 
+export const validateRegister = (data) => {
+    return post('v1/validate-register', data)
+}
+
 export const logout = (data) => {
     return get('v1/logout', data)
 }

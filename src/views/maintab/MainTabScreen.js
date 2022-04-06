@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeScreen from './HomeScreen';
 import OfferScreen from './offer/OfferScreen';
-import AccountScreen from './AccountScreen';
+import AccountScreen from './account/AccountScreen';
 
 import IconHome from '../../assets/images/ic_home.svg';
 import IconOffer from '../../assets/images/ic_offer.svg';

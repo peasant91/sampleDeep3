@@ -244,6 +244,7 @@ const SplashScreen = props => {
   }, [isFocus]);
 
   return (
+
     <View style={{flex: 1, color: Colors.primary}}>
       <StatusBar
         backgroundColor={'#0D233D'}

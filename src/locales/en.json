@@ -16,6 +16,7 @@
     "validate": "Validasi",
     "next": "Lanjutkan",
     "notification": "Notifikasi",
+    "change_password_success": "Ganti Kata Sandi Berhasil.",
     
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",
@@ -23,6 +24,7 @@
     "phone_title": "Nomor Handphone",
     "phone_title2": "Nomor Handphone 2",
     "phone_placeholder": "cth: 89318913819",
+    "confirm_password_title": "Ulangi Kata Sandi",
     "password_title": "Kata Sandi",
     "password_placeholder": "cth: Abc1!23?",
     "forgot_password": "Lupa Kata Sandi",
@@ -111,6 +113,7 @@
     "active_contract": "Kontrak Aktif",
     "see_contract": "Lihat Kontrak",
     "no_active_contract": "Belum ada kontrak aktif. \nSilahkan cari penawaran yang terbaik untuk Anda.",
+    "no_history_contract": "Belum ada riwayat kontrak. \nSilahkan cari penawaran yang terbaik untuk Anda.",
     "see_offer": "Lihat Penawaran",
     "travel_report": "Laporan Perjalanan",
     "verified": "Sudah di verifikasi",
@@ -135,7 +138,7 @@
     "offer_detail": "Detail Penawaran",
     "offer_type": "Jenis Iklan",
     "contract_length": "Lama Kontrak",
-    "estimated_profit": "",
+    "estimated_profit": "Estimasi Penghasilan",
 
     "male": "Pria",
     "female": "Wanita",
@@ -185,7 +188,17 @@
     "go_to_home": "Masuk Ke Home",
     "forgot_password_success": "Password sudah selesai diubah. Silahkan login untuk bisa menggunakan fitur dari Oto Media.",
     "confirm_password_placeholder": "Re-type Password",
-    "reset_password:": "Reset Password"
+    "reset_password:": "Reset Password",
+    "manual_input" : "Input Manual",
+    "add_manual_input": "+Input Manual",
+
+    "contract_end":"Selesai Kontrak",
+    "installation_time_title": "Lokasi & Waktu Pemasangan",
+    "company_detail": "Detail Perusahaan",
+    "apply": "Ajukan",
+    "see_all": "Lihat Semua",
+    "offer_history": "Riwayat Penawaran"
+
 
 
 

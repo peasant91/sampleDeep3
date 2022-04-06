@@ -3,6 +3,7 @@ import OTPInputView from '@twotalltotems/react-native-otp-input'
 import React, { useState, useEffect } from 'react'
 import { View, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler'
+import { showDialog } from '../../actions/commonActions'
 import CountdownOtp from '../../components/atoms/CountdownOtp'
 import CustomButton from '../../components/atoms/CustomButton'
 import CustomInput from '../../components/atoms/CustomInput'
@@ -30,7 +31,7 @@ const OtpScreen = ({ navigation, route }) => {
     if (isRegister) {
     sendOtp({
       address: data.email,
-      type: isRegister,
+      type: 'email',
       otp_id: otpId
     }).then(response => {
       setisLoading(false)
@@ -65,7 +66,8 @@ const OtpScreen = ({ navigation, route }) => {
           setisLoading(false)
           doRegister()
         }).catch(error => {
-
+          setisLoading(false)
+          showDialog(error.message, false)
         })
       } else {
         verifyForgotPassword({
@@ -75,7 +77,7 @@ const OtpScreen = ({ navigation, route }) => {
           setisLoading(false)
           goToForgotPassword()
         }).catch(error => {
-
+          setisLoading(false)
         })
       }
     } 

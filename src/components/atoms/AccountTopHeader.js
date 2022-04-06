@@ -1,37 +1,53 @@
-import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Image} from 'react-native-elements';
-import {LatoRegular} from './CustomText';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Avatar, Image } from 'react-native-elements';
+import { LatoRegular } from './CustomText';
 
 import IconVerified from '../../assets/images/ic_home_verified.svg';
 import IconLock from '../../assets/images/ic_lock.svg';
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
+import { getFullLink, isEmpty } from '../../actions/helper';
+import { ShimmerAccoutTopHeader } from './shimmer/Shimmer';
 
-const AccountTopHeader = ({data}) => {
+const AccountTopHeader = ({ data }) => {
+
+  useEffect(() => {
+    console.log(data)
+  
+  }, [])
+  
+
   return (
-    <View style={styles.container}>
-      <Image source={{uri: data.imageUrl}} style={styles.image} />
-      <View
-        style={{
-          marginLeft: 10,
-          paddingVertical: 4,
-          justifyContent: 'space-around',
-        }}>
-        <LatoRegular Icon={IconLock}>{data.name}</LatoRegular>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <IconVerified
-            color={data.isVerified ? Colors.secondary : Colors.grey}
-          />
-          <LatoRegular
+        <View style={styles.container}>
+      {!isEmpty(data) ?
+        <View style={{flexDirection: 'row'}}>
+          <Avatar 
+            rounded
+            size={'medium'}
+            source={{ uri: getFullLink(data.profile_image) }} />
+          <View
             style={{
-              color: data.isVerified ? Colors.secondary : Colors.grey,
-              marginLeft: 5,
+              marginLeft: 10,
+              paddingVertical: 4,
+              justifyContent: 'space-around',
             }}>
-            {translate(data.isVerified ? 'verified' : 'on_verifying')}
-          </LatoRegular>
-        </View>
-      </View>
+            <LatoRegular Icon={IconLock}>{data.name}</LatoRegular>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <IconVerified
+                color={data.status != 'waiting' ? Colors.secondary : Colors.grey}
+              />
+              <LatoRegular
+                style={{
+                  color: data.status != 'waiting' ? Colors.secondary : Colors.grey,
+                  marginLeft: 5,
+                }}>
+                {translate(data.status != 'waiting' ? 'verified' : 'on_verifying')}
+              </LatoRegular>
+            </View>
+          </View>
+          </View>
+        : <ShimmerAccoutTopHeader />}
     </View>
   );
 };
@@ -54,7 +70,6 @@ const styles = StyleSheet.create({
   image: {
     width: 48,
     height: 48,
-    borderRadius: 48,
   },
 });
 

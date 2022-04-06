@@ -107,8 +107,6 @@ const RegisterScreen = ({navigation, route}) => {
       gender: '',
     },
     inputValidities: {
-      bank: formStateBank.formIsValid,
-      address: formStateAddress.formIsValid,
       gender: false,
     },
     formIsValid: false,
@@ -118,10 +116,8 @@ const RegisterScreen = ({navigation, route}) => {
     inputValues: {
       detail: formStateDetail.inputValues,
     },
-    inputValidities: {
-      detail: formStateDetail.formIsValid,
-    },
-    formIsValid: false && formStateDetail.formIsValid,
+    inputValidities: {},
+    formIsValid: false, 
     isChecked: false,
   });
 
@@ -132,9 +128,9 @@ const RegisterScreen = ({navigation, route}) => {
       type: 'check',
     });
 
-    console.log(navigation);
+    console.log(formState.formIsValid ,formStateCard.formIsValid , formStateDetail.formIsValid , formStateAddress.formIsValid ,formStateBank.formIsValid);
 
-    if (formState.formIsValid && formStateCard.formIsValid) {
+    if (formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null)) {
       // setIsLoading(true);
       // register(formState.inputValues)
       //   .then(response => {
@@ -154,6 +150,7 @@ const RegisterScreen = ({navigation, route}) => {
     var card = []
     for (item in Config.cardList) {
       if (formStateCard.inputValues[Config.cardList[item]]) {
+        console.log('push', Config.cardList[item])
       card.push({
         type: Config.cardList[item],
         number: formStateCard.inputValues[Config.cardList[item]],
@@ -487,7 +484,7 @@ const RegisterScreen = ({navigation, route}) => {
       type: 'input',
       id: 'bank',
       input: formStateBank.inputValues,
-      isValid: formStateBank.formIsValid,
+      isValid: formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null,
     });
   }, [formStateBank]);
 
@@ -611,6 +608,7 @@ const RegisterScreen = ({navigation, route}) => {
                 openPicker('province_id', 'province_title', provinceData)
               }
             />
+            
             <PickerInput
               id={'city_id'}
               title={translate('city_title')}
@@ -618,6 +616,7 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('city_placeholder')}
               value={formStateAddress.inputValues.city_id_value}
               isCheck={formState.isChecked}
+              disabled={formStateAddress.inputValues.province_id == null }
               onPress={() => openPicker('city_id', 'city_title', cityData)}
             />
 
@@ -627,6 +626,7 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('district_placeholder')}
               value={formStateAddress.inputValues.district_id_value}
               isCheck={formState.isChecked}
+              disabled={formStateAddress.inputValues.city_id == null }
               onPress={() =>
                 openPicker('district_id', 'district_title', districtData)
               }
@@ -639,10 +639,25 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('village_placeholder')}
               value={formStateAddress.inputValues.village_id_value}
               isCheck={formState.isChecked}
+              disabled={formStateAddress.inputValues.district_id == null }
               onPress={() =>
                 openPicker('village_id', 'village_title', villageData)
               }
             />
+
+              {formStateAddress.inputValues.village_id == null && formStateAddress.inputValues.village_id_value != null &&
+
+            <CustomInput
+              id={'village_name'}
+              title={translate('manual_input')}
+              containerStyle={{paddingBottom: 16}}
+              placeholder={translate('village_placeholder')}
+              value={formStateAddress.inputValues.village_name}
+              isCheck={formState.isChecked}
+              dispatcher={dispatchAddress}
+              required
+            />
+              }
 
             <CustomInput
               id={'postal_code'}
@@ -718,11 +733,11 @@ const RegisterScreen = ({navigation, route}) => {
             )}
 
             <CustomInput
-              id={'identity_card'}
+              id={'ktp'}
               title={translate('number', {string: translate('ktp')})}
               placeholder={translate('ktp_placeholder')}
               containerStyle={{paddingVertical: 16}}
-              value={formStateCard.inputValues.identity_card}
+              value={formStateCard.inputValues.ktp}
               dispatcher={dispatchCard}
               isCheck={formState.isChecked}
               required

@@ -1,3 +1,5 @@
+import Config from "../constants/Config";
+import Constant from "../constants/Constant";
 
 export const getCurrentWeek = () => {
     currentdate = new Date();
@@ -7,3 +9,17 @@ export const getCurrentWeek = () => {
     console.log(`The week number of the current date (${currentdate}) is ${result}.`);
     return result
 }
+
+export const getFullLink = (text) => {
+    return Constant[Config.developmentMode].DOMAIN + text
+}
+
+export const isEmpty = (obj) => {
+    for(var prop in obj) {
+      if(Object.prototype.hasOwnProperty.call(obj, prop)) {
+        return false;
+      }
+    }
+  
+    return JSON.stringify(obj) === JSON.stringify({});
+  }

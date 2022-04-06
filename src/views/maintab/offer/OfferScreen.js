@@ -23,6 +23,11 @@ const dummyData = [
 ];
 
 const OfferScreen = ({navigation, route}) => {
+  
+const goToDetail = (item) => {
+  navigation.navigate('OfferDetail', {data: item})
+}
+
   return (
     <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
       <View style={{backgroundColor: '#FAFAFA', flex: 1}}>
@@ -46,6 +51,7 @@ const OfferScreen = ({navigation, route}) => {
               <CardContract
                 containerStyle={{marginHorizontal: 16, marginTop: 16}}
                 data={item}
+                onPress={() => goToDetail(item)}
               />
             );
           }}

@@ -19,12 +19,12 @@ const ChangePasswordScreen = ({ navigation, route }) => {
         inputValues: {
             old_password: '',
             new_password: '',
-            repassword: ''
+            password_confirm: ''
         },
         inputValidities: {
             old_password: false,
             new_password: false,
-            repassword: false
+            password_confirm: false
         },
         formIsValid: false,
         isChecked: false
@@ -35,6 +35,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
         dispatch({
             type: 'check'
         })
+        console.log(formState.formIsValid, formState.inputValidities)
 
         if (formState.formIsValid) {
             setIsLoading(true)
@@ -65,7 +66,6 @@ const ChangePasswordScreen = ({ navigation, route }) => {
             <NavBar title={translate('change_password')} navigation={navigation} style={{padding: 10}}/>
             <ScrollView style={styles.scrollView}>
                 <View style={{ backgroundColor: 'white', padding: 16 }}>
-                    <Subtitle1>{translate('password_setting')}<Subtitle1 style={{ color: 'red' }}>*</Subtitle1></Subtitle1>
                     <PasswordInput
                         id='old_password'
                         title={translate('old_password_title')}
@@ -73,6 +73,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                         containerStyle={{ marginVertical: 16 }}
                         isCheck={formState.isChecked}
                         value={formState.inputValues.old_password}
+                        required
                         dispatcher={dispatch}
                     />
                     <PasswordInput
@@ -82,16 +83,18 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                         placeholder={translate('password_placeholder')}
                         containerStyle={{ marginVertical: 16 }}
                         isCheck={formState.isChecked}
+                        required
                         dispatcher={dispatch}
                     />
                     <PasswordInput
-                        id='repassword'
-                        value={formState.inputValues.repassword}
-                        title={translate('re_password_title')}
+                        id='password_confirm'
+                        value={formState.inputValues.password_confirm}
+                        title={translate('confirm_password_title')}
                         placeholder={translate('password_placeholder')}
                         containerStyle={{ marginVertical: 16 }}
                         isCheck={formState.isChecked}
                         match={formState.inputValues.new_password}
+                        required
                         dispatcher={dispatch}
                     />
                 </View>
@@ -100,7 +103,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
             <CustomButton
                 containerStyle={{ margin: 16 }}
                 types='primary'
-                title={translate('change_password')}
+                title={translate('save')}
                 onPress={doChangePassword}
                 isLoading={isLoading}
             />
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     scrollView: {
-        backgroundColor: Colors.backgroundColor,
+        backgroundColor: 'white',
         flex: 1
     }
 })

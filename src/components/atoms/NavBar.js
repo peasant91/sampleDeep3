@@ -11,18 +11,20 @@ const NavBar = ({navigation, title, style, shadowEnabled, RightView}) => {
         {flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'white', width: '100%', zIndex: 0},
         style, shadowEnabled ? styles.bottomShadow : null
       ]}>
-      <TouchableOpacity onPress={() => navigation.pop()}>
+      <TouchableOpacity style={{flex: 1}} onPress={() => navigation.pop()}>
         <BackButton />
       </TouchableOpacity>
       {title ? (
-        <View style={{position: 'absolute', left: 40, right: 40, alignItems: 'center' }}>
+        <View style={{alignItems: 'center', flex: 10 }}>
           <LatoBold style={{fontSize: 20, marginLeft: 10, }}>{title}</LatoBold>
         </View>
       ) : (
         <View />
       )}
-      {RightView && <RightView/>
-      }
+      <View style={{flex: 1}}>
+
+      {RightView}
+      </View>
     </View>
   );
 };

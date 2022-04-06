@@ -18,15 +18,14 @@ const CustomButton = ({
 }) => {
   return (
     <View style={[containerStyle, {borderRadius: 24}]} >
-      <TouchableOpacity>
+      <TouchableOpacity >
         <View >
           <Button
             title={title.toUpperCase()}
             style={style}
-            onPress={onPress}
             pointer
+            onPress={onPress}
             disabled={isLoading}
-            TouchableComponent={TouchableWithoutFeedback}
             loading={isLoading}
             iconContainerStyle={{marginRight: 10, paddingRight: 10, width: 2}}
             icon={icon ? icon : null}

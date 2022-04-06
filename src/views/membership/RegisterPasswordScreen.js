@@ -1,6 +1,7 @@
 import React, {useReducer, useState, useEffect} from 'react'
 import { Platform, SafeAreaView, ScrollView,View } from 'react-native'
 import Animated from 'react-native-reanimated';
+import { showDialog } from '../../actions/commonActions';
 import CustomCheckbox from '../../components/atoms/Checkbox';
 import CustomButton from '../../components/atoms/CustomButton';
 import CustomInput, {PasswordInput, PhoneInput} from '../../components/atoms/CustomInput';
@@ -9,6 +10,7 @@ import NavBar from '../../components/atoms/NavBar';
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
 import formReducer from '../../reducers/formReducer';
+import { validateRegister } from '../../services/auth';
 
 
 const RegisterPasswordScreen = ({navigation, route}) => {
@@ -48,9 +50,18 @@ const RegisterPasswordScreen = ({navigation, route}) => {
             type: 'check'
         })
 
-        if (formState.formIsValid) {
-            navigation.navigate('OtpScreen', {isRegister: true, data: formState.inputValues})
+        if (formState.formIsValid && isChecked) {
+          validate()
         }
+    }
+
+    const validate = () => {
+      validateRegister(formState.inputValues).then(response => {
+            navigation.navigate('OtpScreen', {isRegister: true, data: formState.inputValues})
+      }
+      ).catch(error => {
+        showDialog(error.message)
+      })
     }
     
 
@@ -65,7 +76,6 @@ const RegisterPasswordScreen = ({navigation, route}) => {
           />
           <ScrollView style={{padding: 16}}>
             <View>
-              <LatoRegular>{translate('register_password_page_title')}</LatoRegular>
               <PasswordInput
                 id={'password'}
                 title={translate('password_title')}
@@ -79,8 +89,8 @@ const RegisterPasswordScreen = ({navigation, route}) => {
                 required
               />
               <PasswordInput
-                id={'repassword'}
-                title={translate('repassword_title')}
+                id={'password_confirmation'}
+                title={translate('confirm_password_title')}
                 placeholder={translate('password_placeholder')}
                 error={''}
                 match={formState.inputValues.password}
@@ -90,17 +100,6 @@ const RegisterPasswordScreen = ({navigation, route}) => {
                 dispatcher={dispatch}
                 keyboardType={'default'}
                 required
-              />
-              <CustomInput  
-                id={'referral_code'}
-                title={translate('referral_code_title')}
-                placeholder={translate('referral_code_placeholder')}
-                error={''}
-                value={formStateDetail.inputValues.referral_code}
-                containerStyle={{marginTop: 20}}
-                isCheck={formState.isChecked}
-                dispatcher={dispatchDetail}
-                keyboardType={'default'}
               />
 
               <CustomCheckbox isChecked={isChecked} title={<LatoRegular style={{paddingLeft: 16}}>{translate('i_have_read')} <LatoBold style={{paddingLeft: Platform.OS === 'ios' ? 16 : 0}}>{translate('term_and_condition')}</LatoBold></LatoRegular>} onPress={() => setisChecked(!isChecked)}/>

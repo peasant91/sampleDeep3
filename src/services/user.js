@@ -9,5 +9,5 @@ export const updateProfile = (data) => {
 }
 
 export const changePassword = (data) => {
-    return patch ('v1/user/password', data)
+    return post('v1/driver/new-password', data)
 }

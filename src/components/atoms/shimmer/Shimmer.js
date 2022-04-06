@@ -17,16 +17,24 @@ export const ShimmerPlaceholder = ({style, children, width, height, isLoading=tr
   );
 };
 
-export const ShimmerNews = ({isLoading}) => {
+export const ShimmerAccoutTopHeader = ({isLoading}) => {
   return (
     <View
-      style={{flex: 1, marginBottom: 16, marginRight: 16, borderColor: 'gray'}}>
-      <ShimmerPlaceholder visible={isLoading} width={170} height={100} />
+      style={{flex: 1, marginRight: 16, borderColor: 'gray', flexDirection: 'row' }}>
+      <ShimmerPlaceholder visible={isLoading} width={48} height={48} style={{borderRadius: 900}} />
+      <View style={{marginLeft: 16, justifyContent: 'center'}}>
       <ShimmerPlaceholder
         visible={isLoading}
         width={170}
+        height={17}
+      />
+      <ShimmerPlaceholder
+        visible={isLoading}
+        width={180}
+        height={17}
         style={{marginTop: 10}}
       />
+      </View>
     </View>
   );
 };

@@ -54,6 +54,11 @@ import RegisterVehicleSuccessScreen from './src/views/membership/RegisterVehicle
 import NotificationScreen from './src/views/NotificationScreen';
 import ResetPasswordScreen from './src/views/membership/ResetPasswordScreen';
 import ForgotPasswordSuccessScreen from './src/views/membership/ForgotPasswordSuccessScreen';
+import OfferDetailScreen from './src/views/maintab/offer/OfferDetailScreen';
+import CurrentContractScreen from './src/views/maintab/offer/CurrentContractScreen';
+import ContractHistoryScreen from './src/views/maintab/offer/ContractHistoryScreen';
+import BankScreen from './src/views/maintab/account/BankScreen';
+import JobScreen from './src/views/maintab/home/JobScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -388,16 +393,49 @@ const App = ({navigation, route}) => {
                           component={MyProfileScreen}
                           options={{ headerShown: false, animationEnabled: enableAnimation }}
                         />
+
+                        <Stack.Screen
+                          name="OfferDetail"
+                          component={OfferDetailScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+
+                        <Stack.Screen
+                          name="CurrentContract"
+                          component={CurrentContractScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+
+                        <Stack.Screen
+                          name="ContractHistory"
+                          component={ContractHistoryScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+
                         <Stack.Screen
                           name="ChangePassword"
                           component={ChangePasswordScreen}
                           options={{ headerShown: false, animationEnabled: enableAnimation }}
                         />
+
+                        <Stack.Screen
+                          name="Bank"
+                          component={BankScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+
                         <Stack.Screen
                           name="SingleWeb"
                           component={SingleWebScreen}
                           options={{ headerShown: false, animationEnabled: enableAnimation }}
                         />
+
+                        <Stack.Screen
+                          name="Job"
+                          component={JobScreen}
+                          options={{ headerShown: false, animationEnabled: enableAnimation }}
+                        />
+
                         <Stack.Screen
                           name="Success"
                           component={SuccessScreen}

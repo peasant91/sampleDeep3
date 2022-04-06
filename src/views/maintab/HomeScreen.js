@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useContext, useRef} from 'react';
 import {
-  SafeAreaView,
   View,
   StyleSheet,
   ScrollView,
@@ -40,6 +39,7 @@ import Divider from '../../components/atoms/Divider';
 import CardContract from '../../components/atoms/CardContract';
 import HomeLineChart from '../../components/atoms/HomeLineChart';
 import InfoMenu from '../../components/atoms/InfoMenu';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
   const dummyContractData = {
     imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -94,8 +94,6 @@ const HomeScreen = ({navigation, route}) => {
   );
 
   return (
-    <>
-      <SafeAreaView style={{flex: 0, backgroundColor: 'white'}} />
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
         <StatusBar backgroundColor={Colors.primary} barStyle="dark-content" />
 
@@ -145,6 +143,7 @@ const HomeScreen = ({navigation, route}) => {
                 title={translate('do_job')}
                 iconRight={true}
                 icon={IconArrow}
+                onPress={() => navigation.navigate('Job')}
               />
 
             </View>
@@ -175,7 +174,6 @@ const HomeScreen = ({navigation, route}) => {
         </ScrollView>
 
       </SafeAreaView>
-    </>
   );
 };
 

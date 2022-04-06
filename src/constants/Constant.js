@@ -9,7 +9,7 @@ export default {
 
     dev: {
         API_URL: "https://dev-otomedia.timedoor-host.web.id/api/",
-        FILE_URL: "https://dev.sikansapb.web.id/storage/uploads/files/",
+        DOMAIN: "https://dev-otomedia.timedoor-host.web.id",
         NEWS_TOPIC: "news-id-dev"
     },
     live: {

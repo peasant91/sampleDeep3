@@ -369,7 +369,7 @@ export const PickerInput = ({
       <LatoBold style={{fontFamily: 'Lato-Bold'}}>
         {title}{required && <LatoBold style={{color: 'red' }}>*</LatoBold>}
       </LatoBold>
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={!disabled ? onPress : null}>
         <View
           pointerEvents="none"
           style={[
@@ -416,6 +416,7 @@ export const PasswordInput = ({
   dispatcher,
   keyboardType,
   disabled,
+  required
 }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [errorText, setError] = useState(error);
@@ -424,9 +425,7 @@ export const PasswordInput = ({
     let isValid = true;
     setError(null);
 
-    if (id === 'repassword' || id === 'password_confirmation') {
-      console.log(`text ${text}`);
-      console.log(`password ${match}`);
+    if (match) {
       if (text !== match) {
         isValid = false;
         setError(translate('password_not_match'));
@@ -452,7 +451,9 @@ export const PasswordInput = ({
 
   return (
     <View style={containerStyle}>
-      <LatoBold style={{fontFamily: 'Lato-Bold'}}>{title}</LatoBold>
+      <LatoBold style={{fontFamily: 'Lato-Bold'}}>
+        {title}{required && <LatoBold style={{color: 'red' }}>*</LatoBold>}
+      </LatoBold>
       <View style={styles.pickerContainer}>
         <TextInput
           ref={ref =>
