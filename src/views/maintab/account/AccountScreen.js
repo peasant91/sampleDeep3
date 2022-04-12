@@ -48,7 +48,7 @@ const AccountScreen = ({navigation, route}) => {
   const getProfileApi = () => {
     getProfile().then(response => {
       setrefreshing(false)
-      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE)
+      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(response))
       setprofileData(response)
     }).catch(error => {
       setrefreshing(false)
@@ -56,7 +56,7 @@ const AccountScreen = ({navigation, route}) => {
     })
   }
 
-  useEffect(async () => {
+  useEffect( () => {
     // AsyncStorage.getItem(StorageKey.KEY_USER_PROFILE).then(data => {
     //   if (data) {
     //     setprofileData(JSON.parse(data))
@@ -70,6 +70,9 @@ const AccountScreen = ({navigation, route}) => {
   useEffect(() => {
   }, [])
   
+  const goToEdit = () => {
+    navigation.navigate('Register', { isEdit: true, data: profileData})
+  }
 
   const logout = () => {
     showDialog(translate('logout_confirmation'), true, signOut, null, translate('yes'), translate('cancel'))
@@ -130,6 +133,7 @@ const AccountScreen = ({navigation, route}) => {
             <AccountMenu
               Icon={IconChangeProfile}
               text={translate('change_profile')}
+              onPress={goToEdit}
             />
             <AccountMenu
               Icon={IconChangePassword}

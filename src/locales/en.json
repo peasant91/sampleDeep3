@@ -197,7 +197,12 @@
     "company_detail": "Detail Perusahaan",
     "apply": "Ajukan",
     "see_all": "Lihat Semua",
-    "offer_history": "Riwayat Penawaran"
+    "offer_history": "Riwayat Penawaran",
+
+    "time": "Waktu",
+    "average_speed": "Kecepatan rata-rata",
+    "distance": "Jarak Tempuh",
+    "edit_profile": "Ubah Profile"
 
 
 

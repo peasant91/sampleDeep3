@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import Colors from '../../constants/Colors';
 import {LatoBold} from './CustomText';
@@ -9,17 +9,24 @@ import IconView from '../../assets/images/ic_image_view.svg';
 
 import {Image} from 'react-native-elements';
 import translate from '../../locales/translate';
+import { getFullLink } from '../../actions/helper';
 
 const borderRadius = 8;
 
 const IDCard = ({navigation, title, onPress, imageUri, required, isCheck}) => {
+
+  useEffect(() => {
+    console.log('image id card',imageUri)
+  }, [])
+  
+
   return (
     <View>
       <View style={styles.container}>
         {imageUri ? (
           <TouchableOpacity style={{flex: 1}} onPress={() => navigation.navigate('ImageViewer', {imageUrl: imageUri, title: title})}>
             <Image
-              source={{uri: imageUri}}
+              source={{uri: imageUri.includes('/storage/driver') ? getFullLink(imageUri) : imageUri}}
               style={{
                 height: '100%',
                 width: '100%',

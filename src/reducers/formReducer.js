@@ -48,8 +48,8 @@ const formReducer = (state, action) => {
     }
 
     if (action.type === 'update') {
+        console.log('state push', action.state)
         return {
-            ...state,
             ...action.state
         }
     }

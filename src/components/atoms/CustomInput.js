@@ -91,13 +91,13 @@ const CustomInput = ({
   }, [isCheck]);
 
   return (
-    <View style={containerStyle} pointerEvents={viewOnly ? 'none' : 'auto'}>
+    <View style={containerStyle} pointerEvents={viewOnly || disabled ? 'none' : 'auto'}>
       <LatoBold style={{fontFamily: 'Lato-Bold'}}>
         {title}{required && <LatoBold style={{color: 'red' }}>*</LatoBold>}
       </LatoBold>
       <TextInput
         value={value}
-        onChangeText={!viewOnly ? onTextChange : null}
+        onChangeText={!viewOnly && !disabled ? onTextChange : null}
         placeholder={placeholder}
         multiline={multiline}
         keyboardType={keyboardType ?? 'default'}

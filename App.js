@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, {useMemo, useEffect, useState, createRef} from 'react';
+import React, { useMemo, useEffect, useState, createRef } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,23 +16,23 @@ import {
   StatusBar,
 } from 'react-native';
 
-import {ThemeProvider, Icon} from 'react-native-elements';
+import { ThemeProvider, Icon } from 'react-native-elements';
 import * as RNLocalize from 'react-native-localize';
 import i18n from 'i18n-js';
-import {applyMiddleware, combineReducers, createStore} from 'redux';
-import {Provider, useSelector} from 'react-redux';
+import { applyMiddleware, combineReducers, createStore } from 'redux';
+import { Provider, useSelector } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import StorageKey from './src/constants/StorageKey';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {default as Splash} from 'react-native-splash-screen';
-import {ModalPortal} from 'react-native-modals';
-import {ToastProvider} from 'react-native-toast-notifications';
-import {navigationRef} from './src/navigation/RootNavigation';
+import { default as Splash } from 'react-native-splash-screen';
+import { ModalPortal } from 'react-native-modals';
+import { ToastProvider } from 'react-native-toast-notifications';
+import { navigationRef } from './src/navigation/RootNavigation';
 import * as RootNavigation from './src/navigation/RootNavigation';
 
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {NavigationContainer} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
 
 import translate from './src/locales/translate';
 
@@ -62,7 +62,7 @@ import JobScreen from './src/views/maintab/home/JobScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
-import {Freshchat} from 'react-native-freshchat-sdk';
+import { Freshchat } from 'react-native-freshchat-sdk';
 import CustomisableAlert from 'react-native-customisable-alert';
 import Config from './src/constants/Config';
 import MainTabScreen from './src/views/maintab/MainTabScreen';
@@ -83,19 +83,19 @@ const translationGetters = {
 };
 
 const setI18nConfig = () => {
-  const fallback = {languageTag: 'en'};
-  const {languageTag} =
+  const fallback = { languageTag: 'en' };
+  const { languageTag } =
     RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters)) ||
     fallback;
   translate.cache.clear();
-  i18n.translations = {[languageTag]: translationGetters[languageTag]()};
+  i18n.translations = { [languageTag]: translationGetters[languageTag]() };
   i18n.locale = languageTag;
 };
 
 const Stack = createNativeStackNavigator();
 export const AuthContext = React.createContext();
 
-const App = ({navigation, route}) => {
+const App = ({ navigation, route }) => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -144,9 +144,9 @@ const App = ({navigation, route}) => {
         try {
           const uid = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
           if (Config.isMockDesign) {
-            dispatch({type: 'SIGN_IN', token: "mock"});
+            dispatch({ type: 'SIGN_IN', token: "mock" });
           } else {
-            dispatch({type: 'SIGN_IN', token: uid});
+            dispatch({ type: 'SIGN_IN', token: uid });
           }
         } catch (err) {
           console.log(err);
@@ -154,10 +154,10 @@ const App = ({navigation, route}) => {
       },
       signOut: async data => {
         await AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN)
-        dispatch({type: 'SIGN_OUT'});
+        dispatch({ type: 'SIGN_OUT' });
       },
       doneLoading: async data => {
-        dispatch({type: 'LOADING_COMPLETE'});
+        dispatch({ type: 'LOADING_COMPLETE' });
       },
     }),
     [],
@@ -183,7 +183,7 @@ const App = ({navigation, route}) => {
         console.log(e);
       }
 
-      dispatch({type: 'RESTORE_TOKEN', token: userToken});
+      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
     };
 
     bootstrapAsync();
@@ -233,7 +233,7 @@ const App = ({navigation, route}) => {
         remoteMessage.notification,
       );
       RootNavigation.navigate('NewsDetail', {
-        data: {id: remoteMessage.data.news_id},
+        data: { id: remoteMessage.data.news_id },
       });
 
       // navigation.navigate(remoteMessage.data.type);
@@ -249,7 +249,7 @@ const App = ({navigation, route}) => {
             remoteMessage.notification,
           );
           setInitialRoute('Home');
-          setpushNotifParam({id: remoteMessage.data.news_id}); // e.g. "Settings"
+          setpushNotifParam({ id: remoteMessage.data.news_id }); // e.g. "Settings"
         }
         setLoading(false);
       });
@@ -277,7 +277,7 @@ const App = ({navigation, route}) => {
                   backgroundColor: Colors.darkPrimary,
                   borderRadius: 32,
                 }}>
-                <Text style={{color: 'white', fontFamily: 'Lato-Regular'}}>
+                <Text style={{ color: 'white', fontFamily: 'Lato-Regular' }}>
                   {toast.message}
                 </Text>
               </View>
@@ -290,66 +290,66 @@ const App = ({navigation, route}) => {
                   <Stack.Screen
                     name="Splash"
                     component={SplashScreen}
-                    options={{headerShown: false}}
+                    options={{ headerShown: false }}
                   />
                 ) : !state.userToken ? (
                   <>
                     <Stack.Screen
                       name="Login"
                       component={LoginScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
-                    
+
                     <Stack.Screen
                       name="Notification"
                       component={NotificationScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
                     <Stack.Screen
                       name="ForgotPassword"
                       component={ForgotPasswordScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
                       name="ForgotPasswordSuccess"
                       component={ForgotPasswordSuccessScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
                       name="RegisterSuccess"
                       component={RegisterSuccessScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
                       name="ResetPassword"
                       component={ResetPasswordScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
                       name="Register"
                       component={RegisterScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
                     <Stack.Screen
                       name="RegisterPassword"
                       component={RegisterPasswordScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
                       name="RegisterVehicle"
                       component={RegisterVehicleScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
                       name="RegisterVehicleSuccess"
                       component={RegisterVehicleSuccessScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
 
 
@@ -357,92 +357,104 @@ const App = ({navigation, route}) => {
                     <Stack.Screen
                       name="OtpScreen"
                       component={OtpScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
                     <Stack.Screen
                       name="ImageViewer"
                       component={ImageViewerScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
                     <Stack.Screen
                       name="Picker"
                       component={PickerScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
                     <Stack.Screen
                       name="Success"
                       component={SuccessScreen}
-                      options={{headerShown: false}}
+                      options={{ headerShown: false }}
                     />
-                        <Stack.Screen
-                          name="SingleWeb"
-                          component={SingleWebScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="SingleWeb"
+                      component={SingleWebScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
                   </>
                 ) : (
-                      <>
-                        <Stack.Screen
-                          name="MainTab"
-                          component={MainTabScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                          initialParams={{ news: pushNotifParam }}
-                        />
-                        <Stack.Screen
-                          name="MyProfile"
-                          component={MyProfileScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                  <>
+                    <Stack.Screen
+                      name="MainTab"
+                      component={MainTabScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                      initialParams={{ news: pushNotifParam }}
+                    />
+                    <Stack.Screen
+                      name="MyProfile"
+                      component={MyProfileScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
 
-                        <Stack.Screen
-                          name="OfferDetail"
-                          component={OfferDetailScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="Register"
+                      component={RegisterScreen}
+                      options={{ headerShown: false }}
+                    />
 
-                        <Stack.Screen
-                          name="CurrentContract"
-                          component={CurrentContractScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="OfferDetail"
+                      component={OfferDetailScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
+                    
+                    <Stack.Screen
+                      name="Picker"
+                      component={PickerScreen}
+                      options={{ headerShown: false }}
+                    />
 
-                        <Stack.Screen
-                          name="ContractHistory"
-                          component={ContractHistoryScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="CurrentContract"
+                      component={CurrentContractScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
 
-                        <Stack.Screen
-                          name="ChangePassword"
-                          component={ChangePasswordScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="ContractHistory"
+                      component={ContractHistoryScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
 
-                        <Stack.Screen
-                          name="Bank"
-                          component={BankScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="ChangePassword"
+                      component={ChangePasswordScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
 
-                        <Stack.Screen
-                          name="SingleWeb"
-                          component={SingleWebScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="Bank"
+                      component={BankScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
 
-                        <Stack.Screen
-                          name="Job"
-                          component={JobScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation }}
-                        />
+                    <Stack.Screen
+                      name="SingleWeb"
+                      component={SingleWebScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
 
-                        <Stack.Screen
-                          name="Success"
-                          component={SuccessScreen}
-                          options={{ headerShown: false, animationEnabled: enableAnimation, gestureEnabled: false }}
-                        />
-                      </>
-                    )}
+                    <Stack.Screen
+                      name="Job"
+                      component={JobScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation }}
+                    />
+
+                    <Stack.Screen
+                      name="Success"
+                      component={SuccessScreen}
+                      options={{ headerShown: false, animationEnabled: enableAnimation, gestureEnabled: false }}
+                    />
+                  </>
+                )}
               </Stack.Navigator>
               <ModalPortal />
             </AuthContext.Provider>

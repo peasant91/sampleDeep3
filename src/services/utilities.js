@@ -29,3 +29,15 @@ export const getBank = () => {
 export const getCompanies = () => {
     return get(`${Config.apiVersion}/driver/company`, {})
 }
+
+export const getVehicleType = () => {
+    return get(`${Config.apiVersion}/driver/vehicle/type`, {})
+}
+
+export const getVehicleBrand = (data) => {
+    return get(`${Config.apiVersion}/driver/vehicle/brand`, {})
+}
+
+export const getVehicleModel = (data) => {
+    return get(`${Config.apiVersion}/driver/vehicle/model`, {})
+}

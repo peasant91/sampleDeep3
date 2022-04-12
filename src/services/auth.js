@@ -1,5 +1,5 @@
 import React from 'react'
-import { post } from './baseApi'
+import { post, patch } from './baseApi'
 
 export const login = (data) => {
     return post('v1/login', data)
@@ -8,6 +8,11 @@ export const login = (data) => {
 export const register = (data) => {
     return post('v1/register', data)
 }
+
+export const updateProfile = (data) => {
+    return patch('v1/driver/profile', data)
+}
+
 
 export const validateRegister = (data) => {
     return post('v1/validate-register', data)

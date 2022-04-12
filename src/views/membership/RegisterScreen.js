@@ -30,7 +30,7 @@ import CustomInput, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import formReducer from '../../reducers/formReducer.js';
 import {showDialog, dismissDialog} from '../../actions/commonActions';
-import {register} from '../../services/auth';
+import {register, updateProfile} from '../../services/auth';
 import NavBar from '../../components/atoms/NavBar';
 import {Image} from 'react-native-elements';
 import DatePicker from 'react-native-date-picker';
@@ -47,10 +47,12 @@ import IDCard from '../../components/atoms/IDCard';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
-import {getCity, getDistrict, getVillage} from '../../services/utilities';
+import {getCity, getDistrict, getProvince, getVillage} from '../../services/utilities';
 import moment from 'moment';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
+import { getFullLink } from '../../actions/helper';
+import { getUserBank } from '../../services/user';
 
 const dummyDivision = [
   {
@@ -68,6 +70,7 @@ const dummyDivision = [
 ];
 
 const RegisterScreen = ({navigation, route}) => {
+
   const [companyData, setcompanyData] = useState();
   const [provinceData, setprovinceData] = useState();
   const [cityData, setcityData] = useState();
@@ -76,48 +79,48 @@ const RegisterScreen = ({navigation, route}) => {
   const [bankData, setbankData] = useState();
   const [selectedPicker, setselectedPicker] = useState();
   const [imagePickerId, setimagePickerId] = useState(99);
+  const [preloading, setpreloading] = useState(true)
 
   const [isLoading, setIsLoading] = useState(false);
   const [openDate, setopenDate] = useState(false);
+
+  const { isEdit, data} = route.params
 
   const pickerSheet = useRef();
 
   const [formStateBank, dispatchBank] = useReducer(formReducer, {
     inputValues: {},
     inputValidities: {},
-    formIsValid: false,
+    formIsValid: isEdit,
   });
 
   const [formStateAddress, dispatchAddress] = useReducer(formReducer, {
     inputValues: {},
     inputValidities: {},
-    formIsValid: false,
+    formIsValid: isEdit,
   });
 
   const [formStateCard, dispatchCard] = useReducer(formReducer, {
     inputValues: {},
     inputValidities: {},
-    formIsValid: false,
+    formIsValid: isEdit,
   });
 
   const [formStateDetail, dispatchDetail] = useReducer(formReducer, {
     inputValues: {
-      bank: formStateBank.inputValues,
-      address: formStateAddress.inputValues,
       gender: '',
     },
     inputValidities: {
-      gender: false,
+      gender: isEdit,
     },
-    formIsValid: false,
+    formIsValid: isEdit,
   });
 
   const [formState, dispatch] = useReducer(formReducer, {
     inputValues: {
-      detail: formStateDetail.inputValues,
     },
     inputValidities: {},
-    formIsValid: false, 
+    formIsValid: isEdit, 
     isChecked: false,
   });
 
@@ -142,15 +145,95 @@ const RegisterScreen = ({navigation, route}) => {
       //     showDialog(err.message, false);
       //   });
 
-      buildCard(formState)
+      buildForm(formState)
     }
   };
 
-  const buildCard = (formState) => {
+  //translate form into input state if edit profile
+  const translateForm = () => {
+    console.log(data.city.id)
+    const state = {
+      inputValues:
+    {
+      name: data.name,
+      email: data.email,
+      phone1: data.phone1,
+      phone2: data.phone2,
+    },
+    formIsValid: true 
+    }
+
+    const stateDetail = {
+      inputValues: {
+        birth_date: data.birth_date,
+        driver_company_id: data.driver_company.id,
+        driver_company_id_value: data.driver_company.name,
+        profile_image_uri: data.profile_image,
+        gender: data.gender
+      },
+      formIsValid: true
+    }
+
+    const stateAddress = {
+      inputValues: {
+        address: data.address,
+        postal_code: data.postal_code,
+        province_id: data.province.id,
+        province_id_value: data.province.name,
+        city_id: data.city.id,
+        city_id_value: data.city.name,
+        district_id: data.district.id,
+        district_id_value: data.district.name,
+        village_id: data.village.id,
+        village_id_value: data.village.name
+      },
+      formIsValid: true
+    }
+
+    const stateCard = {
+      inputValues: {
+        ktp: data.ktp.number,
+        ktp_image_uri: data.ktp.image,
+        sim_a: data.sim_a.number,
+        sim_a_image_uri: data.sim_a.image
+      },
+      formIsValid: true
+    }
+
+    // console.log('card', stateCard)
+    // console.log('address', stateAddress)
+
+
+
+    dispatchDetail({
+      type: 'update',
+      state: stateDetail
+    })
+
+    dispatchAddress({
+      type: 'update',
+      state: stateAddress
+    })
+
+    dispatchCard({
+      type: 'update',
+      state: stateCard
+    })
+
+    dispatch({
+      type: 'update',
+      state: state
+    })
+
+    onPickDate(data.birth_date)
+  }
+
+
+  const buildForm = (formState) => {
     var card = []
     for (item in Config.cardList) {
       if (formStateCard.inputValues[Config.cardList[item]]) {
-        console.log('push', Config.cardList[item])
+        // console.log('push', Config.cardList[item])
       card.push({
         type: Config.cardList[item],
         number: formStateCard.inputValues[Config.cardList[item]],
@@ -160,7 +243,9 @@ const RegisterScreen = ({navigation, route}) => {
     }
 
     const detail = {
-      ...formState.inputValues.detail,
+      ...formStateDetail.inputValues,
+      bank: formStateDetail.inputValues.driver_company_id ? null : formStateBank.inputValues,
+      address: formStateAddress.inputValues,
       card: card
     }
 
@@ -169,7 +254,15 @@ const RegisterScreen = ({navigation, route}) => {
       detail: detail
     }
 
+    if (isEdit) {
+      setIsLoading(true)
+      updateProfile(data).then(() => {
+        setIsLoading(false)
+        navigation.navigate('Account', { isChangeProfile: true} , true)
+      })
+    } else {
       navigation.navigate('RegisterPassword', {data: data});
+    }
   }
 
   const onGenderPicked = value => {
@@ -274,8 +367,8 @@ const RegisterScreen = ({navigation, route}) => {
       }
     }
 
-    console.log(result);
-    console.log(formStateBank);
+    // console.log(result);
+    // console.log(formStateBank);
   };
 
   const openGalleryPicker = async selectedPicker => {
@@ -314,8 +407,8 @@ const RegisterScreen = ({navigation, route}) => {
       }
     }
 
-    console.log(result);
-    console.log(formStateBank);
+    // console.log(result);
+    // console.log(formStateBank);
   };
 
   const openImagePicker = async (id, location) => {
@@ -349,11 +442,11 @@ const RegisterScreen = ({navigation, route}) => {
   const openPicker = (id, title, data) => {
     var selectedId;
     if (id == 'driver_company_id') {
-      selectedId = formState.inputValues.detail[id];
-    } else if (id == 'bank') {
-      selectedId = formState.inputValues.detail.bank[id];
+      selectedId = formStateDetail.inputValues[id];
+    } else if (id == 'bank_id') {
+      selectedId = formStateBank.inputValues[id];
     } else {
-      selectedId = formState.inputValues.detail.address[id];
+      selectedId = formStateAddress.inputValues[id];
     }
     console.log(selectedId);
     navigation.navigate('Picker', {
@@ -361,6 +454,7 @@ const RegisterScreen = ({navigation, route}) => {
       title: title,
       data: data,
       selectedId: selectedId,
+      isEdit: isEdit,
       previousRoute: 'Register'
     });
   };
@@ -382,6 +476,9 @@ const RegisterScreen = ({navigation, route}) => {
     AsyncStorage.getItem(StorageKey.KEY_BANK).then(bank => {
       setbankData(JSON.parse(bank));
     });
+
+    translateForm()
+
   }, []);
 
   useEffect(() => {
@@ -404,6 +501,21 @@ const RegisterScreen = ({navigation, route}) => {
           input: null,
           isValid: true,
         });
+        getUserBank(route.params.id).then(response => {
+          const state = {
+            inputValues: {
+            bank_id: response.id,
+            bank_id_value: response.bank_name,
+            ...response
+
+            },
+            formIsValid: true
+          }
+          dispatchBank({
+            type: 'update',
+            state: state
+          })
+        })
       } else if (id == 'bank_id') {
         dispatchBank({
           type: 'picker',
@@ -437,8 +549,25 @@ const RegisterScreen = ({navigation, route}) => {
     }
   }, [route.params]);
 
-  //reset if parent changed
+  //preload region
   useEffect(() => {
+    if (isEdit) {
+      getCity(data.province.id).then(response => setcityData(response))
+      getDistrict(data.city.id).then(response => setdistrictData(response))
+      getVillage(data.district.id).then(response => { 
+        setvillageData(response)
+        setTimeout(() => {
+          setpreloading(false)
+        }, 500);
+      }
+      )
+    }
+  }, [])
+
+
+  //reset if region changed
+  useEffect(() => {
+    if (!isEdit || !preloading) {
     dispatchAddress({
       type: 'picker',
       id: 'city_id',
@@ -446,9 +575,12 @@ const RegisterScreen = ({navigation, route}) => {
       desc: null,
       isValid: false,
     });
+    }
   }, [cityData]);
 
   useEffect(() => {
+    if (!isEdit || !preloading) {
+
     dispatchAddress({
       type: 'picker',
       id: 'district_id',
@@ -456,9 +588,11 @@ const RegisterScreen = ({navigation, route}) => {
       desc: null,
       isValid: false,
     });
+    }
   }, [cityData, districtData]);
 
   useEffect(() => {
+    if (!isEdit || !preloading) {
     dispatchAddress({
       type: 'picker',
       id: 'village_id',
@@ -466,44 +600,16 @@ const RegisterScreen = ({navigation, route}) => {
       desc: null,
       isValid: false,
     });
+    }
   }, [cityData, districtData, villageData]);
 
-  //if state detail change, change also in parent state
-  useEffect(() => {
-    dispatch({
-      type: 'input',
-      id: 'detail',
-      input: formStateDetail.inputValues,
-      isValid: formStateDetail.formIsValid,
-    });
-  }, [formStateDetail]);
-
-  //if state bank change, change also in parent detail state
-  useEffect(() => {
-    dispatchDetail({
-      type: 'input',
-      id: 'bank',
-      input: formStateBank.inputValues,
-      isValid: formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null,
-    });
-  }, [formStateBank]);
-
-  //if state bank change, change also in parent detail state
-  useEffect(() => {
-    dispatchDetail({
-      type: 'input',
-      id: 'address',
-      input: formStateAddress.inputValues,
-      isValid: formStateAddress.formIsValid,
-    });
-  }, [formStateAddress]);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
       <NavBar
         navigation={navigation}
-        title={translate('register_form')}
+        title={isEdit ? translate('edit_profile') : translate('register_form')}
         shadowEnabled={true}
       />
       <KeyboardAvoidingView
@@ -511,10 +617,14 @@ const RegisterScreen = ({navigation, route}) => {
         behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
         <ScrollView style={styles.container}>
           <View style={{paddingBottom: 40}}>
+            {!isEdit && 
+            <View>
             <LatoBold>{translate('register_form_title')}</LatoBold>
             <LatoRegular containerStyle={{marginTop: 5}}>
               {translate('register_form_desc')}
             </LatoRegular>
+            </View>
+        }
 
             <TouchableOpacity
               style={{alignItems: 'center', margin: 16}}
@@ -523,7 +633,7 @@ const RegisterScreen = ({navigation, route}) => {
                 {formStateDetail.inputValues.profile_image_uri ? (
                   <Image
                     source={{
-                      uri: formStateDetail.inputValues.profile_image_uri,
+                      uri: formStateDetail.inputValues.profile_image ? formStateDetail.inputValues.profile_image_uri : getFullLink(formStateDetail.inputValues.profile_image_uri),
                     }}
                     style={{width: 80, height: 80, borderRadius: 50}}
                   />
@@ -685,8 +795,7 @@ const RegisterScreen = ({navigation, route}) => {
               required
               onPress={() => setopenDate(true)}
             />
-
-            {!formState.inputValues.detail.driver_company_id && (
+              { !isEdit && 
               <View>
                 <PickerInput
                   id={'bank_id'}
@@ -696,6 +805,7 @@ const RegisterScreen = ({navigation, route}) => {
                   value={formStateBank.inputValues.bank_id_value}
                   isCheck={formState.isChecked}
                   required
+                  disabled={formStateDetail.inputValues.driver_company_id }
                   onPress={() => openPicker('bank_id', 'bank_title', bankData)}
                 />
 
@@ -706,6 +816,7 @@ const RegisterScreen = ({navigation, route}) => {
                   value={formStateBank.inputValues.number}
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
+                  disabled={formStateDetail.inputValues.driver_company_id}
                   required
                 />
 
@@ -717,6 +828,7 @@ const RegisterScreen = ({navigation, route}) => {
                   value={formStateBank.inputValues.branch}
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
+                  disabled={formStateDetail.inputValues.driver_company_id}
                   required
                 />
 
@@ -727,10 +839,10 @@ const RegisterScreen = ({navigation, route}) => {
                   value={formStateBank.inputValues.name}
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
+                  disabled={formStateDetail.inputValues.driver_company_id}
                   required
                 />
-              </View>
-            )}
+              </View>}
 
             <CustomInput
               id={'ktp'}

@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Borobudur</string>
+    <string name="app_name">Otomedia</string>
     <string name="freshchat_file_provider_authority">com.schott.pbsaving.android.provider</string>
 </resources>

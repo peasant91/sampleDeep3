@@ -65,7 +65,7 @@ const LoginScreen = ({navigation, route}) => {
   };
 
   const goToRegister = () => {
-    navigation.navigate('Register');
+    navigation.navigate('Register', {isEdit: false});
   };
 
   const goToForgotPassword = () => {

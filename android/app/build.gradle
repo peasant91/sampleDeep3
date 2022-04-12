@@ -133,7 +133,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.schott.pbsaving.android"
+        applicationId "id.otomedia"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode Integer.parseInt(VERSION_CODE)
