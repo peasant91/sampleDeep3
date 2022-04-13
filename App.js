@@ -98,6 +98,7 @@ export const AuthContext = React.createContext();
 const App = ({ navigation, route }) => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
+      console.log('App js action', action)
       switch (action.type) {
         case 'RESTORE_TOKEN':
           return {
@@ -294,9 +295,16 @@ const App = ({ navigation, route }) => {
                   />
                 ) : !state.userToken ? (
                   <>
+
                     <Stack.Screen
                       name="Login"
                       component={LoginScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="RegisterSuccess"
+                      component={RegisterSuccessScreen}
                       options={{ headerShown: false }}
                     />
 
@@ -317,11 +325,6 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false }}
                     />
 
-                    <Stack.Screen
-                      name="RegisterSuccess"
-                      component={RegisterSuccessScreen}
-                      options={{ headerShown: false }}
-                    />
 
                     <Stack.Screen
                       name="ResetPassword"
@@ -353,7 +356,6 @@ const App = ({ navigation, route }) => {
                     />
 
 
-
                     <Stack.Screen
                       name="OtpScreen"
                       component={OtpScreen}
@@ -382,12 +384,44 @@ const App = ({ navigation, route }) => {
                   </>
                 ) : (
                   <>
+
                     <Stack.Screen
                       name="MainTab"
                       component={MainTabScreen}
                       options={{ headerShown: false, animationEnabled: enableAnimation }}
                       initialParams={{ news: pushNotifParam }}
                     />
+                    <Stack.Screen
+                      name="RegisterVehicle"
+                      component={RegisterVehicleScreen}
+                      options={{ headerShown: false }}
+                    />
+                    
+                    <Stack.Screen
+                      name="Login"
+                      component={LoginScreen}
+                      options={{ headerShown: false }}
+                    />
+
+
+                    <Stack.Screen
+                      name="Notification"
+                      component={NotificationScreen}
+                      options={{ headerShown: false }}
+                    />
+                    
+                    <Stack.Screen
+                      name="RegisterVehicleSuccessMain"
+                      component={RegisterVehicleSuccessScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="ImageViewer"
+                      component={ImageViewerScreen}
+                      options={{ headerShown: false }}
+                    />
+
                     <Stack.Screen
                       name="MyProfile"
                       component={MyProfileScreen}

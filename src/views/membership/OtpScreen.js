@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 import React, { useState, useEffect } from 'react'
-import { View, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, BackHandler } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler'
 import { showDialog } from '../../actions/commonActions'
 import CountdownOtp from '../../components/atoms/CountdownOtp'
@@ -38,7 +38,9 @@ const OtpScreen = ({ navigation, route }) => {
       console.log(response)
       setotpId(response.id)
     }).catch(error => {
+      setisLoading(false)
       console.log(error)
+      showDialog(error.message)
     })
     } else {
       forgotPassword({
@@ -48,6 +50,8 @@ const OtpScreen = ({ navigation, route }) => {
         setisLoading(false)
         setotpId(response.id)
       }).catch(error => {
+        setisLoading(false)
+        showDialog(error.message)
         console.log(error)
       })
     }
@@ -67,7 +71,7 @@ const OtpScreen = ({ navigation, route }) => {
           doRegister()
         }).catch(error => {
           setisLoading(false)
-          showDialog(error.message, false)
+          showDialog(error.message)
         })
       } else {
         verifyForgotPassword({
@@ -78,6 +82,7 @@ const OtpScreen = ({ navigation, route }) => {
           goToForgotPassword()
         }).catch(error => {
           setisLoading(false)
+          showDialog(error.message)
         })
       }
     } 
@@ -95,11 +100,14 @@ const OtpScreen = ({ navigation, route }) => {
     }).then((response) => {
       setisLoading(false)
       AsyncStorage.setItem(StorageKey.KEY_ACCESS_TOKEN, response.access_token)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'RegisterSuccess' }],
-      });
+      // navigation.reset({
+      //   index: 0,
+      //   routes: [{ name: 'RegisterSuccess' }],
+      // });
+      navigation.navigate('RegisterSuccess')
     }).catch(error => {
+      setisLoading(false)
+      showDialog(error.message)
       console.log(error)
     })
   }
@@ -109,6 +117,11 @@ const OtpScreen = ({ navigation, route }) => {
       sendOtpApi()
     }
   }, [])
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
+        return () => backHandler.remove()
+      }, [])
 
 
   return <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>

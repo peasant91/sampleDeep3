@@ -109,6 +109,7 @@ const AccountScreen = ({navigation, route}) => {
                 Icon={IconCar}
                 text={translate('vehicle')}
                 containerStyle={{margin: 16}}
+                onPress={() => navigation.navigate('RegisterVehicle', {isRegister: false})}
               />
 
               <InfoMenu

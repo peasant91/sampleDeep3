@@ -8,5 +8,10 @@ export default {
     KEY_PROVINCE: 'province',
     KEY_COMPANY: 'company',
     KEY_GENDER: 'gender',
-    KEY_BANK: 'bank'
+    KEY_BANK: 'bank',
+    KEY_VEHICLE_OWNERSHIP: 'vehicle_ownership',
+    KEY_VEHICLE_STICKER: 'vehicle_sticker',
+    KEY_VEHICLE_USAGE: 'vehicle_usage',
+    KEY_VEHICLE_TYPE: 'vehicle_type',
+    KEY_COLOR: 'color'
 }

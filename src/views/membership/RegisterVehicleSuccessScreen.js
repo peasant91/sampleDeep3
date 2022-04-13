@@ -1,6 +1,6 @@
 import AnimatedLottieView from 'lottie-react-native'
-import React, { useContext } from 'react'
-import { SafeAreaView, View } from 'react-native'
+import React, { useContext, useEffect } from 'react'
+import { BackHandler, SafeAreaView, View } from 'react-native'
 
 import CustomButton from '../../components/atoms/CustomButton'
 import { LatoBold, LatoRegular } from '../../components/atoms/CustomText'
@@ -11,6 +11,21 @@ import { AuthContext } from '../../../App'
 const RegisterVehicleSuccessScreen = ({navigation, route}) => {
 
     const { signIn } = useContext(AuthContext)
+
+    const { isRegister } = route.params
+
+    const onButtonPressed = () => {
+        if (isRegister) {
+            signIn
+        } else {
+            navigation.navigate('Home')
+        }
+    }
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
+        return () => backHandler.remove()
+      }, [])
 
     return <SafeAreaView style={{ flex: 1, backgroundColor: 'white', }}>
         <AnimatedLottieView
@@ -27,7 +42,7 @@ const RegisterVehicleSuccessScreen = ({navigation, route}) => {
 
 
         <View style={{ padding: 16 }}>
-            <CustomButton title={translate('go_to_home')} onPress={signIn} />
+            <CustomButton title={translate('go_to_home')} onPress={onButtonPressed} />
         </View>
 
     </SafeAreaView>

@@ -99,7 +99,7 @@ const HomeScreen = ({navigation, route}) => {
 
         <View style={styles.topContainer}>
           <IconTop />
-          <View style={{position: 'absolute', right: 24, top: 24}}>
+          <TouchableOpacity style={{position: 'absolute', right: 24, top: 24}} onPress={() => navigation.navigate('Notification')}>
             <IconBell />
             <IconNotif
               style={[
@@ -107,7 +107,7 @@ const HomeScreen = ({navigation, route}) => {
                 {display: isNotifVisible ? 'flex' : 'none'},
               ]}
             />
-          </View>
+          </TouchableOpacity>
         </View>
 
         <ScrollView>

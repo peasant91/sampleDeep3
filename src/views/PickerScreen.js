@@ -14,12 +14,12 @@ import Colors from '../constants/Colors';
 
 const PickerScreen = ({ navigation, route }) => {
 
-  const { pickerId, title, data, selectedId, isEdit } = route.params;
+  const { pickerId, title, data, selectedId, isEdit, dispatch } = route.params;
 
   const [filteredData, setfilteredData] = useState(data)
 
   const onPressList = (id, name) => {
-    navigation.navigate(route.params.previousRoute, { pickerId: pickerId, id: id, name: name, isEdit: isEdit }, true)
+    navigation.navigate(route.params.previousRoute, { pickerId: pickerId, id: id, name: name, isEdit: isEdit, dispatch: dispatch }, true)
   }
 
   const onChangeText = (text) => {

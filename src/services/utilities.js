@@ -26,6 +26,10 @@ export const getBank = () => {
     return get(`${Config.apiVersion}/bank`, {})
 }
 
+export const getColor = () => {
+    return get(`${Config.apiVersion}/color`, {})
+}
+
 export const getCompanies = () => {
     return get(`${Config.apiVersion}/driver/company`, {})
 }
@@ -35,9 +39,21 @@ export const getVehicleType = () => {
 }
 
 export const getVehicleBrand = (data) => {
-    return get(`${Config.apiVersion}/driver/vehicle/brand`, {})
+    return get(`${Config.apiVersion}/driver/vehicle/brand`, data)
 }
 
 export const getVehicleModel = (data) => {
-    return get(`${Config.apiVersion}/driver/vehicle/model`, {})
+    return get(`${Config.apiVersion}/driver/vehicle/model`, data)
+}
+
+export const getVehicleOwnership = () => {
+    return get(`${Config.apiVersion}/enum/vehicle-ownership`, {})
+}
+
+export const getVehicleSticker = () => {
+    return get(`${Config.apiVersion}/enum/vehicle-sticker`, {})
+}
+
+export const getVehicleUsage = () => {
+    return get(`${Config.apiVersion}/enum/vehicle-usage`, {})
 }

@@ -24,7 +24,7 @@ const IDCard = ({navigation, title, onPress, imageUri, required, isCheck}) => {
     <View>
       <View style={styles.container}>
         {imageUri ? (
-          <TouchableOpacity style={{flex: 1}} onPress={() => navigation.navigate('ImageViewer', {imageUrl: imageUri, title: title})}>
+          <TouchableOpacity style={{flex: 1}} onPress={() => navigation.navigate('ImageViewer', {imageUrl: imageUri.includes('/storage/driver') ? getFullLink(imageUri) : imageUri, title: title})}>
             <Image
               source={{uri: imageUri.includes('/storage/driver') ? getFullLink(imageUri) : imageUri}}
               style={{

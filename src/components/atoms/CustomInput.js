@@ -352,7 +352,7 @@ export const PickerInput = ({
     let isValid = true;
     setError(null);
 
-    if (!required) {
+    if (required) {
       if (text == undefined || text.trim().length <= 0) {
         isValid = false;
         setError(translate('must_not_empty', {s: title}));

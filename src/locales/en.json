@@ -3,6 +3,7 @@
     "app_name": "PB Saving App",
     "ok": "Ok",
     "yes": "Ya",
+    "no": "Tidak",
     "login": "Masuk",
     "back": "Kembali",
     "sign_out": "Sign Out",
@@ -155,7 +156,7 @@
     "vehicle_owner_title": "Kepemilikan Kendaraan",
     "vehicle_owner_placeholder": "cth: Pribadi, Perusahaan",
     "vehicle_usage_title" : "Penggunaan Angkutan Kendaraan",
-    "vehicle_usage_placeholder": "cth: Online, Umum",
+    "vehicle_usage_placeholder": "cth: Pribadi, Umum",
     "vehicle_type_title": "Tipe Bodi",
     "brand_title": "Brand",
     "brand_placeholder": "cth: Toyota, Honda, Suzuki",
@@ -191,6 +192,7 @@
     "reset_password:": "Reset Password",
     "manual_input" : "Input Manual",
     "add_manual_input": "+Input Manual",
+    "sticker_area_placeholder": "cth: Full Body",
 
     "contract_end":"Selesai Kontrak",
     "installation_time_title": "Lokasi & Waktu Pemasangan",
@@ -202,7 +204,9 @@
     "time": "Waktu",
     "average_speed": "Kecepatan rata-rata",
     "distance": "Jarak Tempuh",
-    "edit_profile": "Ubah Profile"
+    "edit_profile": "Ubah Profile",
+    "error_vehicle_image": "Mohon isi Gambar Kendaraan",
+    "error_sticker_area": "Mohon isi Area Yang Ingin Distiker"
 
 
 

@@ -30,7 +30,7 @@ import pkg from '../../package.json';
 import {AuthContext} from '../../App';
 import translate from '../locales/translate';
 import ImageTopLogo from '../assets/images/img_top_logo.svg';
-import {getBank, getCompanies, getDivisionApi, getGender, getProvince} from '../services/utilities';
+import {getBank, getColor, getCompanies, getDivisionApi, getGender, getProvince, getVehicleOwnership, getVehicleSticker, getVehicleType, getVehicleUsage} from '../services/utilities';
 import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
 import Constant from '../constants/Constant';
 import {postFreshchat} from '../services/freshchat';
@@ -41,6 +41,7 @@ import messaging from '@react-native-firebase/messaging';
 import {useIsFocused} from '@react-navigation/native';
 
 import BGSplash from '../assets/background/bg_splash.svg'
+import axios from 'axios';
 
 const SplashScreen = props => {
   Splash.hide();
@@ -105,9 +106,8 @@ const SplashScreen = props => {
   const getCompaniesApi = async () => {
     getCompanies()
       .then(response => {
+        getGenderApi()
         AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
-          .then(response => getGenderApi())
-          .catch(err => console.log(err));
       })
       .catch(err => {
         showDialog(err.message);
@@ -117,9 +117,8 @@ const SplashScreen = props => {
   const getGenderApi = async () => {
     getGender()
       .then(response => {
+        getBankApi()
         AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
-          .then(response => getBankApi())
-          .catch(err => console.log(err));
       })
       .catch(err => {
         showDialog(err.message);
@@ -129,9 +128,8 @@ const SplashScreen = props => {
   const getBankApi = async () => {
     getBank()
       .then(response => {
+        doneLoading()
         AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(response))
-          .then(response => doneLoading())
-          .catch(err => console.log(err));
       })
       .catch(err => {
         showDialog(err.message);
@@ -228,7 +226,28 @@ const SplashScreen = props => {
     // getCalendarYear();
     // checkVersion();
     if (isFocus) {
-      getProvinceApi();
+      axios.all([
+        getProvince(),
+        getCompanies(),
+        getGender(),
+        getBank(),
+        getVehicleOwnership(),
+        getVehicleSticker(),
+        getVehicleUsage(),
+        getColor(),
+      ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
+        console.log('axios spread', province, companies)
+        await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
+        await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
+        await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
+        await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
+        await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
+        doneLoading()
+      }))
+      // getProvinceApi();
       // requestPermission();
       // initFreshchat();
     }
