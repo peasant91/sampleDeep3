@@ -34,7 +34,7 @@
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
-                                                   moduleName:@"Otomedia"
+                                                   moduleName:@"otomedia"
                                             initialProperties:nil];
 
   if (@available(iOS 13.0, *)) {

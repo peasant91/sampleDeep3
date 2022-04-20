@@ -94,7 +94,7 @@ const RegisterPasswordScreen = ({navigation, route}) => {
                 placeholder={translate('password_placeholder')}
                 error={''}
                 match={formState.inputValues.password}
-                value={formState.inputValues.repassword}
+                value={formState.inputValues.password_confirmation}
                 containerStyle={{marginTop: 20}}
                 isCheck={formState.isChecked}
                 dispatcher={dispatch}

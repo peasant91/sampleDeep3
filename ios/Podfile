@@ -3,12 +3,13 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '11.0'
 
-target 'PBSaving' do
+target 'otomedia' do
   config = use_native_modules!
 
   permissions_path = '../node_modules/react-native-permissions/ios'
 
   pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
+  pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -16,7 +17,7 @@ target 'PBSaving' do
     :hermes_enabled => true
   )
 
-  target 'PBSavingTests' do
+  target 'otomediaTests' do
     inherit! :complete
     # Pods for testing
   end

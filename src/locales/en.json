@@ -125,7 +125,7 @@
     "change_vehicle": "Ubah Kendaraan",
     "vehicle": "Kendaraan",
     "verification_success": "Lulus Verifikasi",
-    "vehicle_can_be_change": "Kendaraan bisa di ubah ketika kontrak berakhir & \n status kendaraan akan di verifikasi ulang.",
+    "vehicle_can_be_change": "Kendaraan tidak bisa diubah ketika sudah diverifikasi hubungin admin untuk melakukan perubahan.",
     "info_not_verified": "Tambahkan kendaraan agar mendapatkan penawaran pekerjaan dari Kami.",
     "see_this_offer": "Lihat Penawaran Ini",
 
@@ -206,7 +206,20 @@
     "distance": "Jarak Tempuh",
     "edit_profile": "Ubah Profile",
     "error_vehicle_image": "Mohon isi Gambar Kendaraan",
-    "error_sticker_area": "Mohon isi Area Yang Ingin Distiker"
+    "error_sticker_area": "Mohon isi Area Yang Ingin Distiker",
+    "error_vehicle_not_registered": "Data Kendaraan belum ada atau belum diverifikasi. Tunggu verifikasi dari admin agar Anda bisa mengajukan kontrak.",
+    "province_count": "%{count} Provinsi Operasional",
+    "see_in_map": "Lihat Lokasi di Map",
+    "offer_info": "Informasi Penawaran",
+    "vehicle_purpose": "Penggunaan Angkutan",
+    "operational_province": "Provinsi Operasional",
+    "operational_city": "Kota Operasional",
+    "ad_duration": "Masa Tayang Iklan",
+    "price_per_kilos": "Harga/Km",
+    "vehicle_type": "Jenis Kendaraan",
+    "vehicle_brand": "Merek Kendaraan",
+    "installation_location": "Lokasi Pemasangan"
+    
 
 
 

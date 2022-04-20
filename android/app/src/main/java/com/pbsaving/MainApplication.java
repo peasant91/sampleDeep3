@@ -1,4 +1,4 @@
-package com.schott.pbsaving.android;
+package com.pbsaving;
 
 import android.app.Application;
 import android.content.Context;
@@ -11,7 +11,8 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
   import com.facebook.react.bridge.JSIModulePackage; // <- add
-  import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
+import com.pbsaving.BuildConfig;
+import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
   import androidx.multidex.MultiDexApplication;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {

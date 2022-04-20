@@ -59,6 +59,7 @@ import CurrentContractScreen from './src/views/maintab/offer/CurrentContractScre
 import ContractHistoryScreen from './src/views/maintab/offer/ContractHistoryScreen';
 import BankScreen from './src/views/maintab/account/BankScreen';
 import JobScreen from './src/views/maintab/home/JobScreen';
+import InstallationListScreen from './src/views/maintab/offer/InstallationListScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -309,11 +310,6 @@ const App = ({ navigation, route }) => {
                     />
 
                     <Stack.Screen
-                      name="Notification"
-                      component={NotificationScreen}
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
                       name="ForgotPassword"
                       component={ForgotPasswordScreen}
                       options={{ headerShown: false }}
@@ -391,25 +387,25 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false, animationEnabled: enableAnimation }}
                       initialParams={{ news: pushNotifParam }}
                     />
+
                     <Stack.Screen
                       name="RegisterVehicle"
                       component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
                     />
-                    
+
                     <Stack.Screen
-                      name="Login"
-                      component={LoginScreen}
+                      name="InstallationList"
+                      component={InstallationListScreen}
                       options={{ headerShown: false }}
                     />
-
 
                     <Stack.Screen
                       name="Notification"
                       component={NotificationScreen}
                       options={{ headerShown: false }}
                     />
-                    
+
                     <Stack.Screen
                       name="RegisterVehicleSuccessMain"
                       component={RegisterVehicleSuccessScreen}
@@ -426,12 +422,6 @@ const App = ({ navigation, route }) => {
                       name="MyProfile"
                       component={MyProfileScreen}
                       options={{ headerShown: false, animationEnabled: enableAnimation }}
-                    />
-
-                    <Stack.Screen
-                      name="Register"
-                      component={RegisterScreen}
-                      options={{ headerShown: false }}
                     />
 
                     <Stack.Screen

@@ -12,7 +12,7 @@ const AccountCardInfo = ({data, containerStyle}) => {
     return <View style={[containerStyle, styles.container]}>
 
         <View style={{backgroundColor: '#F5F6FF', padding: 10}}>
-            <LatoRegular style={{color: Colors.primary}} Icon={IconCar}>{data.car + ' - ' + data.licensePlate}</LatoRegular>
+            <LatoRegular style={{color: Colors.primary}} Icon={IconCar}>{data.plate_model}</LatoRegular>
         </View>
 
         <View style={{flexDirection: 'row', height: 95, padding: 10}}>
@@ -27,9 +27,9 @@ const AccountCardInfo = ({data, containerStyle}) => {
                 <LatoRegular>:</LatoRegular>
             </View>
             <View style={{justifyContent: 'space-around', flex: 1}}>
-                <LatoRegular style={{color: Colors.primary}}>{translate('verification_success')}</LatoRegular>
-                <LatoRegular style={{color: Colors.primary}}>{data.travelDistance + 'Km'}</LatoRegular>
-                <LatoRegular style={{color: Colors.primary}}>{data.todayTravel+'KM'}</LatoRegular>
+                <LatoRegular style={{color: Colors.primary}}>{data.status}</LatoRegular>
+                <LatoRegular style={{color: Colors.primary}}>{data.total_rute_distances + 'Km'}</LatoRegular>
+                <LatoRegular style={{color: Colors.primary}}>{data.day_rute_distance+'Km'}</LatoRegular>
             </View>
         </View>
 

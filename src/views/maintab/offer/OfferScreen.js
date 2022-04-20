@@ -1,10 +1,14 @@
-import {FlatList, SafeAreaView, StyleSheet, View} from 'react-native';
-import React from 'react';
+import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import CardContract from '../../../components/atoms/CardContract';
-import {Input} from 'react-native-elements';
+import { Input } from 'react-native-elements';
 
 import IconSearch from '../../../assets/images/ic_search_offer.svg';
 import IconFilter from '../../../assets/images/ic_filter.svg';
+import { getCampaignList } from '../../../services/campaign';
+import ErrorNotRegisterVehicle from '../../../components/atoms/ErrorNotRegisterVehicle';
+import { showDialog } from '../../../actions/commonActions';
+import translate from '../../../locales/translate';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -22,40 +26,63 @@ const dummyData = [
   dummyContractData,
 ];
 
-const OfferScreen = ({navigation, route}) => {
-  
-const goToDetail = (item) => {
-  navigation.navigate('OfferDetail', {data: item})
-}
+const OfferScreen = ({ navigation, route }) => {
+
+  const [data, setdata] = useState([])
+  const [isNotRegisterVehicle, setisNotRegisterVehicle] = useState(false)
+
+  const goToDetail = (item) => {
+    navigation.navigate('OfferDetail', { id: item.id })
+  }
+
+  const getCampaignListApi = () => {
+    getCampaignList().then(response => {
+      setdata(response)
+    }).catch(err => {
+      if (err.message.includes('verifikasi')) {
+        setisNotRegisterVehicle(true)
+      } else {
+        setisNotRegisterVehicle(false)
+        showDialog(err.message)
+      }
+    })
+  }
+
+
+  useEffect(() => {
+    getCampaignListApi()
+  }, [])
+
 
   return (
-    <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
-      <View style={{backgroundColor: '#FAFAFA', flex: 1}}>
+    <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
+      <View style={{ backgroundColor: '#FAFAFA', flex: 1 }}>
         <View style={styles.topHeader}>
           <Input
-            containerStyle={{flex: 1, paddingHorizontal: 16}}
+            containerStyle={{ flex: 1, paddingHorizontal: 16 }}
             rightIcon={IconSearch}
-            style={{height: 35}}
-            placeholder={'test'}
+            style={{ height: 35 }}
+            placeholder={translate('find_offer_here')}
             multiline={false}
           />
-          <IconFilter style={{marginRight: 16, marginBottom: 25}} />
         </View>
 
-        <FlatList
-          data={dummyData}
-          contentContainerStyle={{paddingBottom: 16, overflow: 'visible'}}
-          keyExtractor={item => item.imageUrl}
-          renderItem={({item, index}) => {
-            return (
-              <CardContract
-                containerStyle={{marginHorizontal: 16, marginTop: 16}}
-                data={item}
-                onPress={() => goToDetail(item)}
-              />
-            );
-          }}
-        />
+        {isNotRegisterVehicle ? <ErrorNotRegisterVehicle /> :
+          <FlatList
+            data={data}
+            contentContainerStyle={{ paddingBottom: 16, overflow: 'visible' }}
+            keyExtractor={item => item.id}
+            renderItem={({ item, index }) => {
+              return (
+                <CardContract
+                  containerStyle={{ marginHorizontal: 16, marginTop: 16 }}
+                  data={item}
+                  onPress={() => goToDetail(item)}
+                />
+              );
+            }}
+          />
+        }
       </View>
     </SafeAreaView>
   );

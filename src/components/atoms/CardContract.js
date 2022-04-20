@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {Divider, Image} from 'react-native-elements';
 import {LatoBold, LatoRegular} from './CustomText';
@@ -8,36 +8,43 @@ import IconCheck from '../../assets/images/ic_check_circle.svg';
 
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
+import { displayProvince, getFullLink, getPostTime } from '../../actions/helper';
 
 const CardContract = ({data, onPress, containerStyle}) => {
+
+  useEffect(() => {
+    console.log('datanya', data)
+  }, [])
+  
+
   return (
     <TouchableOpacity onPress={onPress} style={containerStyle}>
       <View style={styles.container}>
         <View style={{flexDirection: 'row', padding: 16}}>
           <Image
-            source={{uri: data.imageUrl}}
+            source={{uri: getFullLink(data.company_image)}}
             style={{height: 64, width: undefined, aspectRatio: 1}}
             resizeMode={'center'}
           />
           <View style={{paddingLeft: 16, justifyContent: 'space-between'}}>
-            <LatoRegular>{data.contractTitle}</LatoRegular>
-            <LatoRegular style={{fontSize: 10}}>{data.bankName}</LatoRegular>
+            <LatoRegular>{data.sticker_area?.length > 1 ? data.sticker_area.join(', ') : data.sticker_area}</LatoRegular>
+            <LatoRegular style={{fontSize: 10}}>{data.company_name}</LatoRegular>
             <LatoRegular
               Icon={IconLocation}
               style={{fontSize: 10, color: Colors.primary}}>
-              {data.address}
+              {displayProvince(data.contract_area)}
             </LatoRegular>
           </View>
         </View>
 
-        {data.carList ? (
+        {data.vehicles ? (
           <View>
             <Divider />
             <LatoRegular
               Icon={IconCheck}
               containerStyle={{paddingHorizontal: 10, paddingVertical: 8}}
               style={{fontSize: 10, color: Colors.primary}}>
-              {data.carList}
+              {data.vehicles.join(', ')}
             </LatoRegular>
             <Divider />
           </View>
@@ -54,7 +61,7 @@ const CardContract = ({data, onPress, containerStyle}) => {
             justifyContent: 'space-between',
           }}>
           <LatoRegular style={{fontSize: 10, color: Colors.greyLight}}>
-            {data.date}
+            {getPostTime(data.start_date)}
           </LatoRegular>
           <LatoBold
             style={{

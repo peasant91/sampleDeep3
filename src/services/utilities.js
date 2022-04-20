@@ -57,3 +57,11 @@ export const getVehicleSticker = () => {
 export const getVehicleUsage = () => {
     return get(`${Config.apiVersion}/enum/vehicle-usage`, {})
 }
+
+export const getDriverVehicle = () => {
+    return get(`${Config.apiVersion}/driver/vehicle`, {})
+}
+
+export const getVehicleRoute = () => {
+    return get(`${Config.apiVersion}/driver/vehicle/rute-distance`, {})
+}

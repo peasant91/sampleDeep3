@@ -13,5 +13,6 @@ export default {
     KEY_VEHICLE_STICKER: 'vehicle_sticker',
     KEY_VEHICLE_USAGE: 'vehicle_usage',
     KEY_VEHICLE_TYPE: 'vehicle_type',
-    KEY_COLOR: 'color'
+    KEY_COLOR: 'color',
+    KEY_DO_JOB: 'do_job'
 }

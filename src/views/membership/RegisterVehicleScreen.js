@@ -181,6 +181,8 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     });
   };
 
+
+  //preload the form data from storage
   const preload = () => {
     AsyncStorage.getItem(StorageKey.KEY_VEHICLE_OWNERSHIP).then(response => {
       setownershipData(JSON.parse(response))
@@ -262,13 +264,16 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
 
       //set the sticker area
       if (pickerId == 'sticker_area_id') {
+        //if sticker is full body set as fullbody
+        //else remove the array and set according to checkbox
         if (id == StickerType[0].id) {
-          setstickerArea([StickerType[0].name])
+          setstickerArea([StickerType[0].id])
         } else {
           setstickerArea([])
         }
       }
 
+      //build data and dispatch to specific dispatcher
       const data =
       {
         type: 'picker',
@@ -278,6 +283,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
         isValid: true,
       };
       dispatch(data)
+
+
+      //get area if parent area selected
       if (pickerId == 'province_id') {
         getCity(route.params.id).then(cityData => {
           setcityData(cityData);

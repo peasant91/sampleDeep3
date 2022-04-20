@@ -1,5 +1,9 @@
 import Config from "../constants/Config";
 import Constant from "../constants/Constant";
+import moment from "moment";
+import translate from "../locales/translate";
+import { FormatMoney } from "format-money-js";
+import openMap from 'react-native-open-maps'
 
 export const getCurrentWeek = () => {
     currentdate = new Date();
@@ -11,7 +15,29 @@ export const getCurrentWeek = () => {
 }
 
 export const getFullLink = (text) => {
-    return Constant[Config.developmentMode].DOMAIN + text
+    return Constant[Config.developmentMode].DOMAIN + '/' + text
+}
+
+export const openMaps = (lat, lng) => {
+  openMap({latitude: lat, longitude: lng, end: `${lat},${lng}`, query: `${lat},${lng}`})
+}
+
+export const getPostTime = (date) => {
+  const utc = moment.utc('2022-04-19T02:20:33.000Z')
+  const now = moment(Date())
+  if (utc.diff(now, 'days') == 0) {
+    return 'Sekitar ' + moment(utc).local().fromNow()
+  } else {
+    return moment(date).format('DD MMMM YYYY')
+  }
+}
+
+export const displayProvince = (province) => {
+  if (province && province.length > 1) {
+    return translate('province_count', {count: province.length})
+  } else {
+    return province
+  }
 }
 
 export const isEmpty = (obj) => {
@@ -22,4 +48,19 @@ export const isEmpty = (obj) => {
     }
   
     return JSON.stringify(obj) === JSON.stringify({});
+}
+
+export const toCurrency = (number) => {
+
+  if (number) {
+    const fm = new FormatMoney({
+      decimals: 0,
+      separator: '.',
+      symbol: 'Rp. '
+    });
+    return fm.from(number)
+  } else {
+    return ''
   }
+
+}

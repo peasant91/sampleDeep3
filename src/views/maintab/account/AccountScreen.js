@@ -21,6 +21,8 @@ import StorageKey from '../../../constants/StorageKey';
 import { AuthContext } from '../../../../App';
 import { showDialog } from '../../../actions/commonActions';
 import { getProfile } from '../../../services/user';
+import { getDriverVehicle, getVehicleRoute } from '../../../services/utilities';
+import { isEmpty } from '../../../actions/helper';
 
 
 
@@ -41,6 +43,7 @@ import { getProfile } from '../../../services/user';
 const AccountScreen = ({navigation, route}) => {
 
   const [profileData, setprofileData] = useState({})
+  const [vehicleRute, setvehicleRute] = useState({})
   const [refreshing, setrefreshing] = useState(false)
   const {signOut} = useContext(AuthContext);
 
@@ -56,6 +59,14 @@ const AccountScreen = ({navigation, route}) => {
     })
   }
 
+  const getVehicleRuteApi = () => {
+    getVehicleRoute().then(response => {
+      setvehicleRute(response)
+    }).catch(err => {
+      showDialog(error.message)
+    })
+  }
+
   useEffect( () => {
     // AsyncStorage.getItem(StorageKey.KEY_USER_PROFILE).then(data => {
     //   if (data) {
@@ -64,6 +75,7 @@ const AccountScreen = ({navigation, route}) => {
     // })
 
     getProfileApi()
+    getVehicleRuteApi()
   
   }, [route.params])
 
@@ -91,11 +103,11 @@ const AccountScreen = ({navigation, route}) => {
       }
       >
         <View>
-          {profileData.isVerified ? (
+          {!isEmpty(vehicleRute) ? (
             <View>
               <AccountCardInfo
                 containerStyle={{margin: 16}}
-                data={dummyCardData}
+                data={vehicleRute}
               />
               <InfoMenu
                 containerStyle={{marginHorizontal: 16, marginBottom: 16}}
