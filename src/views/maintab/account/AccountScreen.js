@@ -23,6 +23,9 @@ import { showDialog } from '../../../actions/commonActions';
 import { getProfile } from '../../../services/user';
 import { getDriverVehicle, getVehicleRoute } from '../../../services/utilities';
 import { isEmpty } from '../../../actions/helper';
+import axios from 'axios';
+import { ShimmerPlaceholder } from '../../../components/atoms/shimmer/Shimmer';
+import { getHome } from '../../../services/home';
 
 
 
@@ -44,46 +47,43 @@ const AccountScreen = ({navigation, route}) => {
 
   const [profileData, setprofileData] = useState({})
   const [vehicleRute, setvehicleRute] = useState({})
+  const [contractData, setContractData] = useState({})
+  const [isLoading, setisLoading] = useState(true)
   const [refreshing, setrefreshing] = useState(false)
   const {signOut} = useContext(AuthContext);
 
-
   const getProfileApi = () => {
-    getProfile().then(response => {
+    setisLoading(true)
+    axios.all([
+      getProfile(),
+      getVehicleRoute(),
+      getHome()
+    ]).then(axios.spread((profile, vehicleRoute, contract) => {
+      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
+      setprofileData(profile)
+      setvehicleRute(vehicleRoute)
+      setContractData(contract)
       setrefreshing(false)
-      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(response))
-      setprofileData(response)
-    }).catch(error => {
+      setisLoading(false)
+    })).catch(err => {
       setrefreshing(false)
-      showDialog(error.message)
-    })
-  }
-
-  const getVehicleRuteApi = () => {
-    getVehicleRoute().then(response => {
-      setvehicleRute(response)
-    }).catch(err => {
+      setisLoading(false)
       showDialog(error.message)
     })
   }
 
   useEffect( () => {
-    // AsyncStorage.getItem(StorageKey.KEY_USER_PROFILE).then(data => {
-    //   if (data) {
-    //     setprofileData(JSON.parse(data))
-    //   }
-    // })
 
     getProfileApi()
-    getVehicleRuteApi()
   
   }, [route.params])
 
-  useEffect(() => {
-  }, [])
-  
   const goToEdit = () => {
     navigation.navigate('Register', { isEdit: true, data: profileData})
+  }
+
+  const goToContract = () => {
+    navigation.navigate('CurrentContract', { id: contractData?.active_contract.contract_id, isEmpty: contractData.active_contract == null})
   }
 
   const logout = () => {
@@ -93,7 +93,7 @@ const AccountScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AccountTopHeader data={profileData} />
+      <AccountTopHeader data={profileData} isLoading={isLoading}/>
       <ScrollView
        refreshControl={
         <RefreshControl
@@ -103,7 +103,7 @@ const AccountScreen = ({navigation, route}) => {
       }
       >
         <View>
-          {!isEmpty(vehicleRute) ? (
+          { isLoading ? <View style={{margin: 16}}><ShimmerPlaceholder style={{width: '100%', height: 100, }} /></View> : (!isEmpty(vehicleRute) ? (
             <View>
               <AccountCardInfo
                 containerStyle={{margin: 16}}
@@ -129,16 +129,25 @@ const AccountScreen = ({navigation, route}) => {
                 text={translate('info_not_verified')}
               />
             </View>
-          )}
+          ))}
 
           <Divider />
 
+            <View style={{margin: 12}}>
+
+            <ShimmerPlaceholder
+            isLoading={isLoading}
+            height={40}
+            style={{width: '100%'}}
+            >
           <AccountMenu
             Icon={IconMyContract}
             text={translate('my_contract')}
-            containerStyle={{margin: 16}}
-            onPress={() => navigation.navigate('CurrentContract')}
+            containerStyle={{margin: 4}}
+            onPress={goToContract}
           />
+            </ShimmerPlaceholder>
+            </View>
 
           <Divider />
 

@@ -246,7 +246,9 @@ const SplashScreen = props => {
         await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
         await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
         doneLoading()
-      }))
+      })).catch(err => {
+        showDialog(err.message)
+      })
       // getProvinceApi();
       // requestPermission();
       // initFreshchat();

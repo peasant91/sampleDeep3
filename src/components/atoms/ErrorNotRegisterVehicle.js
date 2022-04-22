@@ -6,9 +6,9 @@ import { LatoRegular } from './CustomText'
 
 
 
-const ErrorNotRegisterVehicle = () => {
+const ErrorNotRegisterVehicle = ({containerStyle}) => {
 
-    return <View style={{flex: 1, justifyContent: 'center'}}>
+    return <View style={[{flex: 1, justifyContent: 'center'}, containerStyle]}>
         <Image source={require('../../assets/images/ic_car_empty.png')} style={{width: '100%', aspectRatio: 3}}/>
         <LatoRegular containerStyle={{paddingVertical: 24, paddingHorizontal: 32}} style={{textAlign: 'center'}}>{translate('error_vehicle_not_registered')}</LatoRegular>
     </View>

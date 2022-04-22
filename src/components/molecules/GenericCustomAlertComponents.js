@@ -5,6 +5,7 @@ import {Touchable} from 'react-native';
 import {TouchableOpacity} from 'react-native';
 import CustomButton from '../atoms/CustomButton';
 import translate from '../../locales/translate';
+import Colors from '../../constants/Colors';
 
 const GenericCustomAlertComponents = props => {
   const data = props.listData;
@@ -13,11 +14,13 @@ const GenericCustomAlertComponents = props => {
       <Text
         style={{
           fontFamily: 'Lato-Bold',
+          marginTop: 10,
           fontSize: 18,
-          marginBottom: 10,
+          marginBottom: 16,
           alignSelf: 'center',
           textAlign: 'center',
           minWidth: '80%',
+          color: Colors.primary
         }}>
         {props.dialogTitle}
       </Text>
@@ -33,6 +36,7 @@ const GenericCustomAlertComponents = props => {
             <CustomButton
               types="secondary"
               onPress={props.onNegativePress}
+              style={{height: 40, marginHorizontal: 2}}
               title={
                 props.negativeTitle ? props.negativeTitle : translate('cancel')
               }
@@ -42,6 +46,7 @@ const GenericCustomAlertComponents = props => {
             <CustomButton
               types="primary"
               onPress={props.onPositivePress}
+              style={{height: 40, marginHorizontal: 2}}
               title={
                 props.positiveTitle ? props.positiveTitle : translate('retry')
               }

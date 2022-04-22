@@ -459,13 +459,6 @@ const RegisterScreen = ({navigation, route}) => {
     });
   };
 
- 
-
-  const closeDivision = () => {
-    console.log('closing');
-    bottomSheetModalRef.current.close();
-  };
-
   useEffect(async () => {
     AsyncStorage.getItem(StorageKey.KEY_COMPANY).then(company => {
       setcompanyData(JSON.parse(company));

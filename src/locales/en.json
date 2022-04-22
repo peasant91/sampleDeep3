@@ -19,6 +19,7 @@
     "notification": "Notifikasi",
     "change_password_success": "Ganti Kata Sandi Berhasil.",
     
+    "network_error": "Tidak dapat terhubung, Mohon periksa Koneksi",
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",
     "email_placeholder": "cth: nama@email.com",
@@ -218,7 +219,17 @@
     "price_per_kilos": "Harga/Km",
     "vehicle_type": "Jenis Kendaraan",
     "vehicle_brand": "Merek Kendaraan",
-    "installation_location": "Lokasi Pemasangan"
+    "installation_location": "Lokasi Pemasangan",
+    "created_at": "Dibuat %{date}",
+    "contract_offer_confirmation": "Apakah Anda yakin ingin menagajukan kontrak ini?",
+    "from_": "Dari %{date}",
+    "profit": "Penghasilan",
+    "transferred": "Ditransfer",
+    "trip_report": "Laporan Perjalanan",
+    "driver_status": "Status Driver",
+    "ads_type": "Jenis Iklan",
+    "total_trip": "Total Perjalanan",
+    "trip_today": "Perjalanan Hari Ini"
     
 
 

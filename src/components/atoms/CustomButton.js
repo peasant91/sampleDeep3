@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   titleSecondary: {
     fontSize: 18,
     fontFamily: 'Lato-Bold',
-    color: '#1644BD',
+    color: Colors.primary,
   },
   disbledTitle: {
     fontFamily: 'Lato-Bold',

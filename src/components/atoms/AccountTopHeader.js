@@ -10,7 +10,7 @@ import translate from '../../locales/translate';
 import { getFullLink, isEmpty } from '../../actions/helper';
 import { ShimmerAccoutTopHeader } from './shimmer/Shimmer';
 
-const AccountTopHeader = ({ data }) => {
+const AccountTopHeader = ({ data, isLoading }) => {
 
   useEffect(() => {
     console.log(data)
@@ -20,7 +20,7 @@ const AccountTopHeader = ({ data }) => {
 
   return (
         <View style={styles.container}>
-      {!isEmpty(data) ?
+      {!isLoading ?
         <View style={{flexDirection: 'row'}}>
           <Avatar 
             rounded

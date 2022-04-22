@@ -11,9 +11,10 @@ const InfoMenu = ({text, containerStyle}) => {
         backgroundColor: '#F5F6FF',
         borderRadius: 5,
         flexDirection: 'row',
+        flex: 1
       }, containerStyle]}>
       <IconInfo />
-      <LatoRegular style={{paddingVertical: 10, marginLeft: 16, paddingRight: 20}}>
+      <LatoRegular style={{paddingVertical: 10, marginLeft: 16, paddingRight: 20, width: '95%', fontSize: 12}}>
         {text}
       </LatoRegular>
     </View>

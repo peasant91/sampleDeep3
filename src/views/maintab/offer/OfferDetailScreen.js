@@ -17,6 +17,9 @@ import ListInstallationSchedule from '../../../components/atoms/list/ListInstall
 import { getCampaignDetail } from '../../../services/campaign'
 import { showDialog } from '../../../actions/commonActions'
 import { displayProvince, getFullLink, openMaps, toCurrency } from '../../../actions/helper'
+import ListTag from '../../../components/atoms/list/ListTag'
+import { ShimmerOfferDetail } from '../../../components/atoms/shimmer/Shimmer'
+import { applyContract } from '../../../services/contract'
 
 const data = {
     imageUrl: 'https://picsum.photos/200/300',
@@ -43,6 +46,7 @@ const OfferDetailScreen = ({ navigation, route }) => {
     const { id } = route.params
 
     const [isLoading, setisLoading] = useState(true)
+    const [isProcessing, setisProcessing] = useState(false)
     const [data, setdata] = useState({})
 
     const getDetail = (id) => {
@@ -69,6 +73,20 @@ const OfferDetailScreen = ({ navigation, route }) => {
         }
     }
 
+    const assignContract = () => {
+        setisProcessing(true)
+        applyContract(id).then(response => {
+            setisProcessing(false)
+            navigation.navigate('Home', {isReload: true}, true)
+        }).catch(err => {
+            showDialog(err.message)
+        })
+    }
+
+    const showConfirmationDialog = () => {
+        showDialog(translate('contract_offer_confirmation'), true, assignContract, null, translate('yes'))
+    }
+
     useEffect(() => {
         getDetail(id)
     }, [])
@@ -79,22 +97,22 @@ const OfferDetailScreen = ({ navigation, route }) => {
         <ScrollView style={{ flex: 1 }}>
 
             {isLoading ?
-                <View>
+                <ShimmerOfferDetail containerStyle={{padding: 16}}/>
 
-                </View> :
+                :
 
                 <View>
                     <View style={{ flexDirection: 'row', padding: 16 }}>
-                        <Image source={{ uri: getFullLink(data?.company_image) }} style={{ height: 64, width: 'auto', aspectRatio: 1 }} />
+                    <Image source={{ uri: getFullLink(data?.company_image) }} style={{ height: 64, width: 'auto', aspectRatio: 1 }} />
 
                         <View style={{ paddingLeft: 16 }}>
-                            <LatoBold style={{ color: Colors.secondText }}>{data.sticker_area?.length > 1 ? data.sticker_area.join(', ') : data.sticker_area}</LatoBold>
+                            <LatoBold style={{ color: '#6D6D6D' }}>{data.company_name}</LatoBold>
                             <LatoRegular
                                 style={{ color: Colors.primary, fontSize: 10, paddingVertical: 10 }}
                                 Icon={IconLocation}>{displayProvince(data.contract_area)}</LatoRegular>
                             <LatoRegular
-                                style={{ fontSize: 10 }}
-                            >{data.company_name}</LatoRegular>
+                                style={{ fontSize: 10, color: '#A7A7A7' }}
+                            >{translate('created_at', {date: moment(data.created_at).format('DD MMMM YYYY')})}</LatoRegular>
                         </View>
 
                     </View>
@@ -121,7 +139,25 @@ const OfferDetailScreen = ({ navigation, route }) => {
                             </View>
                         </View>
                         <LatoRegular style={styles.primarySub} containerStyle={{ marginTop: 8 }}>{translate('operational_province')}</LatoRegular>
+                        <FlatList
+                            scrollEnabled={false}
+                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}}
+                            data={data.contract_area}
+                            keyExtractor={item => item}
+                            renderItem={({item, index}) => {
+                                return <ListTag title={item}/>
+                            }}
+                        />
                         <LatoRegular style={styles.primarySub} containerStyle={{ marginTop: 8 }}>{translate('operational_city')}</LatoRegular>
+                        <FlatList
+                            scrollEnabled={false}
+                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}}
+                            data={data.contract_area_city}
+                            keyExtractor={item => item}
+                            renderItem={({item, index}) => {
+                                return <ListTag title={item}/>
+                            }}
+                        />
                     </View>
 
 
@@ -136,6 +172,15 @@ const OfferDetailScreen = ({ navigation, route }) => {
                             <LatoRegular style={styles.primarySub} containerStyle={{ flex: 5, marginLeft: 10 }}>{data?.vehicle_type?.length > 1 ? data.vehicle_type.join(' & ') : data.vehicle_type}</LatoRegular>
                         </View>
                         <LatoRegular style={styles.primarySub} containerStyle={{ marginTop: 8 }}>{translate('vehicle_brand')}</LatoRegular>
+                        <FlatList
+                            scrollEnabled={false}
+                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}}
+                            data={data.vehicles}
+                            keyExtractor={item => item}
+                            renderItem={({item, index}) => {
+                                return <ListTag title={item}/>
+                            }}
+                        />
 
                     </View>
                     <Divider />
@@ -147,15 +192,6 @@ const OfferDetailScreen = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* <FlatList
-                    scrollEnabled={false}
-                    data={data.installation_schedule}
-                    keyExtractor={item => item.id}
-                    renderItem={({item, index}) => {
-                        if (index <= 2) {
-                        }
-                    }}
-                /> */}
                     {
                         data.installation_schedule && data.installation_schedule.map((item, index) => {
                             return <ListInstallationSchedule data={item} onPressMap={() => openMaps(Number(item.lat), Number(item.lng))} />
@@ -170,10 +206,13 @@ const OfferDetailScreen = ({ navigation, route }) => {
 
         </ScrollView>
 
-        <CustomButton
+        {!isLoading && <CustomButton
             containerStyle={{ padding: 16 }}
             types={'primary'}
+            onPress={showConfirmationDialog}
+            isLoading={isProcessing}
             title={translate('apply')} />
+        }
     </SafeAreaView>
 
 }

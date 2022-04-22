@@ -1,7 +1,7 @@
 import { get } from "./baseApi"
 
-export const getCampaignList = () => {
-    return get('v1/campaign', {})
+export const getCampaignList = (query) => {
+    return get('v1/campaign', query)
 }
 
 export const getCampaignDetail = (id, query) => {

@@ -1,21 +1,17 @@
 import React, { useEffect } from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {Divider, Image} from 'react-native-elements';
-import {LatoBold, LatoRegular} from './CustomText';
+import {LatoBold, LatoRegular} from '../CustomText';
 
-import IconLocation from '../../assets/images/ic_home_location.svg';
-import IconCheck from '../../assets/images/ic_check_circle.svg';
+import IconLocation from '../../../assets/images/ic_home_location.svg';
+import IconCheck from '../../../assets/images/ic_check_circle.svg';
 
-import Colors from '../../constants/Colors';
-import translate from '../../locales/translate';
-import { displayProvince, getFullLink, getPostTime } from '../../actions/helper';
+import Colors from '../../../constants/Colors';
+import translate from '../../../locales/translate';
+import { displayProvince, getFullLink, getPostTime } from '../../../actions/helper';
+import StatusTag from '../StatusTag';
 
 const CardContract = ({data, onPress, containerStyle}) => {
-
-  useEffect(() => {
-    console.log('datanya', data)
-  }, [])
-  
 
   return (
     <TouchableOpacity onPress={onPress} style={containerStyle}>
@@ -23,8 +19,8 @@ const CardContract = ({data, onPress, containerStyle}) => {
         <View style={{flexDirection: 'row', padding: 16}}>
           <Image
             source={{uri: getFullLink(data.company_image)}}
-            style={{height: 64, width: undefined, aspectRatio: 1}}
-            resizeMode={'center'}
+            style={{height: data.contract_status ? 80 : 60, width: undefined, aspectRatio: 1}}
+            resizeMode={'cover'}
           />
           <View style={{paddingLeft: 16, justifyContent: 'space-between'}}>
             <LatoRegular>{data.sticker_area?.length > 1 ? data.sticker_area.join(', ') : data.sticker_area}</LatoRegular>
@@ -34,6 +30,7 @@ const CardContract = ({data, onPress, containerStyle}) => {
               style={{fontSize: 10, color: Colors.primary}}>
               {displayProvince(data.contract_area)}
             </LatoRegular>
+            {data.contract_status && <StatusTag text={data.contract_status}/>}
           </View>
         </View>
 
@@ -61,7 +58,7 @@ const CardContract = ({data, onPress, containerStyle}) => {
             justifyContent: 'space-between',
           }}>
           <LatoRegular style={{fontSize: 10, color: Colors.greyLight}}>
-            {getPostTime(data.start_date)}
+            {getPostTime(data.created_at)}
           </LatoRegular>
           <LatoBold
             style={{
@@ -82,7 +79,7 @@ export default CardContract;
 const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: 'black',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -90,6 +87,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     backgroundColor: 'white',
-    elevation: 2,
+    elevation: 20,
   },
 });
