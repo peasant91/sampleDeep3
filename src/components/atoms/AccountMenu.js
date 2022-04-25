@@ -18,7 +18,7 @@ export default AccountMenu;
 const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: 'black',
     backgroundColor: 'white',
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    elevation: 2,
+    elevation: 10
   },
 });
