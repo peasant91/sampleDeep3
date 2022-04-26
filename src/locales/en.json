@@ -18,6 +18,7 @@
     "next": "Lanjutkan",
     "notification": "Notifikasi",
     "change_password_success": "Ganti Kata Sandi Berhasil.",
+    "see_report": "Lihat Report",
     
     "network_error": "Tidak dapat terhubung, Mohon periksa Koneksi",
     "fullname_placeholder": "cth: Sri Sedana",
@@ -229,7 +230,13 @@
     "driver_status": "Status Driver",
     "ads_type": "Jenis Iklan",
     "total_trip": "Total Perjalanan",
-    "trip_today": "Perjalanan Hari Ini"
+    "trip_today": "Perjalanan Hari Ini",
+    "weekly_report": "Report Mingguan",
+    "+create_report": "+ Buat Report Minggu ini",
+    "empty_report": "Anda belum mengisi laporan periode ini.",
+    "no_report": "Tidak ada laporan di tanggal ini",
+    "add_now": "Tambahkan Sekarang",
+    "report_detail": "Detail Report"
     
 
 

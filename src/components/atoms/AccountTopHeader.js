@@ -9,6 +9,7 @@ import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
 import { getFullLink, isEmpty } from '../../actions/helper';
 import { ShimmerAccoutTopHeader } from './shimmer/Shimmer';
+import { Shadow } from 'react-native-shadow-2';
 
 const AccountTopHeader = ({ data, isLoading }) => {
 
@@ -19,7 +20,8 @@ const AccountTopHeader = ({ data, isLoading }) => {
   
 
   return (
-        <View style={styles.container}>
+          <Shadow viewStyle={{width: '100%', padding: 10}} distance={5}>
+
       {!isLoading ?
         <View style={{flexDirection: 'row'}}>
           <Avatar 
@@ -48,13 +50,12 @@ const AccountTopHeader = ({ data, isLoading }) => {
           </View>
           </View>
         : <ShimmerAccoutTopHeader />}
-    </View>
+          </Shadow>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

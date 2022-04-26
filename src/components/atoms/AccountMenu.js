@@ -1,15 +1,20 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import { Shadow } from 'react-native-shadow-2';
 import Colors from '../../constants/Colors';
 import {LatoBold} from '../atoms/CustomText';
 
 const AccountMenu = ({Icon, text, onPress, containerStyle, tintColor}) => {
   return (
-    <TouchableOpacity onPress={onPress} style={containerStyle}>
+    <View style={containerStyle}>
+      <Shadow viewStyle={{width: '100%'}} radius={8} distance={2}>
+    <TouchableOpacity onPress={onPress} >
       <View style={styles.container}>
         <LatoBold Icon={Icon} style={{color: tintColor ?? Colors.primary}} iconTint={tintColor}>{text}</LatoBold>
       </View>
     </TouchableOpacity>
+      </Shadow>
+    </View>
   );
 };
 

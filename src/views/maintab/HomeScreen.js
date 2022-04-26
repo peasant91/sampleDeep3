@@ -37,7 +37,7 @@ import IconCarEmpty from '../../assets/images/ic_car_empty.svg';
 import { Image } from 'react-native-elements';
 import { LatoBold, LatoRegular } from '../../components/atoms/CustomText';
 import Divider from '../../components/atoms/Divider';
-import HomeLineChart from '../../components/atoms/HomeLineChart';
+import DistanceChart from '../../components/atoms/DistanceChart';
 import InfoMenu from '../../components/atoms/InfoMenu';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CardContract from '../../components/atoms/list/CardContract';
@@ -50,6 +50,7 @@ import { getFullLink, isEmpty } from '../../actions/helper';
 import { ShimmerCardContract, ShimmerHomeBody, ShimmerHomeProfile } from '../../components/atoms/shimmer/Shimmer';
 import axios from 'axios';
 import ErrorNotRegisterVehicle from '../../components/atoms/ErrorNotRegisterVehicle';
+import { getChartData } from '../../services/report';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -66,6 +67,7 @@ const HomeScreen = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(true)
   const [homeData, sethomeData] = useState({})
   const [profileData, setprofileData] = useState({})
+  const [chartData, setChartData] = useState([])
 
 
   const data = {
@@ -102,10 +104,22 @@ const HomeScreen = ({ navigation, route }) => {
       sethomeData(home)
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
       setprofileData(profile)
+      getChartDataAPI(home)
     })).catch(err => {
       setisLoading(false)
       showDialog(err.message)
     })
+  }
+
+  //get chart data if there is active conctract
+  const getChartDataAPI = (home) => {
+    if (home.active_contract) {
+      getChartData(home.active_contract.contract_id).then(response => {
+        setChartData(response)
+      }).catch(err => {
+        showDialog(err.message)
+      })
+    }
   }
 
   useEffect(() => {
@@ -229,7 +243,7 @@ const HomeScreen = ({ navigation, route }) => {
                         <View style={{ padding: 16 }}>
                           <CardContract data={homeData.active_contract} onPress={goToContractDetail} />
                           <LatoBold Icon={IconActiveContract} style={{ color: Colors.primary }} containerStyle={{ paddingVertical: 16 }}>{translate('travel_report')}</LatoBold>
-                          <HomeLineChart />
+                          <DistanceChart data={chartData} />
                         </View>
                       </View>
                       :

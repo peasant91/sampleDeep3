@@ -22,12 +22,16 @@ import Divider from '../../../components/atoms/Divider'
 import ListInstallationSchedule from '../../../components/atoms/list/ListInstallationSchedule'
 import KeyValueComponent from '../../../components/atoms/KeyValueComponent'
 import axios from 'axios'
-import { getReportList } from '../../../services/report'
+import { getChartData, getReportList } from '../../../services/report'
+import ListReport from '../../../components/atoms/list/ListReport'
+import DistanceChart from '../../../components/atoms/DistanceChart'
 
 const CurrentContractScreen = ({navigation, route}) => {
 
     const [contractData, setcontractData] = useState()
-    const [reportData, setreportData] = useState()
+    const [reportData, setreportData] = useState([])
+    const [chartData, setChartData] = useState([])
+
     const [isLoading, setisLoading] = useState(true)
     const {id, isEmpty} = route.params
 
@@ -50,12 +54,13 @@ const CurrentContractScreen = ({navigation, route}) => {
     useEffect(() => {
         if (id) {
             axios.all([
+                getReportList(id),
                 getContract(id),
-                getReportList(id)
-            ]).then(axios.spread((contract, report) => {
+                getChartData(id)
+            ]).then(axios.spread(async (report, contract, chart) => {
                 setcontractData(contract)
-                console.log('contract data', contract)
                 setreportData(report)
+                setChartData(chart)
                 setisLoading(false)
             })).catch(err => {
                 showDialog(err.message)
@@ -76,7 +81,7 @@ const CurrentContractScreen = ({navigation, route}) => {
             } />
         {!isEmpty ? (isLoading ? <ShimmerOfferDetail containerStyle={{padding: 16}}/> :
             <ScrollView style={{flex: 1}}>
-                <View style={{flex: 1}}>
+                <View style={{flex: 1, marginBottom: 16}}>
 
                     <View style={{ flexDirection: 'row', padding: 16 }}>
                         <Image source={{ uri: getFullLink(contractData?.campaign.company_image) }} style={{ height: 64, width: 'auto', aspectRatio: 1 }} />
@@ -133,6 +138,20 @@ const CurrentContractScreen = ({navigation, route}) => {
                             <KeyValueComponent title={translate('total_trip')} value={contractData.total_distance + 'Km'} style={styles.subHeading} />
                             <KeyValueComponent title={translate('trip_today')} value={contractData.today_distance + 'Km'} style={styles.subHeading} />
                     </View>
+
+                    {
+                        chartData.length > 0 && <View>
+                            <DistanceChart data={chartData}/>
+                            <LatoRegular>{translate('see_detail')}</LatoRegular>
+                        </View>
+                    }
+
+
+                    {
+                        reportData?.map((value, index) => {
+                            return <ListReport data={value}/>
+                        })
+                    }
 
                 </View>
 

@@ -68,7 +68,7 @@ const SplashScreen = props => {
           onPress: () => {
             Platform.OS == 'android'
               ? Linking.openURL(
-                  'market://details?id=com.schott.pbsaving.android',
+                  'market://details?id=id.otomedia.android',
                 )
               : Linking.openURL(
                   'itms-apps://itunes.apple.com/app/apple-store/id1588342499?mt=8',

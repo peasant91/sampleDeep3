@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import {Divider, Image} from 'react-native-elements';
+import {Card, Divider, Image} from 'react-native-elements';
 import {LatoBold, LatoRegular} from '../CustomText';
 
 import IconLocation from '../../../assets/images/ic_home_location.svg';
@@ -10,11 +10,14 @@ import Colors from '../../../constants/Colors';
 import translate from '../../../locales/translate';
 import { displayProvince, getFullLink, getPostTime } from '../../../actions/helper';
 import StatusTag from '../StatusTag';
+import { Shadow } from 'react-native-shadow-2';
 
 const CardContract = ({data, onPress, containerStyle}) => {
 
   return (
-    <TouchableOpacity onPress={onPress} style={containerStyle}>
+    <View style={containerStyle}>
+    <Shadow  radius={10} offset={[0,0]} distance={3} viewStyle={[{backgroundColor: 'white', borderRadius: 9, width: '100%'}, ]}>
+    <TouchableOpacity onPress={onPress} >
       <View style={styles.container}>
         <View style={{flexDirection: 'row', padding: 16}}>
           <Image
@@ -71,6 +74,8 @@ const CardContract = ({data, onPress, containerStyle}) => {
         </View>
       </View>
     </TouchableOpacity>
+    </Shadow>
+    </View>
   );
 };
 
@@ -87,6 +92,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     backgroundColor: 'white',
-    elevation: 20,
   },
 });

@@ -1,9 +1,13 @@
 import {get} from '../services/baseApi'
 
 export const getReportList = (id) => {
-    get(`v1/contract/${id}/report`)
+    return get(`v1/contract/${id}/report`)
 }
 
 export const getReportDetail = (id) => {
-    get(`v1/contract/report/${id}`)
+    return get(`v1/contract/report/${id}`)
+}
+
+export const getChartData = (id) => {
+    return get (`v1/contract/${id}/trip/graph`)
 }
