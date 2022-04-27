@@ -95,6 +95,7 @@ const AccountScreen = ({navigation, route}) => {
     <SafeAreaView style={styles.container}>
       <AccountTopHeader data={profileData} isLoading={isLoading}/>
       <ScrollView
+        style={{zIndex: -1}}
        refreshControl={
         <RefreshControl
           refreshing={refreshing}

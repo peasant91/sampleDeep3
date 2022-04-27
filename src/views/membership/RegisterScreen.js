@@ -298,7 +298,7 @@ const RegisterScreen = ({navigation, route}) => {
       }
 
       setimagePickerId(99);
-    }, 100);
+    }, 500);
   }, [imagePickerId]);
 
   const deleteImage = selectedPicker => {
@@ -790,6 +790,7 @@ const RegisterScreen = ({navigation, route}) => {
             />
               { !isEdit && 
               <View>
+
                 <PickerInput
                   id={'bank_id'}
                   title={translate('bank_title')}

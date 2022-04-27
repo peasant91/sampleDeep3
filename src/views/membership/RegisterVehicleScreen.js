@@ -24,31 +24,31 @@ import { getCity, getDistrict, getVehicleBrand, getVehicleModel, getVehicleType,
 import { registerVehicle } from '../../services/user'
 import { showDialog } from '../../actions/commonActions'
 
-const StickerType = [
-  {
-    id: 'full_body',
-    name: translate('full_body')
-  },
-  {
-    id: 'not_full_body',
-    name: translate('not_full_body')
-  },
-
-]
-
-const YesNoData = [
-  {
-    id: 1,
-    name: translate('yes'),
-  },
-  {
-    id: 0,
-    name: translate('no'),
-  },
-]
 
 
 const RegisterVehicleScreen = ({ navigation, route }) => {
+  const StickerType = [
+    {
+      id: 'full_body',
+      name: translate('full_body')
+    },
+    {
+      id: 'not_full_body',
+      name: translate('not_full_body')
+    },
+
+  ]
+
+  const YesNoData = [
+    {
+      id: 1,
+      name: translate('yes'),
+    },
+    {
+      id: 0,
+      name: translate('no'),
+    },
+  ]
 
   const { isRegister } = route.params
 
@@ -92,7 +92,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   })
 
   const goToRegisterVehicleSuccess = () => {
-    navigation.navigate(isRegister ? 'RegisterVehicleSuccess' : 'RegisterVehicleSuccessMain', {isRegister: isRegister})
+    navigation.navigate(isRegister ? 'RegisterVehicleSuccess' : 'RegisterVehicleSuccessMain', { isRegister: isRegister })
   }
 
   const doRegisterVehicle = () => {
@@ -222,7 +222,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       }
 
       setimagePickerId(99);
-    }, 100);
+    }, 500);
   }, [imagePickerId]);
 
   //reset if parent changed
@@ -489,10 +489,10 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
                 />
               }}
             />
-          {formState.isChecked && stickerArea.length == 0 && 
-        <LatoBold
-          style={{color: 'red', marginBottom: 10}}>{translate('error_sticker_area')}</LatoBold>
-          }
+            {formState.isChecked && stickerArea.length == 0 &&
+              <LatoBold
+                style={{ color: 'red', marginBottom: 10 }}>{translate('error_sticker_area')}</LatoBold>
+            }
 
 
           </View>
@@ -515,10 +515,10 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           }}
         />
 
-          {formState.isChecked && images.filter(item => item != ' ').length == 0 && 
-        <LatoBold
-          style={{color: 'red', marginBottom: 10}}>{translate('error_vehicle_image')}</LatoBold>
-          }
+        {formState.isChecked && images.filter(item => item != ' ').length == 0 &&
+          <LatoBold
+            style={{ color: 'red', marginBottom: 10 }}>{translate('error_vehicle_image')}</LatoBold>
+        }
 
 
         <CustomInput
@@ -539,7 +539,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           value={formState.inputValues.is_convoy_value}
           isCheck={formState.isChecked}
           onPress={() =>
-            openPicker('is_convoy', '', YesNoData, formState, dispatch)
+            openPicker('is_convoy', 'yes_no_picker', YesNoData, formState, dispatch)
           }
           required
         />
@@ -551,7 +551,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           value={formState.inputValues.is_broadcast_value}
           isCheck={formState.isChecked}
           onPress={() =>
-            openPicker('is_broadcast', '', YesNoData, formState, dispatch)
+            openPicker('is_broadcast', 'yes_no_picker', YesNoData, formState, dispatch)
           }
           required
         />
@@ -564,7 +564,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           value={formState.inputValues.is_term_value}
           isCheck={formState.isChecked}
           onPress={() =>
-            openPicker('is_term', '', YesNoData, formState, dispatch)
+            openPicker('is_term', 'yes_no_picker', YesNoData, formState, dispatch)
           }
           required
         />

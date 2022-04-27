@@ -16,7 +16,7 @@ const CardContract = ({data, onPress, containerStyle}) => {
 
   return (
     <View style={containerStyle}>
-    <Shadow  radius={10} offset={[0,0]} distance={3} viewStyle={[{backgroundColor: 'white', borderRadius: 9, width: '100%'}, ]}>
+    <Shadow  radius={10} offset={[0,0]} distance={3} startColor={Colors.divider} viewStyle={[{backgroundColor: 'white', borderRadius: 9, width: '100%'}, ]}>
     <TouchableOpacity onPress={onPress} >
       <View style={styles.container}>
         <View style={{flexDirection: 'row', padding: 16}}>

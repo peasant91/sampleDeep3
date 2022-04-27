@@ -202,7 +202,8 @@
     "apply": "Ajukan",
     "see_all": "Lihat Semua",
     "offer_history": "Riwayat Penawaran",
-
+    "yes_no_picker": "Pilih ya atau tidak",
+    "vehicle_type_placeholder": "cth: Mobil, Bus",
     "time": "Waktu",
     "average_speed": "Kecepatan rata-rata",
     "distance": "Jarak Tempuh",
@@ -236,7 +237,14 @@
     "empty_report": "Anda belum mengisi laporan periode ini.",
     "no_report": "Tidak ada laporan di tanggal ini",
     "add_now": "Tambahkan Sekarang",
-    "report_detail": "Detail Report"
+    "report_detail": "Detail Report",
+    "see_detail": "Lihat Selengkapnya",
+    "trip_detail": "Detail Perjalanan",
+    "create_report": "Buat Report",
+    "report_detail_placeholder": "cth: laporan Minggu ini..",
+    "odometer_photo": "Foto Odometer",
+    "add_foto": "Tambah Foto",
+    "report_string": "Foto Kendaraan (%{body})"
     
 
 

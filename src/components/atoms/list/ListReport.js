@@ -9,7 +9,7 @@ import Colors from '../../../constants/Colors'
 import IconNoReport from '../../../assets/images/ic_no_report'
 import IconEmptyReport from '../../../assets/images/ic_empty_report'
 
-const ListReport = ({data}) => {
+const ListReport = ({data, onPress}) => {
 
     const NoReport = () => {
         return <View style={{backgroundColor: '#FFF8F8', borderRadius: 4, padding: 16, alignItems: 'center', marginTop: 10}}>
@@ -19,7 +19,9 @@ const ListReport = ({data}) => {
     }
 
     const EmptyReport = () => {
-        return <TouchableOpacity style={{backgroundColor: '#EFEFFF', borderRadius: 4, padding: 16, alignItems: 'center', marginTop: 10}}>
+        return <TouchableOpacity 
+                style={{backgroundColor: '#EFEFFF', borderRadius: 4, padding: 16, alignItems: 'center', marginTop: 10}} 
+                onPress={() => onPress(true, data.id)}>
             <IconEmptyReport/>
             <LatoRegular containerStyle={{marginVertical: 5}}>{translate('empty_report')}</LatoRegular>
             <LatoRegular style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('add_now')}</LatoRegular>
@@ -37,7 +39,7 @@ const ListReport = ({data}) => {
         <Divider/>
         <View style={{flexDirection: 'row', marginTop: 16, justifyContent: 'space-between'}}>
             <LatoBold>{moment(data.start_date).format('DD MMM YYYY')}</LatoBold>
-            {data.is_driver && data.desc && <LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold>}
+            {data.is_driver && data.desc && <TouchableOpacity onPress={() => onPress(false, data.id)}><LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold></TouchableOpacity>}
         </View>
         {
             !data.desc ? <EmptyReport/> : (data.is_driver ? <Report/> : <NoReport/>)

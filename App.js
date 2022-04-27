@@ -60,6 +60,8 @@ import ContractHistoryScreen from './src/views/maintab/offer/ContractHistoryScre
 import BankScreen from './src/views/maintab/account/BankScreen';
 import JobScreen from './src/views/maintab/home/JobScreen';
 import InstallationListScreen from './src/views/maintab/offer/InstallationListScreen';
+import TripDetailScreen from './src/views/maintab/offer/TripDetailScreen';
+import CrudReportScreen from './src/views/maintab/offer/CrudReportScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -297,9 +299,16 @@ const App = ({ navigation, route }) => {
                 ) : !state.userToken ? (
                   <>
 
+                    
                     <Stack.Screen
                       name="Login"
                       component={LoginScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="RegisterVehicle"
+                      component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
                     />
 
@@ -339,11 +348,6 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false }}
                     />
 
-                    <Stack.Screen
-                      name="RegisterVehicle"
-                      component={RegisterVehicleScreen}
-                      options={{ headerShown: false }}
-                    />
 
                     <Stack.Screen
                       name="RegisterVehicleSuccess"
@@ -351,12 +355,12 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false }}
                     />
 
-
                     <Stack.Screen
                       name="OtpScreen"
                       component={OtpScreen}
                       options={{ headerShown: false }}
                     />
+                    
                     <Stack.Screen
                       name="ImageViewer"
                       component={ImageViewerScreen}
@@ -397,6 +401,24 @@ const App = ({ navigation, route }) => {
                     <Stack.Screen
                       name="InstallationList"
                       component={InstallationListScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="Register"
+                      component={RegisterScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="TripDetail"
+                      component={TripDetailScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="CrudReport"
+                      component={CrudReportScreen}
                       options={{ headerShown: false }}
                     />
 
