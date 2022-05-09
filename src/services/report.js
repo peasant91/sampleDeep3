@@ -19,3 +19,7 @@ export const getTripDetail =  (id) => {
 export const postReport = (data) => {
     return post(`v1/contract/report`, data)
 }
+
+export const postReportImage = (id, data) => {
+    return post(`v1/contract/report/${id}/image`, data)
+}

@@ -16,8 +16,8 @@ const ReportImage = ({imageUri, onPress, navigation, title}) => {
     }, [])
     
 
-    return <View style={{height: 150, width: '48%', justifyContent: 'space-between', marginTop: 16}}>
-        {imageUri ? (
+    return <View style={{height: 120, width: '48%', justifyContent: 'space-between', marginTop: 16}}>
+        {imageUri != ' ' ? (
           <TouchableOpacity style={{flex: 1}} onPress={() => navigation.navigate('ImageViewer', {imageUrl: imageUri.includes('/storage/') ? getFullLink(imageUri) : imageUri, title: title})}>
             <Image
               source={{uri: imageUri.includes('/storage/') ? getFullLink(imageUri) : imageUri}}

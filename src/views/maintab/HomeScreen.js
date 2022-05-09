@@ -51,6 +51,7 @@ import { ShimmerCardContract, ShimmerHomeBody, ShimmerHomeProfile } from '../../
 import axios from 'axios';
 import ErrorNotRegisterVehicle from '../../components/atoms/ErrorNotRegisterVehicle';
 import { getChartData } from '../../services/report';
+import { getNotification } from '../../services/notification';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -98,8 +99,9 @@ const HomeScreen = ({ navigation, route }) => {
 
     axios.all([
       getHome(),
-      getProfile()
-    ]).then(axios.spread(async (home, profile) => {
+      getProfile(),
+      getNotification()
+    ]).then(axios.spread(async (home, profile, notification) => {
       setisLoading(false)
       sethomeData(home)
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))

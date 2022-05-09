@@ -26,6 +26,9 @@ import { isEmpty } from '../../../actions/helper';
 import axios from 'axios';
 import { ShimmerPlaceholder } from '../../../components/atoms/shimmer/Shimmer';
 import { getHome } from '../../../services/home';
+import moment from 'moment';
+import { getIncomeList } from '../../../services/transaction';
+import IncomeProfile from '../../../components/atoms/IncomeProfile';
 
 
 
@@ -50,6 +53,7 @@ const AccountScreen = ({navigation, route}) => {
   const [contractData, setContractData] = useState({})
   const [isLoading, setisLoading] = useState(true)
   const [refreshing, setrefreshing] = useState(false)
+  const [incomeData, setincomeData] = useState({})
   const {signOut} = useContext(AuthContext);
 
   const getProfileApi = () => {
@@ -57,12 +61,16 @@ const AccountScreen = ({navigation, route}) => {
     axios.all([
       getProfile(),
       getVehicleRoute(),
-      getHome()
-    ]).then(axios.spread((profile, vehicleRoute, contract) => {
+      getHome(),
+      getIncomeList({
+        year: moment(Date()).format('yyyy')
+      })
+    ]).then(axios.spread((profile, vehicleRoute, contract, income) => {
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
       setprofileData(profile)
       setvehicleRute(vehicleRoute)
       setContractData(contract)
+      setincomeData(income)
       setrefreshing(false)
       setisLoading(false)
     })).catch(err => {
@@ -83,7 +91,11 @@ const AccountScreen = ({navigation, route}) => {
   }
 
   const goToContract = () => {
-    navigation.navigate('CurrentContract', { id: contractData?.active_contract.contract_id, isEmpty: contractData.active_contract == null})
+    navigation.navigate('CurrentContract', { id: contractData?.active_contract.contract_id, isEmpty: contractData.active_contract == null, isCurrent: true})
+  }
+
+  const goToBank = () => {
+    navigation.navigate('Bank', {isReadOnly: profileData.account_bank ? false : true, prevData: profileData.account_bank ? profileData.account_bank : profileData.driver_company.account_bank})
   }
 
   const logout = () => {
@@ -94,6 +106,7 @@ const AccountScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.container}>
       <AccountTopHeader data={profileData} isLoading={isLoading}/>
+
       <ScrollView
         style={{zIndex: -1}}
        refreshControl={
@@ -103,6 +116,7 @@ const AccountScreen = ({navigation, route}) => {
         />
       }
       >
+
         <View>
           { isLoading ? <View style={{margin: 16}}><ShimmerPlaceholder style={{width: '100%', height: 100, }} /></View> : (!isEmpty(vehicleRute) ? (
             <View>
@@ -129,12 +143,15 @@ const AccountScreen = ({navigation, route}) => {
                 containerStyle={{marginHorizontal: 16, marginBottom: 16}}
                 text={translate('info_not_verified')}
               />
+
             </View>
           ))}
 
           <Divider />
 
             <View style={{margin: 12}}>
+
+              {!isEmpty(incomeData) && <IncomeProfile data={incomeData} onPress={() => navigation.navigate('IncomeDetail')}/>}
 
             <ShimmerPlaceholder
             isLoading={isLoading}
@@ -153,28 +170,33 @@ const AccountScreen = ({navigation, route}) => {
           <Divider />
 
           <View style={{margin: 16}}>
+
             <AccountMenu
               Icon={IconChangeProfile}
               text={translate('change_profile')}
               onPress={goToEdit}
             />
+
             <AccountMenu
               Icon={IconChangePassword}
               text={translate('change_password')}
               containerStyle={{marginTop: 16}}
               onPress={() => navigation.navigate('ChangePassword')}
             />
+
             <AccountMenu
               Icon={IconBank}
               text={translate('bank_account')}
               containerStyle={{marginTop: 16}}
-              onPress={() => navigation.navigate('Bank')}
+              onPress={goToBank}
             />
+
             <AccountMenu
               Icon={IconContactUs}
               text={translate('contact_us')}
               containerStyle={{marginTop: 16}}
             />
+
           </View>
 
           <Divider />
@@ -186,8 +208,11 @@ const AccountScreen = ({navigation, route}) => {
             onPress={logout}
             tintColor={'red'}
           />
+
         </View>
+
       </ScrollView>
+
     </SafeAreaView>
   );
 };

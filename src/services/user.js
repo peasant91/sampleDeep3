@@ -15,3 +15,7 @@ export const getUserBank = (id) => {
 export const registerVehicle = (data) => {
     return post('v1/driver/vehicle', data)
 }
+
+export const updateBank = (data) => {
+    return post('v1/driver/bank-account', data)
+}

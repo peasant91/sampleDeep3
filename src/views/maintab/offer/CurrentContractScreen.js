@@ -33,7 +33,7 @@ const CurrentContractScreen = ({navigation, route}) => {
     const [chartData, setChartData] = useState([])
 
     const [isLoading, setisLoading] = useState(true)
-    const {id, isEmpty} = route.params
+    const {id, isEmpty, isCurrent} = route.params
 
     const seeOffer = () => {
         navigation.navigate('Offer')
@@ -80,10 +80,11 @@ const CurrentContractScreen = ({navigation, route}) => {
 
     return <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
         <NavBar 
-            title={translate('active_contract')} 
+            title={isCurrent ? translate('active_contract') : translate('contract_detail')} 
             navigation={navigation} 
             shadowEnabled 
             RightView={
+                isCurrent && 
                 <TouchableOpacity onPress={() => navigation.navigate('ContractHistory')}>
                     <IconHistory/>
                 </TouchableOpacity>
@@ -112,7 +113,7 @@ const CurrentContractScreen = ({navigation, route}) => {
 
                     <View style={{ padding: 16, justifyContent: 'space-between', flexDirection: 'row' }}>
                         <LatoBold style={{ color: Colors.primary }}>{translate('installation_time_title')}</LatoBold>
-                        <TouchableOpacity onPress={() => navigation.navigate('InstallationList', {contractData: contractData.campaign.installation_schedule})}>
+                        <TouchableOpacity onPress={() => navigation.navigate('InstallationList', {data: contractData.campaign.installation_schedule})}>
                             <LatoBold style={{ textDecorationLine: 'underline', color: Colors.secondary }}>{translate('see_all')}</LatoBold>
                         </TouchableOpacity>
                     </View>
@@ -148,6 +149,7 @@ const CurrentContractScreen = ({navigation, route}) => {
                             <KeyValueComponent title={translate('trip_today')} value={contractData.today_distance + 'Km'} style={styles.subHeading} />
                     </View>
 
+
                     {
                         chartData.length > 0 && <View style={{justifyContent: 'center', alignItems: 'center'}}>
                             <DistanceChart data={chartData}/>
@@ -157,6 +159,13 @@ const CurrentContractScreen = ({navigation, route}) => {
                         </View>
                     }
 
+                    <View style={{paddingTop: 16}}>
+                        <Divider/>
+                        <LatoBold containerStyle={{padding:16}}>{translate('weekly_report')}</LatoBold>
+                        <TouchableOpacity onPress={goToCrudReport}>
+                            <LatoBold style={{color: Colors.primarySecondary}} containerStyle={{alignSelf: 'center', padding: 5}}>{translate('+create_report')}</LatoBold>
+                            </TouchableOpacity>
+                    </View>
 
                     {
                         reportData?.map((value, index) => {

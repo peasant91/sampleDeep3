@@ -244,7 +244,10 @@
     "report_detail_placeholder": "cth: laporan Minggu ini..",
     "odometer_photo": "Foto Odometer",
     "add_foto": "Tambah Foto",
-    "report_string": "Foto Kendaraan (%{body})"
+    "report_string": "Foto Kendaraan (%{body})",
+    "odometer": "Odometer",
+    "total_income": "Jumlah Pendapatan",
+    "contract_detail" : "Kontrak Detail"
     
 
 

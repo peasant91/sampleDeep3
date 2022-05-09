@@ -62,6 +62,7 @@ import JobScreen from './src/views/maintab/home/JobScreen';
 import InstallationListScreen from './src/views/maintab/offer/InstallationListScreen';
 import TripDetailScreen from './src/views/maintab/offer/TripDetailScreen';
 import CrudReportScreen from './src/views/maintab/offer/CrudReportScreen';
+import IncomeDetailScreen from './src/views/maintab/account/IncomeDetailScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
@@ -298,7 +299,6 @@ const App = ({ navigation, route }) => {
                   />
                 ) : !state.userToken ? (
                   <>
-
                     
                     <Stack.Screen
                       name="Login"
@@ -395,6 +395,12 @@ const App = ({ navigation, route }) => {
                     <Stack.Screen
                       name="RegisterVehicle"
                       component={RegisterVehicleScreen}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="IncomeDetail"
+                      component={IncomeDetailScreen}
                       options={{ headerShown: false }}
                     />
 
