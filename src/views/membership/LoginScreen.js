@@ -34,14 +34,16 @@ import {getFreshchat} from '../../services/freshchat';
 import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
 import {useKeyboard} from '@react-native-community/hooks';
 import translate from '../../locales/translate';
+import Config from '../../constants/Config';
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const LoginScreen = ({navigation, route}) => {
   const [formState, dispatch] = useReducer(formReducer, {
     inputValues: {
-      phone: '',
-      password: '',
+      phone: Config.isDevMode ? '8133918999' : '',
+      credential: Config.isDevMode ? '8133918999' : '',
+      password: Config.isDevMode ? 'password': '',
     },
     inputValidities: {
       phone: false,
@@ -84,7 +86,11 @@ const LoginScreen = ({navigation, route}) => {
 
     if (formState.formIsValid) {
       setIsLoading(true);
-      login(formState.inputValues)
+      AsyncStorage.getItem(StorageKey.KEY_FIREBASE_TOKEN).then(token => {
+      login({
+        ...formState.inputValues,
+        fcm_token: token
+      })
         .then(response => {
           setIsLoading(false);
           saveToken(response);
@@ -94,6 +100,7 @@ const LoginScreen = ({navigation, route}) => {
           setIsLoading(false);
           showDialog(err.message, false);
         });
+      })
     }
   };
 

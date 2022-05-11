@@ -70,8 +70,16 @@ import { Freshchat } from 'react-native-freshchat-sdk';
 import CustomisableAlert from 'react-native-customisable-alert';
 import Config from './src/constants/Config';
 import MainTabScreen from './src/views/maintab/MainTabScreen';
+import { logout } from './src/services/user';
+import { showDialog } from './src/actions/commonActions';
+
+//realm
+import { Realm, createRealmContext } from '@realm/react'
+import { SpeedSchema } from './src/data/schema';
 
 // const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+
+const { RealmProvider, useRealm, useQuery } = createRealmContext({ schema: [SpeedSchema] })
 
 const theme = {
   colors: {
@@ -158,8 +166,13 @@ const App = ({ navigation, route }) => {
         }
       },
       signOut: async data => {
-        await AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN)
-        dispatch({ type: 'SIGN_OUT' });
+        logout().then(response => {
+          AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
+            dispatch({ type: 'SIGN_OUT' });
+          })
+        }).catch(err => {
+          showDialog(err.message)
+        })
       },
       doneLoading: async data => {
         dispatch({ type: 'LOADING_COMPLETE' });
@@ -266,6 +279,8 @@ const App = ({ navigation, route }) => {
 
   return (
     <SafeAreaProvider>
+      <RealmProvider>
+
       <ThemeProvider theme={theme}>
         <CustomisableAlert
           titleStyle={{
@@ -411,7 +426,7 @@ const App = ({ navigation, route }) => {
                     />
 
                     <Stack.Screen
-                      name="Register"
+                      name="EditProfile"
                       component={RegisterScreen}
                       options={{ headerShown: false }}
                     />
@@ -513,6 +528,7 @@ const App = ({ navigation, route }) => {
           </NavigationContainer>
         </ToastProvider>
       </ThemeProvider>
+      </RealmProvider>
     </SafeAreaProvider>
   );
 };

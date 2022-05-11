@@ -124,8 +124,6 @@ const RegisterScreen = ({navigation, route}) => {
     isChecked: false,
   });
 
-  
-
   const doRegister = () => {
     dispatch({
       type: 'check',
@@ -151,7 +149,7 @@ const RegisterScreen = ({navigation, route}) => {
 
   //translate form into input state if edit profile
   const translateForm = () => {
-    console.log(data.city.id)
+    console.log('translateForm', data.city.id)
     const state = {
       inputValues:
     {
@@ -166,8 +164,8 @@ const RegisterScreen = ({navigation, route}) => {
     const stateDetail = {
       inputValues: {
         birth_date: data.birth_date,
-        driver_company_id: data.driver_company.id,
-        driver_company_id_value: data.driver_company.name,
+        driver_company_id: data.driver_company?.id,
+        driver_company_id_value: data.driver_company?.name,
         profile_image_uri: data.profile_image,
         gender: data.gender
       },
@@ -225,6 +223,8 @@ const RegisterScreen = ({navigation, route}) => {
       state: state
     })
 
+    console.log('detail form', stateDetail)
+
     onPickDate(data.birth_date)
   }
 
@@ -259,6 +259,8 @@ const RegisterScreen = ({navigation, route}) => {
       updateProfile(data).then(() => {
         setIsLoading(false)
         navigation.navigate('Account', { isChangeProfile: true} , true)
+      }).catch(err => {
+        showDialog(err.message)
       })
     } else {
       navigation.navigate('RegisterPassword', {data: data});

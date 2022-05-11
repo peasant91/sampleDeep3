@@ -6,6 +6,7 @@ import { FormatMoney } from "format-money-js";
 import openMap from 'react-native-open-maps'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageKey from "../constants/StorageKey";
+import Realm from 'realm'
 
 export const getCurrentWeek = () => {
   currentdate = new Date();
@@ -113,3 +114,9 @@ export const range = (min, max) => {
   return arr;
 }
 
+export const getRealm = (schema) => {
+  return Realm.open({
+    path: 'otomedia',
+    schema: [schema]
+  })
+}

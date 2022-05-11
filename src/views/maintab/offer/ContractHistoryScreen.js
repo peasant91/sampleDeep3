@@ -65,7 +65,7 @@ const ContractHistoryScreen = ({ navigation, route }) => {
                 />
             })
             : 
-            (data 
+            (data.length > 0 
                 ? 
           <FlatList
             refreshControl={<RefreshControl

@@ -27,7 +27,7 @@ const GenericCustomAlertComponents = props => {
       {props.isDoubleButton ? (
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: props.isReversed ? 'row-reverse' : 'row',
             display: 'flex',
             marginTop: 10,
             marginBottom: 10,

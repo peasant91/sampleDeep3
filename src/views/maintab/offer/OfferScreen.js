@@ -66,6 +66,8 @@ const OfferScreen = ({ navigation, route }) => {
       setisLoading(false)
       if (err.message.includes('verifikasi')) {
         setisNotRegisterVehicle(true)
+      } else if (err.message.includes('belum ada')) {
+        setisNotRegisterVehicle(true)
       } else {
         setisNotRegisterVehicle(false)
         showDialog(err.message)

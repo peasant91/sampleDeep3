@@ -37,7 +37,7 @@ import {postFreshchat} from '../services/freshchat';
 import {getCalendarWeek} from '../data/dummy';
 import {getNumberFormatSettings} from 'react-native-localize';
 import {getSettings} from '../services/settings';
-import messaging from '@react-native-firebase/messaging';
+import messaging, { firebase } from '@react-native-firebase/messaging';
 import {useIsFocused} from '@react-navigation/native';
 
 import BGSplash from '../assets/background/bg_splash.svg'
@@ -87,6 +87,7 @@ const SplashScreen = props => {
       );
     } else {
       checkVersion();
+      getFirebaseToken();
     }
   };
 
@@ -181,6 +182,23 @@ const SplashScreen = props => {
     }
   };
 
+  const getFirebaseToken = async () => {
+    const authStatus = await messaging().requestPermission();
+    const messaging = firebase.messaging()
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (enabled) {
+    console.log('Authorization status:', authStatus);
+    messaging.getToken().then(token => {
+      AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token)
+    }).catch(err => {
+      showDialog(err.message)
+    })
+  }
+  }
+
   const checkVersion = async () => {
     try {
       const response = await checkAppVersion(appVersion);
@@ -223,7 +241,6 @@ const SplashScreen = props => {
   };
 
   useEffect(() => {
-    // getCalendarYear();
     // checkVersion();
     if (isFocus) {
       axios.all([
@@ -250,11 +267,11 @@ const SplashScreen = props => {
         showDialog(err.message)
       })
       // getProvinceApi();
-      // requestPermission();
+      requestPermission();
       // initFreshchat();
     }
 
-    AppState.addEventListener('change', handleAppStateChange);
+    // AppState.addEventListener('change', handleAppStateChange);
     console.log('state', 'add listener');
     // getCalendarWeek();
     // const willFocusSub = props.navigation.addListener('willFocus', () => {

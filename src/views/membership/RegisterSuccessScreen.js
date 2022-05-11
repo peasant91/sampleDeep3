@@ -13,7 +13,7 @@ const RegisterSuccessScreen = ({navigation, route}) => {
     const { signIn } = useContext(AuthContext)
 
     const goToRegisterVehicle = () => {
-        navigation.navigate('RegisterVehicle', {isRegister: true})
+        navigation.navigate('RegisterVehicle', {isRegister: true, isEdit: false})
     }
 
     useEffect(() => {

@@ -29,6 +29,7 @@ export const showDialog = (
   negativeAction,
   positiveTitle,
   negativeTitle,
+  isReversed
 ) => {
   console.log('alert dialog show');
   // DialogManager.show({
@@ -73,6 +74,7 @@ export const showDialog = (
             }}
           positiveTitle={positiveTitle}
           negativeTitle={negativeTitle}
+          isReversed={isReversed}
         />
       ),
     });

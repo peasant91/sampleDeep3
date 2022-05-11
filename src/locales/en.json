@@ -102,7 +102,7 @@
     "password_not_match": "Kata Sandi tidak sama",
     "enable_push_notif": "Mohon ijinkan pemberitahuan untuk mendapatkan berita terbaru.",
 
-    "logout_confirmation": "Yakin untuk Log Out ?",
+    "logout_confirmation": "Apakah Anda yakin ingin keluar ?",
     "sure": "Yakin",
 
     "wanna_join": "Tertarik menjadi",
@@ -247,7 +247,9 @@
     "report_string": "Foto Kendaraan (%{body})",
     "odometer": "Odometer",
     "total_income": "Jumlah Pendapatan",
-    "contract_detail" : "Kontrak Detail"
+    "contract_detail" : "Kontrak Detail",
+    "vehicle_not_registered": "Kendaraan Belum Terdaftar",
+    "update_bank_account_success": "Berhasil mengubah Rekening Bank"
     
 
 

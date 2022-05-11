@@ -87,11 +87,19 @@ const AccountScreen = ({navigation, route}) => {
   }, [route.params])
 
   const goToEdit = () => {
-    navigation.navigate('Register', { isEdit: true, data: profileData})
+    navigation.navigate('EditProfile', { isEdit: true, data: profileData})
+  }
+
+  const goToEditVehicle = () => {
+    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: true})
+  }
+
+  const goToAddVehicle = () => {
+    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})
   }
 
   const goToContract = () => {
-    navigation.navigate('CurrentContract', { id: contractData?.active_contract.contract_id, isEmpty: contractData.active_contract == null, isCurrent: true})
+    navigation.navigate('CurrentContract', { id: contractData?.active_contract?.contract_id, isEmpty: contractData.active_contract == null, isCurrent: true})
   }
 
   const goToBank = () => {
@@ -99,7 +107,7 @@ const AccountScreen = ({navigation, route}) => {
   }
 
   const logout = () => {
-    showDialog(translate('logout_confirmation'), true, signOut, null, translate('yes'), translate('cancel'))
+    showDialog(translate('logout_confirmation'), true, signOut, null, translate('yes'), translate('cancel'), true)
   }
   
 
@@ -123,6 +131,7 @@ const AccountScreen = ({navigation, route}) => {
               <AccountCardInfo
                 containerStyle={{margin: 16}}
                 data={vehicleRute}
+                onPress={goToEditVehicle}
               />
               <InfoMenu
                 containerStyle={{marginHorizontal: 16, marginBottom: 16}}
@@ -136,7 +145,7 @@ const AccountScreen = ({navigation, route}) => {
                 Icon={IconCar}
                 text={translate('vehicle')}
                 containerStyle={{margin: 16}}
-                onPress={() => navigation.navigate('RegisterVehicle', {isRegister: false})}
+                onPress={() => navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})}
               />
 
               <InfoMenu

@@ -19,3 +19,11 @@ export const registerVehicle = (data) => {
 export const updateBank = (data) => {
     return post('v1/driver/bank-account', data)
 }
+
+export const updateFcmToken = (data) => {
+    return post('v1/fcm-token', data)
+} 
+
+export const logout = () => {
+    return post('v1/logout', {})
+}

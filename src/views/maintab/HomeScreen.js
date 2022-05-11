@@ -43,7 +43,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CardContract from '../../components/atoms/list/CardContract';
 import { getHome } from '../../services/home';
 import { showDialog } from '../../actions/commonActions';
-import { getProfile } from '../../services/user';
+import { getProfile, updateFcmToken } from '../../services/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
 import { getFullLink, isEmpty } from '../../actions/helper';
@@ -97,11 +97,13 @@ const HomeScreen = ({ navigation, route }) => {
       }
     })
 
+    refreshToken()
+
     axios.all([
       getHome(),
       getProfile(),
-      getNotification()
-    ]).then(axios.spread(async (home, profile, notification) => {
+      getNotification(),
+    ]).then(axios.spread(async (home, profile, notification, refreshToken) => {
       setisLoading(false)
       sethomeData(home)
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
@@ -110,6 +112,18 @@ const HomeScreen = ({ navigation, route }) => {
     })).catch(err => {
       setisLoading(false)
       showDialog(err.message)
+    })
+  }
+
+  const refreshToken = () => {
+    AsyncStorage.getItem(StorageKey.KEY_FIREBASE_TOKEN).then(token => {
+      updateFcmToken({
+        fcm_token: token
+      }).then(response => {
+
+      }).catch(err => {
+        showDialog(err.message)
+      })
     })
   }
 
@@ -202,7 +216,7 @@ const HomeScreen = ({ navigation, route }) => {
 
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <IconCar />
-                    <LatoRegular style={{ marginHorizontal: 5 }}>{homeData.vehicle?.brand + ' -   ' + homeData.vehicle?.vehicle_plate}</LatoRegular>
+                    <LatoRegular style={{ marginHorizontal: 5 }}>{homeData.vehicle ? homeData.vehicle?.brand + ' -   ' + homeData.vehicle?.vehicle_plate : translate('vehicle_not_registered')}</LatoRegular>
                     <IconVerified style={{ color: homeData.vehicle_status == 'verified' ? Colors.primarySecondary : Colors.grey }} />
                   </View>
 

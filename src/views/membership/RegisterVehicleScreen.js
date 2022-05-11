@@ -50,7 +50,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     },
   ]
 
-  const { isRegister } = route.params
+  const { isRegister, isEdit } = route.params
 
   const [provinceData, setprovinceData] = useState([])
   const [cityData, setcityData] = useState([])
