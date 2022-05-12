@@ -74,12 +74,9 @@ import { logout } from './src/services/user';
 import { showDialog } from './src/actions/commonActions';
 
 //realm
-import { Realm, createRealmContext } from '@realm/react'
-import { SpeedSchema } from './src/data/schema';
 
 // const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
-const { RealmProvider, useRealm, useQuery } = createRealmContext({ schema: [SpeedSchema] })
 
 const theme = {
   colors: {
@@ -279,7 +276,6 @@ const App = ({ navigation, route }) => {
 
   return (
     <SafeAreaProvider>
-      <RealmProvider>
 
       <ThemeProvider theme={theme}>
         <CustomisableAlert
@@ -528,7 +524,6 @@ const App = ({ navigation, route }) => {
           </NavigationContainer>
         </ToastProvider>
       </ThemeProvider>
-      </RealmProvider>
     </SafeAreaProvider>
   );
 };

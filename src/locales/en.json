@@ -249,7 +249,9 @@
     "total_income": "Jumlah Pendapatan",
     "contract_detail" : "Kontrak Detail",
     "vehicle_not_registered": "Kendaraan Belum Terdaftar",
-    "update_bank_account_success": "Berhasil mengubah Rekening Bank"
+    "update_bank_account_success": "Berhasil mengubah Rekening Bank",
+    "start": "Mulai",
+    "stop": "Berhenti"
     
 
 

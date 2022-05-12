@@ -239,7 +239,7 @@ const HomeScreen = ({ navigation, route }) => {
                   title={translate('do_job')}
                   iconRight={true}
                   icon={IconArrow}
-                  onPress={() => navigation.navigate('Job')}
+                  onPress={() => navigation.navigate('Job', {id: homeData.active_contract.id})}
                 />
               }
 

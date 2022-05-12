@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useState, useEffect, useRef} from 'react';
 import {View, Platform} from 'react-native';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -14,11 +14,24 @@ import IconAccount from '../../assets/images/ic_account.svg';
 import Colors from '../../constants/Colors';
 import {AuthContext} from '../../../App';
 import StorageKey from '../../constants/StorageKey';
+import { initBackground } from '../../services/background';
+import Realm from 'realm'
+import moment from 'moment';
+import { DistanceSchema, SpeedSchema } from '../../data/realm/speed';
+import { calcDistance } from '../../actions/helper';
+import { sendDistance } from '../../services/contract';
+import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 
 const Tab = createBottomTabNavigator();
 
 const MainTabScreen = ({navigation, route}) => {
+
   const [isLogin, setisLogin] = useState(false);
+  const currentPosition = useRef({
+    latitude: 0,
+    longitude: 0
+  });
+  const lastSentTime = useRef();
 
   useEffect(() => {
     AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN).then(token => {
@@ -28,7 +41,94 @@ const MainTabScreen = ({navigation, route}) => {
         setisLogin(false);
       }
     });
+
+    initBackground()
+
+        BackgroundGeolocation.on('location', (location) => {
+          // handle your locations here
+          // to perform long running operation on iOS
+          // you need to create background task
+
+          console.log('location', location)
+          BackgroundGeolocation.startTask(taskKey => {
+            // execute long running task
+            // eg. ajax post location
+            // IMPORTANT: task has to be ended by endTask
+            onLocationChange(location)
+            BackgroundGeolocation.endTask(taskKey);
+          });
+        });
+    
   }, []);
+
+  const onLocationChange = async (location) => {
+    console.log('maintab onlocation', location)
+    const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude)
+    console.log('distance', distance)
+
+    sendLocation(distance, location)
+
+    const schema = [SpeedSchema, DistanceSchema]
+
+    try {
+    const realm = await Realm.open(
+      {
+        path: 'otomedia',
+        schema: schema,
+      }
+    )
+    realm.write(() => {
+      realm.create("Speed", {
+        date: Date(),
+        speed: location.speed
+      })
+      realm.create("Distance", {
+        date: Date(),
+        lat: location.latitude,
+        lng: location.longitude,
+        distance: distance
+      })
+    })
+    } catch (err) {
+      console.log(err)
+    }
+    currentPosition.current = {
+      latitude: location.latitude,
+      longitude: location.longitude
+    }
+  }
+
+  const sendLocation = (distance, location) => {
+    if (!lastSentTime.current) {
+      lastSentTime.current = moment(Date())
+    } else {
+      const duration = moment.duration(lastSentTime.current.diff(moment(Date()))).asMinutes()
+      
+      console.log('momentDuration', duration)
+      console.log('lastsenttime', lastSentTime)
+
+      if (duration > -1) {
+        return
+      }
+    }
+
+
+    AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
+      sendDistance({
+        lat: location.latitude,
+        lng: location.longitude,
+        distance: distance * 1000, //in meter
+        contract_id: id
+      }).then(response => {
+
+      }).catch(err => {
+
+      })
+    })
+
+    lastSentTime.current = moment(Date())
+
+  }
 
   return (
     <Tab.Navigator

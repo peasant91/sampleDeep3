@@ -14,5 +14,7 @@ export default {
     KEY_VEHICLE_USAGE: 'vehicle_usage',
     KEY_VEHICLE_TYPE: 'vehicle_type',
     KEY_COLOR: 'color',
-    KEY_DO_JOB: 'do_job'
+    KEY_DO_JOB: 'do_job',
+    KEY_ACTIVE_CONTRACT: 'active_contract',
+    KEY_BACKGROUND_ACTIVE: 'background_active'
 }

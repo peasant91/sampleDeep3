@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "id.otomedia",
+  "applicationId": "id.otomedia.android",
   "variantName": "processReleaseResources",
   "elements": [
     {

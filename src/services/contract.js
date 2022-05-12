@@ -11,3 +11,8 @@ export const getContractHistory = (query) => {
 export const getContract = (id) => {
     return get(`/v1/contract/${id}/active`)
 }
+
+
+export const sendDistance = (data) => {
+    return post ('v1/contract/trip', data)
+}
