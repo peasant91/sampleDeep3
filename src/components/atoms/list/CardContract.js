@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import {Card, Divider, Image} from 'react-native-elements';
+import {Card, Image} from 'react-native-elements';
 import {LatoBold, LatoRegular} from '../CustomText';
 
 import IconLocation from '../../../assets/images/ic_home_location.svg';
@@ -11,6 +11,7 @@ import translate from '../../../locales/translate';
 import { displayProvince, getFullLink, getPostTime } from '../../../actions/helper';
 import StatusTag from '../StatusTag';
 import { Shadow } from 'react-native-shadow-2';
+import Divider from '../Divider';
 
 const CardContract = ({data, onPress, containerStyle}) => {
 

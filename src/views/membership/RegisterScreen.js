@@ -630,7 +630,7 @@ const RegisterScreen = ({navigation, route}) => {
                     source={{
                       uri: formStateDetail.inputValues.profile_image ? formStateDetail.inputValues.profile_image_uri : getFullLink(formStateDetail.inputValues.profile_image_uri),
                     }}
-                    style={{width: 80, height: 80, borderRadius: 50}}
+                    style={{width: 80, height: 80, borderRadius: 50, resizeMode: 'cover'}}
                   />
                 ) : (
                   <IconProfilePlaceholder />
@@ -668,6 +668,7 @@ const RegisterScreen = ({navigation, route}) => {
               dispatcher={dispatch}
               value={formState.inputValues.phone2}
               isCheck={formState.isChecked}
+              optional
             />
 
             <CustomInput

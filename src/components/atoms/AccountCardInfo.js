@@ -6,13 +6,16 @@ import { LatoBold, LatoRegular } from './CustomText'
 
 import IconCar from '../../assets/images/ic_home_car.svg'
 import IconVerified from '../../assets/images/ic_home_verified.svg';
+import { Shadow } from 'react-native-shadow-2'
 
 
 const AccountCardInfo = ({ data, containerStyle, onPress }) => {
 
-    return <View style={[containerStyle, styles.container]}>
+    return  <View style={containerStyle}>
+    <Shadow viewStyle={{backgroundColor: 'white', width: '100%', borderRadius: 10}} radius={10} distance={2} offset={[0,2]} startColor={Colors.divider} containerViewStyle={containerStyle}>
+    <View >
 
-        <View style={{ backgroundColor: '#F5F6FF', padding: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ backgroundColor: '#F5F6FF', padding: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopLeftRadius: 10, borderTopRightRadius: 10}}>
             <LatoRegular style={{ color: Colors.primary }} Icon={IconCar}>{data.plate_model}</LatoRegular>
             <IconVerified
                 color={data.status.includes('Lulus') ? Colors.secondary : Colors.grey}
@@ -44,6 +47,8 @@ const AccountCardInfo = ({ data, containerStyle, onPress }) => {
         }
 
     </View>
+    </Shadow>
+    </View>
 }
 
 const styles = StyleSheet.create({
@@ -58,7 +63,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.20,
         shadowRadius: 1.41,
 
-        elevation: 2,
+        elevation: 5,
     }
 })
 

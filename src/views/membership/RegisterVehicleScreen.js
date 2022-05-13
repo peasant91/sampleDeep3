@@ -21,7 +21,7 @@ import Colors from '../../constants/Colors'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import CustomButton from '../../components/atoms/CustomButton'
 import { getCity, getDistrict, getVehicleBrand, getVehicleModel, getVehicleType, getVillage } from '../../services/utilities'
-import { registerVehicle } from '../../services/user'
+import { getVehicle, registerVehicle, updateVehicle } from '../../services/user'
 import { showDialog } from '../../actions/commonActions'
 
 
@@ -128,6 +128,8 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     }
 
     setisLoading(true)
+
+    if (!isEdit) {
     registerVehicle(form).then(response => {
       setisLoading(false)
       goToRegisterVehicleSuccess()
@@ -135,6 +137,15 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       setisLoading(false)
       showDialog(error.message)
     })
+    } else {
+    updateVehicle(form).then(response => {
+      setisLoading(false)
+      goToRegisterVehicleSuccess()
+    }).catch(error => {
+      setisLoading(false)
+      showDialog(error.message)
+    })
+    }
   }
 
   const openCameraPicker = async () => {
@@ -210,6 +221,82 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
         isValid: true
       })
     })
+
+    if (isEdit) {
+      getVehicle().then(response => {
+        translateEditForm(response)
+      }).catch(err => {
+        showDialog(err.message)
+      })
+    }
+  }
+
+  const translateEditForm = (form) => {
+    console.log('stickerArea', form.detail.sticker_area)
+
+    const isFullBody = form.detail.sticker_area.includes(StickerType[0].id)
+
+    const formStateDetail = {
+      inputValues: {
+      color_id: form.detail.color.id,
+      color_id_value: form.detail.color.name,
+      images: form.images,
+      model_vehicle_id: form.detail.vehicle_model.id,
+      model_vehicle_id_value: form.detail.vehicle_model.name,
+      vehicle_brand_id: form.detail.vehicle_brand.id,
+      vehicle_brand_id_value: form.detail.vehicle_brand.name,
+      plate_number: form.detail.plate_number,
+      sticker_area: form.detail.stickerArea,
+      year: form.detail.year,
+      sticker_area_id: isFullBody ? StickerType[0].id : StickerType[1].id,
+      sticker_area_id_value: isFullBody ? StickerType[0].name : StickerType[1].name
+      },
+      inputValidities: {},
+      formIsValid: true,
+    }
+
+    const formState = {
+      inputValues: {
+        province_id: form.province.id,
+        province_id_value: form.province.name,
+        district_id: form.district.id,
+        district_id_value: form.district.name,
+        city_id: form.city.id,
+        city_id_value: form.city.name,
+        village_id: form.village?.id,
+        village_id_value: form.village?.name,
+        vehicle_ownership: form.vehicle_ownership.id,
+        vehicle_ownership_value: form.vehicle_ownership.name,
+        vehicle_usage: form.vehicle_usage.id,
+        vehicle_usage_value: form.vehicle_usage.name,
+        vehicle_type: form.detail.vehicle_type.id,
+        vehicle_type_value: form.detail.vehicle_type.name,
+        total_work_days: `${form.total_work_days}`,
+        is_convoy: form.is_convoy ? 1 : 0,
+        is_convoy_value: form.is_convoy ? translate('yes') : translate('false'),
+        is_broadcast: form.is_broadcast ? 1 : 0,
+        is_broadcast_value: form.is_broadcast ? translate('yes') : translate('false'),
+        is_term: form.is_term ? 1 : 0,
+        is_term_value: form.is_term ? translate('yes') : translate('false'),
+      },
+      inputValidities: {},
+      formIsValid: false,
+      isCheck: false
+    }
+
+    dispatchDetail({
+      type: 'update',
+      state: formStateDetail
+    })
+
+    dispatch({
+      type: 'update',
+      state: formState
+    })
+
+    if (!isFullBody) {
+      setstickerArea(form.detail.sticker_area)
+    }
   }
 
   useEffect(() => {
@@ -324,7 +411,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
 
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-    <NavBar title={translate('register_vehicle')} navigation={navigation} />
+    <NavBar title={isEdit ? translate('edit_vehicle') : translate('register_vehicle')} navigation={navigation} />
     <ScrollView style={{ flex: 1, padding: 16 }}>
       <View style={{ paddingBottom: 16 }}>
         <PickerInput
@@ -478,11 +565,17 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
               data={stickerAreaData}
               keyExtractor={item => item.id}
               renderItem={({ item, index }) => {
+                const isChecked = stickerArea.includes(item.value)
+
                 return <StickerAreaCheckbox
                   title={item.name}
-                  isChecked={stickerArea[index] == item.value}
+                  isChecked={isChecked}
                   onPress={() => {
-                    stickerArea[index] = item.value
+                    if (isChecked) {
+                      stickerArea.pop(item.value)
+                    } else {
+                      stickerArea.push(item.value)
+                    }
                     console.log(stickerArea)
                     setstickerArea([...stickerArea])
                   }}

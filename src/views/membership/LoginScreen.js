@@ -191,7 +191,7 @@ const LoginScreen = ({navigation, route}) => {
                 <View style={{padding: 16}}>
                   <PhoneInput
                   id="phone"
-                  value={formState.inputValues.credential}
+                  value={formState.inputValues.phone}
                   placeholder={translate('phone_placeholder')}
                   title={translate('phone_title')}
                   // onChangeText={onChangeText}

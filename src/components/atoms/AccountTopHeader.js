@@ -20,10 +20,10 @@ const AccountTopHeader = ({ data, isLoading }) => {
   
 
   return (
-          <Shadow viewStyle={{width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 99}} distance={2} offset={[0,2]}>
+          <Shadow viewStyle={{width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 999, elevation: 10}} distance={2} offset={[0,2]}>
 
       {!isLoading ?
-        <View style={{flexDirection: 'row', zIndex: 99}}>
+        <View style={{flexDirection: 'row', zIndex: 999, elevation: 10}}>
           <Avatar 
             rounded
             size={'medium'}

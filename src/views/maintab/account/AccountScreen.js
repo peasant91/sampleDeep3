@@ -116,7 +116,7 @@ const AccountScreen = ({navigation, route}) => {
       <AccountTopHeader data={profileData} isLoading={isLoading}/>
 
       <ScrollView
-        style={{zIndex: -1}}
+        style={{zIndex: -99,}}
        refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -127,9 +127,9 @@ const AccountScreen = ({navigation, route}) => {
 
         <View>
           { isLoading ? <View style={{margin: 16}}><ShimmerPlaceholder style={{width: '100%', height: 100, }} /></View> : (!isEmpty(vehicleRute) ? (
-            <View>
+            <View style={{zIndex: -1}}>
               <AccountCardInfo
-                containerStyle={{margin: 16}}
+                containerStyle={{margin: 8, zIndex: -1}}
                 data={vehicleRute}
                 onPress={goToEditVehicle}
               />

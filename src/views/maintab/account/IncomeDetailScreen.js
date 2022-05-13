@@ -7,7 +7,7 @@ import { getIncomeList } from '../../../services/transaction'
 import { showDialog } from '../../../actions/commonActions'
 import moment from 'moment'
 import { range, toCurrency } from '../../../actions/helper'
-import { ShimmerTripDetail } from '../../../components/atoms/shimmer/Shimmer'
+import { ShimmerIncome, ShimmerTripDetail } from '../../../components/atoms/shimmer/Shimmer'
 import PeriodStrip from '../../../components/atoms/PeriodStrip'
 import BlueHeader from '../../../components/atoms/BlueHeader'
 import { LatoRegular } from '../../../components/atoms/CustomText'
@@ -46,7 +46,6 @@ const IncomeDetailScreen = ({navigation, route}) => {
 
     return <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
         <NavBar navigation={navigation} title={translate('total_income')} />
-        {isLoading ? <ShimmerTripDetail/> : 
         <View>
             <BlueHeader title={toCurrency(data.total)} sub={selectedYear} />
             <View style={{ width: '100%', backgroundColor: Colors.lightPrimary, height: 50 }}>
@@ -61,6 +60,8 @@ const IncomeDetailScreen = ({navigation, route}) => {
                     }}
                 />
             </View>
+            {
+                isLoading ? <ShimmerIncome containerStyle={{margin: 16}}/> :
             <FlatList
                 data={data.incomes}
                 keyExtractor={item => item.date}
@@ -74,7 +75,8 @@ const IncomeDetailScreen = ({navigation, route}) => {
                     </View>
                 }}
             />
-        </View>}
+            }
+        </View>
     </SafeAreaView>
 
 }

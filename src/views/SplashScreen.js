@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useContext, useState, useRef} from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,48 +12,50 @@ import {
   Platform,
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
-import {LatoBold, Subtitle2} from '../components/atoms/CustomText';
+import { LatoBold, Subtitle2 } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
-import {default as Splash} from 'react-native-splash-screen';
-import {getApplicationName, getVersion} from 'react-native-device-info';
+import { default as Splash } from 'react-native-splash-screen';
+import { getApplicationName, getVersion } from 'react-native-device-info';
 import {
   showErrorAlert,
   checkAppVersion,
   showDialog,
   dismissDialog,
   getCalendarYear,
+  showLocationAlwaysDialog,
 } from '../actions/commonActions';
-import {Alert} from 'react-native';
-import {BackHandler} from 'react-native';
+import { Alert } from 'react-native';
+import { BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../constants/StorageKey';
 import pkg from '../../package.json';
-import {AuthContext} from '../../App';
+import { AuthContext } from '../../App';
 import translate from '../locales/translate';
 import ImageTopLogo from '../assets/images/img_top_logo.svg';
-import {getBank, getColor, getCompanies, getDivisionApi, getGender, getProvince, getVehicleOwnership, getVehicleSticker, getVehicleType, getVehicleUsage} from '../services/utilities';
-import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
+import { getBank, getColor, getCompanies, getDivisionApi, getGender, getProvince, getVehicleOwnership, getVehicleSticker, getVehicleType, getVehicleUsage } from '../services/utilities';
+import { Freshchat, FreshchatConfig } from 'react-native-freshchat-sdk';
 import Constant from '../constants/Constant';
-import {postFreshchat} from '../services/freshchat';
-import {getCalendarWeek} from '../data/dummy';
-import {getNumberFormatSettings} from 'react-native-localize';
-import {getSettings} from '../services/settings';
+import { postFreshchat } from '../services/freshchat';
+import { getCalendarWeek } from '../data/dummy';
+import { getNumberFormatSettings } from 'react-native-localize';
+import { getSettings } from '../services/settings';
 import messaging, { firebase } from '@react-native-firebase/messaging';
-import {useIsFocused} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 
 import BGSplash from '../assets/background/bg_splash.svg'
 import axios from 'axios';
-import { openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
-const SplashScreen = props => {
+const SplashScreen = ({ navigation, route }) => {
   Splash.hide();
-  const {doneLoading} = useContext(AuthContext);
+  const { doneLoading } = useContext(AuthContext);
   const appVersion = getVersion();
   const isFocus = useIsFocused();
 
 
   // const [appState, setappState] = useState('active');
-  var appState = 'active'
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const showUpdateAlert = response => {
     Alert.alert(
@@ -72,11 +74,11 @@ const SplashScreen = props => {
           onPress: () => {
             Platform.OS == 'android'
               ? Linking.openURL(
-                  'market://details?id=id.otomedia.android',
-                )
+                'market://details?id=id.otomedia.android',
+              )
               : Linking.openURL(
-                  'itms-apps://itunes.apple.com/app/apple-store/id1588342499?mt=8',
-                );
+                'itms-apps://itunes.apple.com/app/apple-store/id1588342499?mt=8',
+              );
           },
         },
       ],
@@ -114,7 +116,7 @@ const SplashScreen = props => {
         AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
       })
       .catch(err => {
-        showDialog(err.message);  
+        showDialog(err.message);
       });
   }
 
@@ -143,39 +145,85 @@ const SplashScreen = props => {
 
   const getFirebaseToken = async () => {
     const authStatus = await messaging().requestPermission();
-    const messaging = firebase.messaging()
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    const fMessagging = firebase.messaging()
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  if (enabled) {
-    console.log('Authorization status:', authStatus);
-    messaging.getToken().then(token => {
-      AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token)
-      loadAllData()
-    }).catch(err => {
-      showDialog(err.message)
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+      fMessagging.getToken().then(token => {
+        AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token)
+        loadAllData()
+      }).catch(err => {
+        showDialog(err.message)
+      })
+    }
+  }
+
+  const showOpenSetting = () => {
+    showDialog(translate('please_allow_location_always'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+  }
+
+  const requestAndroidLocationPermission = () => {
+    request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION).then(result => {
+      console.log('background permission', result)
+      if (result == RESULTS.GRANTED) {
+        if (Platform.Version < 29) {
+          getFirebaseToken()
+          return
+        } else {
+          request(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION).then(result => {
+            console.log('background permission', result)
+            if (result == RESULTS.GRANTED) {
+              getFirebaseToken()
+              return
+            }
+          })
+        }
+      }
+
+      showOpenSetting()
+
     })
   }
-  }
 
-  const requestBackgroundPermission = () => {
+  const requestBackgroundPermission = async () => {
     if (Platform.OS == 'ios') {
       request(PERMISSIONS.IOS.LOCATION_ALWAYS).then(result => {
-        if (result == RESULTS.GRANTED ) {
+        if (result == RESULTS.GRANTED) {
+
           requestNotificationPermission()
         } else {
           openSettings().catch(() => console.warn('cannot open settings'));
         }
       })
     } else {
-      request(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION).then(result => {
-        if (result == RESULTS.GRANTED) {
-          requestNotificationPermission
-        } else {
-          openSettings().catch(() => console.warn('cannot open settings'));
+      const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+        if (result == RESULTS.DENIED) {
+          showLocationAlwaysDialog(() => {
+            requestAndroidLocationPermission()
+          })
+          return
+        } 
+
+        if (Platform.Version >= 29) {
+            const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
+              if (result == RESULTS.DENIED) {
+                showLocationAlwaysDialog(() => {
+                  requestAndroidLocationPermission()
+                })
+                return
+              }
+
+              if (result == RESULTS.BLOCKED) {
+              showOpenSetting()
+              return
+              }
         }
-      })
+        
+        getFirebaseToken()
+      
     }
   }
 
@@ -221,29 +269,29 @@ const SplashScreen = props => {
   // };
 
   const loadAllData = () => {
-      axios.all([
-        getProvince(),
-        getCompanies(),
-        getGender(),
-        getBank(),
-        getVehicleOwnership(),
-        getVehicleSticker(),
-        getVehicleUsage(),
-        getColor(),
-      ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
-        console.log('axios spread', province, companies)
-        await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
-        await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
-        await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
-        await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
-        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
-        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
-        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
-        await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
-        doneLoading()
-      })).catch(err => {
-        showDialog(err.message)
-      })
+    axios.all([
+      getProvince(),
+      getCompanies(),
+      getGender(),
+      getBank(),
+      getVehicleOwnership(),
+      getVehicleSticker(),
+      getVehicleUsage(),
+      getColor(),
+    ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
+      console.log('axios spread', province, companies)
+      await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
+      await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
+      await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
+      await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
+      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
+      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
+      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
+      await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
+      doneLoading()
+    })).catch(err => {
+      showDialog(err.message)
+    })
   }
 
   useEffect(() => {
@@ -252,6 +300,7 @@ const SplashScreen = props => {
       // getProvinceApi();
       checkVersion()
       // initFreshchat();
+      AsyncStorage.setItem(StorageKey.KEY_BACKGROUND_ACTIVE, JSON.stringify(false))
     }
 
     // AppState.addEventListener('change', handleAppStateChange);
@@ -261,19 +310,31 @@ const SplashScreen = props => {
     //   checkVersion()
     // });
 
-    return () => {};
+    const subscription = AppState.addEventListener("change", nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        requestBackgroundPermission()
+      }
+
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+    });
+
+    return () => subscription.remove();
   }, [isFocus]);
 
   return (
 
-    <View style={{flex: 1, color: Colors.primary}}>
+    <View style={{ flex: 1, color: Colors.primary }}>
       <StatusBar
         backgroundColor={'#0D233D'}
         barStyle="light-content"></StatusBar>
       <View style={styles.container}>
         <Image
           source={require('../assets/background/bg_splash.png')}
-          style={{width: '100%', height: '100%'}}
+          style={{ width: '100%', height: '100%' }}
           resizeMode='contain'
         />
         {/* <BGSplash style={{width: '100%', height: '100%'}} /> */}
@@ -281,7 +342,7 @@ const SplashScreen = props => {
       </View>
       <View style={styles.versionContainer}>
         {/* <ActivityIndicator size="small" color={Colors.primary} /> */}
-        <LatoBold style={{color: 'black'}}>
+        <LatoBold style={{ color: 'black' }}>
           Ver. {appVersion} {pkg.mode == 'dev' ? 'dev' : ''}
         </LatoBold>
       </View>

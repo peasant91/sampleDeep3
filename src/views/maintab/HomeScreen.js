@@ -85,7 +85,7 @@ const HomeScreen = ({ navigation, route }) => {
   }
 
   const goToContractDetail = () => {
-    navigation.navigate('CurrentContract', {id: homeData.active_contract.contract_id, isEmpty: false})
+    navigation.navigate('CurrentContract', {id: homeData.active_contract.contract_id, isEmpty: false, isCurrent: true})
   }
 
   const getHomeData = () => {
@@ -234,7 +234,7 @@ const HomeScreen = ({ navigation, route }) => {
 
               {homeData.active_contract &&
                 <CustomButton
-                  style={{ marginHorizontal: 8 }}
+                  containerStyle={{ marginHorizontal: 16, marginBottom: 16 }}
                   types={'primary'}
                   title={translate('do_job')}
                   iconRight={true}

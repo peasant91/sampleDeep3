@@ -251,7 +251,18 @@
     "vehicle_not_registered": "Kendaraan Belum Terdaftar",
     "update_bank_account_success": "Berhasil mengubah Rekening Bank",
     "start": "Mulai",
-    "stop": "Berhenti"
+    "stop": "Berhenti",
+    "on_work_title": "Melakukan Pekerjaan",
+    "on_work_desc": "Kami mencatat aktifitas GPS anda!",
+    "always_location_title": "Ijinkan Untuk Mengakses Lokasi Kapanpun",
+    "always_location_desc": "Mohon ijinkan kami untuk mengakses lokasi anda setiap saat. Akses lokasi digunakan untuk menyimpan data perjalanan anda. \n\nData perjalanan anda hanya akan digunakan untuk menentukan pendapatan, dan tidak dipergunakan untuk keperluan lainnya.",
+    "understand": "Saya Mengerti",
+    "please_allow_location_always": "Mohon ijinkan kami untuk mengakses lokasi anda setiap saat",
+    "open_setting": "Ke Pengaturan",
+    "exit": "keluar",
+    "edit_vehicle": "Ubah Kendaraan",
+    "error_odometer": "Mohon tambahkan gambar odometer",
+    "error_image": "Mohon tambahkan gambar %{string}"
     
 
 

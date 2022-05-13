@@ -4,6 +4,7 @@ import BackgroundGeolocation from '@mauron85/react-native-background-geolocation
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../constants/StorageKey';
+import translate from '../locales/translate';
 
 export const initBackground = () => {
       if (Platform.OS === 'ios') {
@@ -57,8 +58,12 @@ export const initBackground = () => {
       BackgroundGeolocation.configure({
         desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
         stationaryRadius: 50,
-        notificationTitle: 'Background tracking',
-        notificationText: 'enabled',
+        distanceFilter: 50,
+        interval: 10000,
+        fastestInterval: 5000,
+        activitiesInterval: 10000,
+        notificationTitle: translate('on_work_title'),
+        notificationText: translate('on_work_desc'),
         notificationsEnabled: true,
         debug: true,
         startOnBoot: true,

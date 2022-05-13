@@ -12,7 +12,7 @@ import DialogManager, {
 } from 'react-native-dialog-component';
 import DialogComponent from 'react-native-dialog-component/dist/DialogComponent';
 import getClientVersioning from '../services/getClientVersioning';
-import CustomText, { Subtitle1 } from '../components/atoms/CustomText';
+import CustomText, { LatoBold, LatoRegular, Subtitle1 } from '../components/atoms/CustomText';
 import translate from '../locales/translate';
 import CustomButton from '../components/atoms/CustomButton';
 import {getErrorMessage} from '../services/baseApi';
@@ -112,6 +112,51 @@ export const showLoadingDialog = message => {
       ),
           });
 };
+
+export const showLocationAlwaysDialog = (onConfirm) => {
+  DialogManager.show(
+    {
+      animationDuration: 0,
+      ScaleAnimation: new ScaleAnimation(),
+      width: '80%',
+      dialogStyle: {borderRadius: 16, width: '80%'},
+      dismissOnTouchOutside: false,
+      children: (
+        <View style={{margin: 20}}>
+          <LottieView
+            ref={animation => {
+              this.animation = animation;
+            }}
+            autoPlay
+            loop
+            style={{width: 200, height: 100, alignSelf: 'center'}}
+            source={require('../assets/lottie/location.json')}
+          />
+          <LatoBold>{translate('always_location_title')}</LatoBold>
+          <LatoRegular
+            containerStyle={{marginVertical: 16}}
+            style={{
+              fontFamily: 'Lato-Bold',
+              fontSize: 12,
+              marginBottom: 10,
+              alignSelf: 'center',
+              textAlign: 'center',
+            }}>
+            {translate('always_location_desc')}
+          </LatoRegular>
+          <CustomButton
+            types="primary"
+            onPress={() => { DialogManager.dismiss(); onConfirm() }}
+            title={translate('understand')}
+          />
+        </View>
+      ),
+    },
+    () => {
+      console.log('callback - show');
+    },
+  );
+}
 
 export const showSuccessDialog = message => {
   DialogManager.show(

@@ -159,6 +159,7 @@ const CurrentContractScreen = ({navigation, route}) => {
                         </View>
                     }
 
+                    { isCurrent &&
                     <View style={{paddingTop: 16}}>
                         <Divider/>
                         <LatoBold containerStyle={{padding:16}}>{translate('weekly_report')}</LatoBold>
@@ -166,6 +167,7 @@ const CurrentContractScreen = ({navigation, route}) => {
                             <LatoBold style={{color: Colors.primarySecondary}} containerStyle={{alignSelf: 'center', padding: 5}}>{translate('+create_report')}</LatoBold>
                             </TouchableOpacity>
                     </View>
+                    }
 
                     {
                         reportData?.map((value, index) => {

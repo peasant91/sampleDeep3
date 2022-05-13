@@ -72,6 +72,7 @@ import Config from './src/constants/Config';
 import MainTabScreen from './src/views/maintab/MainTabScreen';
 import { logout } from './src/services/user';
 import { showDialog } from './src/actions/commonActions';
+import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 
 //realm
 
@@ -164,9 +165,11 @@ const App = ({ navigation, route }) => {
       },
       signOut: async data => {
         logout().then(response => {
+          BackgroundGeolocation.stop()
           AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
             dispatch({ type: 'SIGN_OUT' });
           })
+          
         }).catch(err => {
           showDialog(err.message)
         })

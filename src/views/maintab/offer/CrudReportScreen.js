@@ -38,14 +38,16 @@ const CrudReportScreen = ({ navigation, route }) => {
             desc: '',
             odometer: ' '
         },
-        inputValidities: {},
+        inputValidities: {
+            odometer: false
+        },
         formIsValid: false,
-        isCheck: false
+        isChecked: false
     })
 
     const getStickers = () => {
         mapStickerArea(stickerArea).then(response => {
-            // console.log('map sticker', response)
+            console.log('map sticker', response)
             setStickerLayoutData(response)
         })
     }
@@ -72,6 +74,20 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const doReport = () => {
+
+        dispatch({
+            type: 'check'
+        })
+
+        console.log(formState)
+        let imageIsValid = true
+
+        for(item in stickerLayoutData) {
+            const item = stickerLayoutData[item]
+            imageIsValid = item.images.includes()
+        }
+
+        if (formState.formIsValid) {
         setisloading(true)
         postReport(formState.inputValues).then(response => {
             setisloading(false)
@@ -80,6 +96,7 @@ const CrudReportScreen = ({ navigation, route }) => {
         }).catch(err => {
             // showDialog(err.message)
         })
+        }
     }
 
     const postReportImageAPI = () => {
@@ -230,6 +247,8 @@ const CrudReportScreen = ({ navigation, route }) => {
                 value={formState.inputValues.desc}
                 containerStyle={{paddingBottom: 16}}
                 disabled={!isAdd}
+                required
+                isCheck={formState.isChecked}
             />
             {
                 stickerLayoutData?.map((value, index) => {
@@ -244,12 +263,20 @@ const CrudReportScreen = ({ navigation, route }) => {
                             renderItem={({ item, index }) => {
                                 return <ReportImage imageUri={item} navigation={navigation} title={value.name} onPress={() => openImagePicker(value.value, value.value, index)} />
                             }} />
+            {
+                 stickerLayoutData.filter(item =>  item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_image', {string: value.name})}</LatoBold>
+            }
                     </View>
                 })
             }
 
             <LatoBold>{translate('odometer_photo')}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
+
             <ReportImage imageUri={formState.inputValues.odometer} onPress={() => openImagePicker('odometer', 'odometer')} navigation={navigation} title={translate('odometer')} />
+
+            {
+                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_odometer')}</LatoBold>
+            }
 
             {
                 isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginVertical: 24 }} />

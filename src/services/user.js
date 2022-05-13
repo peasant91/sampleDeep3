@@ -4,6 +4,10 @@ export const getProfile = () => {
     return get('v1/driver/profile', {})
 }
 
+export const getVehicle = () => {
+    return get('v1/driver/vehicle', {})
+}
+
 export const changePassword = (data) => {
     return post('v1/driver/new-password', data)
 }
@@ -15,6 +19,11 @@ export const getUserBank = (id) => {
 export const registerVehicle = (data) => {
     return post('v1/driver/vehicle', data)
 }
+
+export const updateVehicle = (data) => {
+    return patch('v1/driver/vehicle', data)
+}
+
 
 export const updateBank = (data) => {
     return post('v1/driver/bank-account', data)

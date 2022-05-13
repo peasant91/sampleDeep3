@@ -61,6 +61,27 @@ export const ShimmerTripDetail = ({containerStyle}) => {
   </View>
 }
 
+export const ShimmerIncome = ({containerStyle}) => {
+  return <View style={containerStyle}>
+    <ShimmerPlaceholder style={{width: 200, height: 20, marginTop: 0}}/>
+    <ShimmerPlaceholder style={{width: 250, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 290, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 150, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 200, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 250, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 200, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 150, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 200, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 250, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 200, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 270, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 220, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 290, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 220, height: 20, marginTop: 16}}/>
+    <ShimmerPlaceholder style={{width: 250, height: 20, marginTop: 16}}/>
+  </View>
+}
+
 export const ShimmerOfferDetail = ({containerStyle}) => {
   return <View style={containerStyle}>
     <View style={{flexDirection: 'row'}}>

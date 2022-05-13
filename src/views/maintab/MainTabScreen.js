@@ -21,6 +21,7 @@ import { DistanceSchema, SpeedSchema } from '../../data/realm/speed';
 import { calcDistance } from '../../actions/helper';
 import { sendDistance } from '../../services/contract';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import Config from '../../constants/Config';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,6 +33,7 @@ const MainTabScreen = ({navigation, route}) => {
     longitude: 0
   });
   const lastSentTime = useRef();
+  const sumDistance = useRef(0);
 
   useEffect(() => {
     AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN).then(token => {
@@ -58,15 +60,21 @@ const MainTabScreen = ({navigation, route}) => {
             BackgroundGeolocation.endTask(taskKey);
           });
         });
+
+        AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(backround => {
+          console.log('background', backround)
+          if (JSON.parse(backround)) {
+            BackgroundGeolocation.start()
+          }
+        })
     
   }, []);
 
   const onLocationChange = async (location) => {
-    console.log('maintab onlocation', location)
     const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude)
-    console.log('distance', distance)
+    sumDistance.current += distance
 
-    sendLocation(distance, location)
+    sendLocation(location)
 
     const schema = [SpeedSchema, DistanceSchema]
 
@@ -98,29 +106,30 @@ const MainTabScreen = ({navigation, route}) => {
     }
   }
 
-  const sendLocation = (distance, location) => {
+  const sendLocation = (location) => {
     if (!lastSentTime.current) {
       lastSentTime.current = moment(Date())
+      return
     } else {
       const duration = moment.duration(lastSentTime.current.diff(moment(Date()))).asMinutes()
       
       console.log('momentDuration', duration)
       console.log('lastsenttime', lastSentTime)
+      console.log('sumdistance', sumDistance.current)
 
-      if (duration > -1) {
+      if (duration > Config.minimumTimeToSend) {
         return
       }
     }
-
 
     AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
       sendDistance({
         lat: location.latitude,
         lng: location.longitude,
-        distance: distance * 1000, //in meter
+        distance: sumDistance.current * 1000, //in meter
         contract_id: id
       }).then(response => {
-
+        sumDistance.current = 0
       }).catch(err => {
 
       })
