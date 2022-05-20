@@ -5,14 +5,15 @@ import {LatoMedium, LatoRegular, LatoBold} from '../CustomText';
 
 import IconOffice from '../../../assets/images/ic_office.svg';
 import IconCheckmark from '../../../assets/images/ic_checkmark.svg';
+import { Shadow } from 'react-native-shadow-2';
 
 const ListCompany = ({data, selectedId, onPress}) => {
   return (
-    <TouchableOpacity onPress={() => onPress(data.id, data.name)}>
+    <TouchableOpacity onPress={() => onPress(data.id, data.name)} style={styles.container}>
+    <Shadow  radius={10} offset={[0,0]} distance={3} startColor={Colors.divider} viewStyle={[{backgroundColor: selectedId == data.id ? '#EEEEFF' : 'white', borderRadius: 9, width: '100%'}, ]}>
       <View
         style={[
-          styles.container,
-          {backgroundColor: selectedId == data.id ? '#EEEEFF' : 'white'},
+          { flexDirection: 'row', padding: 16},
         ]}>
         <IconOffice />
         <View style={{paddingLeft: 10, flex: 1}}>
@@ -26,27 +27,16 @@ const ListCompany = ({data, selectedId, onPress}) => {
           <LatoRegular>{data.address}</LatoRegular>
         </View>
       </View>
+      </Shadow>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    flexDirection: 'row',
     marginHorizontal: 16,
-    borderRadius: 10,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0.5,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 1.22,
-
-    elevation: 3,
-  },
+  }
 });
 
 export default ListCompany;

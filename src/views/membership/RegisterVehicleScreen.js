@@ -50,7 +50,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     },
   ]
 
-  const { isRegister, isEdit } = route.params
+  const { isEdit, isRegister } = route.params
 
   const [provinceData, setprovinceData] = useState([])
   const [cityData, setcityData] = useState([])
@@ -69,6 +69,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   const [stickerAreaData, setstickerAreaData] = useState([])
   const [stickerArea, setstickerArea] = useState([])
   const [colorData, setcolorData] = useState([])
+  // const [isRegister, setisRegister] = useState(route.params.isRegister)
 
   const [isLoading, setisLoading] = useState(false)
 
@@ -100,6 +101,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       type: 'check'
     })
 
+    console.log(formState.formIsValid, formStateDetail.formIsValid, stickerArea.length != 0)
     if (formState.formIsValid && formStateDetail.formIsValid && images.filter(item => item != ' ').length != 0 && stickerArea.length != 0) {
       buildForm()
     }
@@ -188,7 +190,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       data: data,
       selectedId: selectedId,
       previousRoute: 'RegisterVehicle',
-      dispatch: dispatch
+      dispatch: dispatch,
+      isRegister: isRegister,
+      isEdit: isEdit
     });
   };
 
@@ -255,6 +259,8 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       formIsValid: true,
     }
 
+    setstickerArea([...form.detail.sticker_area])
+
     const formState = {
       inputValues: {
         province_id: form.province.id,
@@ -280,7 +286,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
         is_term_value: form.is_term ? translate('yes') : translate('false'),
       },
       inputValidities: {},
-      formIsValid: false,
+      formIsValid: true,
       isCheck: false
     }
 
@@ -294,9 +300,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       state: formState
     })
 
-    if (!isFullBody) {
-      setstickerArea(form.detail.sticker_area)
-    }
+    // if (!isFullBody) {
+    //   setstickerArea(form.detail.sticker_area)
+    // }
   }
 
   useEffect(() => {
@@ -621,6 +627,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           dispatcher={dispatch}
           value={formState.inputValues.total_work_days}
           isCheck={formState.isChecked}
+          keyboardType={'number-pad'}
           required
         />
 

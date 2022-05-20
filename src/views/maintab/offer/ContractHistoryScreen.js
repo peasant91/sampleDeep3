@@ -46,7 +46,7 @@ const ContractHistoryScreen = ({ navigation, route }) => {
     }
 
   const onRefresh = () => {
-    canLoadData.current = true
+    canLoadMore.current = true
     page.current = 1
     getHistory()
   }

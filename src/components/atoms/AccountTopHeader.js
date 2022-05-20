@@ -37,14 +37,14 @@ const AccountTopHeader = ({ data, isLoading }) => {
             <LatoRegular Icon={IconLock}>{data.name}</LatoRegular>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <IconVerified
-                color={data.status != 'waiting' ? Colors.secondary : Colors.grey}
+                color={data.status == 'verified' ? Colors.secondary : Colors.grey}
               />
               <LatoRegular
                 style={{
-                  color: data.status != 'waiting' ? Colors.secondary : Colors.grey,
+                  color: data.status == 'verified' ? Colors.secondary : Colors.grey,
                   marginLeft: 5,
                 }}>
-                {translate(data.status != 'waiting' ? 'verified' : 'on_verifying')}
+                {translate(data.status == 'verified' ? 'verified' : 'on_verifying')}
               </LatoRegular>
             </View>
           </View>

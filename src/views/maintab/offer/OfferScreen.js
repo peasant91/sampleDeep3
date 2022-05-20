@@ -10,6 +10,9 @@ import ErrorNotRegisterVehicle from '../../../components/atoms/ErrorNotRegisterV
 import { showDialog } from '../../../actions/commonActions';
 import translate from '../../../locales/translate';
 import { ShimmerCardContract } from '../../../components/atoms/shimmer/Shimmer';
+import { Shadow } from 'react-native-shadow-2';
+import { useIsFocused } from '@react-navigation/native';
+import Colors from '../../../constants/Colors';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -35,6 +38,7 @@ const OfferScreen = ({ navigation, route }) => {
   const canLoadData = useRef(true)  
   const [isLoading, setisLoading] = useState(true)
   const [search, setsearch] = useState('')
+  const isFocused = useIsFocused();
 
   const goToDetail = (item) => {
     navigation.navigate('OfferDetail', { id: item.id })
@@ -82,17 +86,19 @@ const OfferScreen = ({ navigation, route }) => {
     getCampaignListApi()
   }
 
-
   useEffect(() => {
-    getCampaignListApi()
-  }, [])
-
-  
-
+    if (isFocused) {
+      onRefresh()
+    } else {
+      setisLoading(true)
+    }
+  }, [search, isFocused])
 
   return (
     <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
       <View style={{ backgroundColor: '#FAFAFA', flex: 1 }}>
+        <Shadow viewStyle={{width: '100%'}} offset={[0, 10]} distance={10} startColor={Colors.divider}>
+
         <View style={styles.topHeader}>
           <Input
             containerStyle={{ flex: 1, paddingHorizontal: 16 }}
@@ -106,6 +112,8 @@ const OfferScreen = ({ navigation, route }) => {
             }}
           />
         </View>
+
+        </Shadow>
 
         {isNotRegisterVehicle ? <ErrorNotRegisterVehicle /> :
           (isLoading ? dummyContractShimmer.map((item, index) => {
@@ -145,8 +153,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 50,
-    paddingTop: 16,
+    height: 60,
+    paddingTop: 24,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -154,6 +162,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.15,
     shadowRadius: 3.84,
+
 
     elevation: 10,
     zIndex: 1,

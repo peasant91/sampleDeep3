@@ -53,6 +53,7 @@ import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
 import { getFullLink } from '../../actions/helper';
 import { getUserBank } from '../../services/user';
+import InfoMenu from '../../components/atoms/InfoMenu';
 
 const dummyDivision = [
   {
@@ -414,11 +415,13 @@ const RegisterScreen = ({navigation, route}) => {
   };
 
   const openImagePicker = async (id, location) => {
-    pickerSheet.current.expand();
     setselectedPicker({
       id,
       location,
     });
+    setTimeout(() => {
+      pickerSheet.current.expand();
+    }, 100);
   };
 
   const isPickedImageEmpty = () => {
@@ -693,6 +696,8 @@ const RegisterScreen = ({navigation, route}) => {
               isCheck={formState.isChecked}
             />
 
+            <InfoMenu text={translate('company_bank_info')} containerStyle={{marginTop: 16}}/>
+
             <CustomInput
               id={'address'}
               title={translate('address_title')}
@@ -944,6 +949,7 @@ const RegisterScreen = ({navigation, route}) => {
               {translate('pick_camera')}
             </LatoRegular>
           </TouchableOpacity>
+          
           {!isPickedImageEmpty() && (
             <View>
               <View

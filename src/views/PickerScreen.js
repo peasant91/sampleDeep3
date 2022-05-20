@@ -11,15 +11,17 @@ import { Input } from 'react-native-elements';
 import ListArea from '../components/atoms/list/ListArea';
 import { LatoRegular } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
+import { Shadow } from 'react-native-shadow-2';
 
 const PickerScreen = ({ navigation, route }) => {
 
-  const { pickerId, title, data, selectedId, isEdit, dispatch } = route.params;
+  const { pickerId, title, data, selectedId, isEdit, dispatch, isRegister } = route.params;
 
   const [filteredData, setfilteredData] = useState(data)
 
   const onPressList = (id, name) => {
-    navigation.navigate(route.params.previousRoute, { pickerId: pickerId, id: id, name: name, isEdit: isEdit, dispatch: dispatch }, true)
+    console.log(isEdit)
+    navigation.navigate(route.params.previousRoute, { pickerId: pickerId, id: id, name: name, isEdit: isEdit, dispatch: dispatch, isRegister: isRegister }, true)
   }
 
   const onChangeText = (text) => {
@@ -29,7 +31,10 @@ const PickerScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={style.container}>
+      <Shadow viewStyle={{width: '100%'}}>
+
       <View style={style.header}>
+        
         <TouchableOpacity onPress={() => navigation.pop()}>
           <IconBack onPress={() => navigation.pop()} />
         </TouchableOpacity>
@@ -37,10 +42,11 @@ const PickerScreen = ({ navigation, route }) => {
           onChangeText={onChangeText}
           rightIcon={IconSearch}
           rightIconContainerStyle={{ marginVertical: 0 }} 
-          placeholder={translate(title)} 
+          placeholder={translate('find_picker' , {title: translate(title)})} 
           style={{ flex: 1 }} 
           containerStyle={{ flex: 1, marginBottom: -15 }} />
       </View>
+      </Shadow>
       <View style={{flex: 1}}>
 
 

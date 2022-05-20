@@ -64,7 +64,7 @@ const dummyContractData = {
 const HomeScreen = ({ navigation, route }) => {
 
   const [backPressedCount, setBackPressedCount] = useState(0);
-  const [isNotifVisible, setisNotifVisible] = useState(true);
+  const [isNotifVisible, setisNotifVisible] = useState(false);
   const [isLoading, setisLoading] = useState(true)
   const [homeData, sethomeData] = useState({})
   const [profileData, setprofileData] = useState({})
@@ -109,6 +109,13 @@ const HomeScreen = ({ navigation, route }) => {
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
       setprofileData(profile)
       getChartDataAPI(home)
+
+      if (notification.length > 0 && notification.filter(item => !item.read_at).length > 0) {
+        setisNotifVisible(true)
+      } else {
+        setisNotifVisible(false)
+      }
+      
     })).catch(err => {
       setisLoading(false)
       showDialog(err.message)

@@ -150,7 +150,7 @@ export const PhoneInput = ({
       }
     }
 
-    if (text == undefined || text.trim().length <= 0) {
+    if ((text == undefined || text.trim().length <= 0) && !optional) {
       isValid = false;
       setError(translate('must_not_empty', {s: title}));
     }

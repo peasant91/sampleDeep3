@@ -202,7 +202,7 @@
     "apply": "Ajukan",
     "see_all": "Lihat Semua",
     "offer_history": "Riwayat Penawaran",
-    "yes_no_picker": "Pilih ya atau tidak",
+    "yes_no_picker": "Ya atau Tidak",
     "vehicle_type_placeholder": "cth: Mobil, Bus",
     "time": "Waktu",
     "average_speed": "Kecepatan rata-rata",
@@ -262,7 +262,9 @@
     "exit": "keluar",
     "edit_vehicle": "Ubah Kendaraan",
     "error_odometer": "Mohon tambahkan gambar odometer",
-    "error_image": "Mohon tambahkan gambar %{string}"
+    "error_image": "Mohon tambahkan gambar %{string}",
+    "find_picker": "Cari %{title}",
+    "company_bank_info": "Jika memilih perusahaan maka rekening yang digunakan adalah rekening perusahaan."
     
 
 

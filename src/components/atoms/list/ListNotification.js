@@ -9,7 +9,7 @@ import Divider from '../Divider'
 
 
 const ListNotification = ({data}) => {
-    return <View style={{backgroundColor: data.isRead ? 'white' : '#F4F5FF'}}>
+    return <View style={{backgroundColor: data.read_at ? 'white' : '#F4F5FF'}}>
 
     <View style={{flexDirection: 'row', padding: 16, flex: 1, alignItems: 'flex-start'}}>
         <Image

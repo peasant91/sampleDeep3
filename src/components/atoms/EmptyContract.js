@@ -15,7 +15,7 @@ const EmptyContract = ({ desc, onPress, onPressTitle }) => {
             <LatoRegular containerStyle={{ paddingHorizontal: 60, paddingVertical: 30 }} style={{ textAlign: 'center' }}>{desc}</LatoRegular>
         </View>
         {
-            onPress && <CustomButton title={translate('see_offer').toUpperCase()} types='primary' containerStyle={{ paddingHorizontal: 16 }} onPress={onPress} />
+            onPress && <CustomButton title={translate('see_offer').toUpperCase()} types='primary' containerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }} onPress={onPress} />
         }
     </View>
 }

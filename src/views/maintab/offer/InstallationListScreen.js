@@ -10,7 +10,7 @@ const InstallationListScreen = ({navigation, route}) => {
 
     const {data} = route.params
 
-    return <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
+    return <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>   
         <NavBar title={translate('installation_location')} navigation={navigation} shadowEnabled={true}/>
         <View>
             <FlatList
@@ -18,7 +18,7 @@ const InstallationListScreen = ({navigation, route}) => {
                 data={data}
                 keyExtractor={item => item.id}
                 renderItem={({item, index}) => {
-                    return <ListInstallationSchedule data={item} onPressMap={() => openMaps(item.lat, item.lng)}/>
+                    return <ListInstallationSchedule data={item} onPressMap={() => openMaps(Number(item.lat), Number(item.lng))}/>
                 }}
             />
         </View>
