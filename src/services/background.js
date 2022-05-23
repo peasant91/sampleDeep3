@@ -65,7 +65,7 @@ export const initBackground = () => {
         notificationTitle: translate('on_work_title'),
         notificationText: translate('on_work_desc'),
         notificationsEnabled: true,
-        debug: true,
+        debug: false,
         startOnBoot: true,
         stopOnTerminate: true,
         locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,

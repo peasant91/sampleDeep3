@@ -9,12 +9,13 @@ import Divider from '../Divider'
 
 
 const ListNotification = ({data}) => {
+    
     return <View style={{backgroundColor: data.read_at ? 'white' : '#F4F5FF'}}>
 
     <View style={{flexDirection: 'row', padding: 16, flex: 1, alignItems: 'flex-start'}}>
         <Image
-            source={{uri: getFullLink(data.imageUrl)}}
-            style={{width: 24, height: 24, borderRadius: 24, resizeMode: 'center'}}
+            source={{uri: getFullLink(data.icon)}}
+            style={{width: 24, height: 24, borderRadius: 24, resizeMode: 'cover'}}
         />
 
         <View style={{flex: 1, marginLeft: 10}}>

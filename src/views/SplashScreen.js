@@ -5,13 +5,11 @@ import {
   View,
   StyleSheet,
   Image,
-  ActivityIndicator,
   Linking,
   StatusBar,
   AppState,
   Platform,
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { LatoBold, Subtitle2 } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
 import { default as Splash } from 'react-native-splash-screen';
@@ -31,18 +29,10 @@ import StorageKey from '../constants/StorageKey';
 import pkg from '../../package.json';
 import { AuthContext } from '../../App';
 import translate from '../locales/translate';
-import ImageTopLogo from '../assets/images/img_top_logo.svg';
 import { getBank, getColor, getCompanies, getDivisionApi, getGender, getProvince, getVehicleOwnership, getVehicleSticker, getVehicleType, getVehicleUsage } from '../services/utilities';
-import { Freshchat, FreshchatConfig } from 'react-native-freshchat-sdk';
-import Constant from '../constants/Constant';
-import { postFreshchat } from '../services/freshchat';
-import { getCalendarWeek } from '../data/dummy';
-import { getNumberFormatSettings } from 'react-native-localize';
-import { getSettings } from '../services/settings';
 import messaging, { firebase } from '@react-native-firebase/messaging';
 import { useIsFocused } from '@react-navigation/native';
 
-import BGSplash from '../assets/background/bg_splash.svg'
 import axios from 'axios';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
@@ -233,14 +223,8 @@ const SplashScreen = ({ navigation, route }) => {
       const token = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
       if (response.need_update === true) {
         showUpdateAlert(response);
-        // if (Constant.RESET) {
-        //   clearAppData();
-        // }
       } else {
         requestBackgroundPermission()
-        // token
-        //   ? props.navigation.navigate('MainFlow')
-        //   : props.navigation.navigate('Welcome');
       }
     } catch (err) {
       showDialog(
@@ -255,18 +239,6 @@ const SplashScreen = ({ navigation, route }) => {
       );
     }
   };
-
-  // const handleAppStateChange = nextAppState => {
-  //   console.log('state', nextAppState);
-  //   console.log('prevstate', appState);
-  //   if (appState.match(/inactive|background/) && nextAppState === 'active') {
-  //     console.log('request permission');
-  //     requestPermission();
-  //   }
-
-  //   appState = nextAppState
-
-  // };
 
   const loadAllData = () => {
     axios.all([
@@ -295,20 +267,12 @@ const SplashScreen = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-    // checkVersion();
     if (isFocus) {
-      // getProvinceApi();
       checkVersion()
-      // initFreshchat();
       AsyncStorage.setItem(StorageKey.KEY_BACKGROUND_ACTIVE, JSON.stringify(false))
     }
 
-    // AppState.addEventListener('change', handleAppStateChange);
     console.log('state', 'add listener');
-    // getCalendarWeek();
-    // const willFocusSub = props.navigation.addListener('willFocus', () => {
-    //   checkVersion()
-    // });
 
     const subscription = AppState.addEventListener("change", nextAppState => {
       if (

@@ -28,11 +28,7 @@ import {login} from '../../services/auth';
 import formReducer from '../../reducers/formReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
-import {getProfile} from '../../services/user';
 import {AuthContext} from '../../../App';
-import {getFreshchat} from '../../services/freshchat';
-import {Freshchat, FreshchatConfig} from 'react-native-freshchat-sdk';
-import {useKeyboard} from '@react-native-community/hooks';
 import translate from '../../locales/translate';
 import Config from '../../constants/Config';
 
@@ -41,9 +37,9 @@ const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 const LoginScreen = ({navigation, route}) => {
   const [formState, dispatch] = useReducer(formReducer, {
     inputValues: {
-      phone: Config.isDevMode ? '8133918999' : '',
-      credential: Config.isDevMode ? '8133918999' : '',
-      password: Config.isDevMode ? 'password': '',
+      phone: Config.isDevMode ? '88226330063' : '',
+      credential: Config.isDevMode ? '88226330063' : '',
+      password: Config.isDevMode ? 'timedoor': '',
     },
     inputValidities: {
       phone: false,
@@ -53,18 +49,8 @@ const LoginScreen = ({navigation, route}) => {
     isChecked: false,
   });
 
-  const [isKeyboardOpen, setKeyboardOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const {signIn} = useContext(AuthContext);
-
-  const onChangeText = (id, text, isValid) => {
-    dispatch({
-      type: 'input',
-      id: id,
-      input: text,
-      isValid: isValid,
-    });
-  };
 
   const goToRegister = () => {
     navigation.navigate('Register', {isEdit: false});
@@ -123,48 +109,6 @@ const LoginScreen = ({navigation, route}) => {
         console.log(err);
       });
   };
-
-  const doGetProfile = () => {
-    getProfile()
-      .then(response => {
-        saveProfile(response);
-        restoreFreshchat(response.employee_id);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  const restoreFreshchat = id => {
-    getFreshchat()
-      .then(response => {
-        console.log(
-          `restoring freshchat id ${id} fresh id ${response.freshchat_id}`,
-        );
-        Freshchat.identifyUser(id, response.freshchat_id, error =>
-          console.log(`fresh restore: ${error}`),
-        );
-      })
-      .catch(err => showDialog(err.message, false));
-  };
-
-  const goToHome = () => {
-    navigation.navigate('Home');
-  };
-
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardOpen(true);
-      console.log('pisang');
-    });
-    Keyboard.addListener('keyboardDidHide', () => setKeyboardOpen(false));
-
-    // cleanup function
-    return () => {
-      Keyboard.removeListener('keyboardDidShow', () => setKeyboardOpen(true));
-      Keyboard.removeListener('keyboardDidHide', () => setKeyboardOpen(false));
-    };
-  }, []);
 
   return (
     <>

@@ -53,14 +53,15 @@ const CrudReportScreen = ({ navigation, route }) => {
     }
 
     const makeImageQueue = () => {
-        // var queue = []
-        // for (index in stickerLayoutData) {
-        //     for (childIndex in stickerLayoutData[index].images)[
-        //         queue.push(stickerLayoutData[index].images[childIndex] + '_!_' + stickerLayoutData[index].value)
-        //     ]
-        // }
-        // setimageQueue(queue)
-        setimageQueue(stickerLayoutData)
+        var array = []
+        for (index in stickerLayoutData) {
+            const data = {
+                sticker_area: stickerLayoutData[index].value,
+                images: [...stickerLayoutData[index].images]
+            }
+            array.push(data)
+        }
+        setimageQueue([...array])
         // showLoadingDialog(`mengeirim ${imageIndicator.current}/ ${queue.length}`)
     }
 
@@ -82,15 +83,14 @@ const CrudReportScreen = ({ navigation, route }) => {
         console.log(formState)
         let imageIsValid = true
 
-        for(item in stickerLayoutData) {
-            const item = stickerLayoutData[item]
-            imageIsValid = item.images.includes()
+        for(index in stickerLayoutData) {
+            const item  = stickerLayoutData[index]
+            imageIsValid = !item.images.includes(" ")
         }
 
-        if (formState.formIsValid) {
+        if (formState.formIsValid && imageIsValid) {
         setisloading(true)
         postReport(formState.inputValues).then(response => {
-            setisloading(false)
             reportId.current = response.report_id
             makeImageQueue()
         }).catch(err => {
@@ -105,7 +105,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             if (image.images.length > 0) {
                 postReportImage(reportId.current, {
                     image: image.images[0],
-                    sticker_area: image.value
+                    sticker_area: image.sticker_area
                 }).then(response => {
                     image.images.shift()
                     setimageQueue([...imageQueue])
@@ -204,7 +204,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             postReportImageAPI()
         } else {
             if (isloading) {
-                showDialog(translate('report_send_success'))
+                showDialog(translate('report_send_success'), false, () => navigation.pop())
             }
         }
     }, [imageQueue])
@@ -221,6 +221,10 @@ const CrudReportScreen = ({ navigation, route }) => {
                                 desc: response.desc,
                                 odometer: response.odometer
                             },
+                            inputValidities: {
+                                desc: true,
+                                odometer: true
+                            }
 
                         }
                     })
@@ -279,7 +283,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             }
 
             {
-                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginVertical: 24 }} />
+                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginVertical: 24 }} isLoading={isloading} />
             }
 
 

@@ -9011,11 +9011,6 @@
     "react-native-ratings" "8.0.4"
     "react-native-size-matters" "^0.3.1"
 
-"react-native-freshchat-sdk@^3.3.5":
-  "integrity" "sha512-qkh0oM7F6wnT92+BE/avyFBiW7cCnLHNjEd74Qa+lallyv8V8iAC17YD1d2qoeKXYQnyWGSlo+GaCJqpdF6RoQ=="
-  "resolved" "https://registry.npmjs.org/react-native-freshchat-sdk/-/react-native-freshchat-sdk-3.3.5.tgz"
-  "version" "3.3.5"
-
 "react-native-fs@^2.19.0":
   "integrity" "sha512-Yl09IbETkV5UJcBtVtBLttyTmiAhJIHpGA/LvredI5dYiw3MXMMVu42bzELiuH2Bwj7F+qd0fMNvgfBDiDxd2A=="
   "resolved" "https://registry.npmjs.org/react-native-fs/-/react-native-fs-2.19.0.tgz"

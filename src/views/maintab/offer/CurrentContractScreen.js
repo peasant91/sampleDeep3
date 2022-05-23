@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import EmptyContract from '../../../components/atoms/EmptyContract'
 import NavBar from '../../../components/atoms/NavBar'
 import translate from '../../../locales/translate'
@@ -25,6 +24,7 @@ import axios from 'axios'
 import { getChartData, getReportList } from '../../../services/report'
 import ListReport from '../../../components/atoms/list/ListReport'
 import DistanceChart from '../../../components/atoms/DistanceChart'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const CurrentContractScreen = ({navigation, route}) => {
 

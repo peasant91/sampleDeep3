@@ -264,7 +264,8 @@
     "error_odometer": "Mohon tambahkan gambar odometer",
     "error_image": "Mohon tambahkan gambar %{string}",
     "find_picker": "Cari %{title}",
-    "company_bank_info": "Jika memilih perusahaan maka rekening yang digunakan adalah rekening perusahaan."
+    "company_bank_info": "Jika memilih perusahaan maka rekening yang digunakan adalah rekening perusahaan.",
+    "report_send_success": "Berhasil mengirim Laporan"
     
 
 

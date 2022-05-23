@@ -41,6 +41,8 @@ import IconProfileAddImage from '../../assets/images/ic_profile_add_image.svg';
 import IconGallery from '../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../assets/images/ic_camera_picker.svg';
 import IconDelete from '../../assets/images/ic_trash_black.svg';
+import IconCalendar from '../../assets/images/ic_calendar.svg';
+
 
 import GenderComponents from '../../components/molecules/GenderComponents';
 import IDCard from '../../components/atoms/IDCard';
@@ -133,16 +135,6 @@ const RegisterScreen = ({navigation, route}) => {
     console.log(formState.formIsValid ,formStateCard.formIsValid , formStateDetail.formIsValid , formStateAddress.formIsValid ,formStateBank.formIsValid);
 
     if (formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null)) {
-      // setIsLoading(true);
-      // register(formState.inputValues)
-      //   .then(response => {
-      //     setIsLoading(false);
-      //     goToSuccess();
-      //   })
-      //   .catch(err => {
-      //     setIsLoading(false);
-      //     showDialog(err.message, false);
-      //   });
 
       buildForm(formState)
     }
@@ -199,11 +191,6 @@ const RegisterScreen = ({navigation, route}) => {
       formIsValid: true
     }
 
-    // console.log('card', stateCard)
-    // console.log('address', stateAddress)
-
-
-
     dispatchDetail({
       type: 'update',
       state: stateDetail
@@ -229,8 +216,7 @@ const RegisterScreen = ({navigation, route}) => {
     onPickDate(data.birth_date)
   }
 
-
-  const buildForm = (formState) => {
+  const buildCardForm = () => {
     var card = []
     for (item in Config.cardList) {
       if (formStateCard.inputValues[Config.cardList[item]]) {
@@ -243,11 +229,18 @@ const RegisterScreen = ({navigation, route}) => {
       }
     }
 
+    return card
+
+  }
+
+
+  const buildForm = (formState) => {
+
     const detail = {
       ...formStateDetail.inputValues,
       bank: formStateDetail.inputValues.driver_company_id ? null : formStateBank.inputValues,
       address: formStateAddress.inputValues,
-      card: card
+      card: buildCardForm()
     }
 
     const data = {
@@ -305,119 +298,64 @@ const RegisterScreen = ({navigation, route}) => {
   }, [imagePickerId]);
 
   const deleteImage = selectedPicker => {
-      if (selectedPicker.location == 'card') {
-        dispatchCard({
+    selectedPicker.dispatch({
           type: 'input',
           id: selectedPicker.id,
           input: undefined,
           isValid: false,
-        });
-        dispatchCard({
+    })
+    selectedPicker.dispatch({
           type: 'input',
           id: selectedPicker.id + '_uri',
           input: undefined,
           isValid: false,
-        });
-      } else {
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id,
-          input: undefined,
-          isValid: false,
-        });
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: undefined,
-          isValid: false,
-        });
+    })
   }
-}
 
-  const openCameraPicker = async selectedPicker => {
+  const openCameraPicker =  async () => {
     const result = await launchCamera({
       quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
     });
     if (result) {
-      if (selectedPicker.location == 'card') {
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      } else {
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      }
+      saveImageResult(result)
     }
 
-    // console.log(result);
-    // console.log(formStateBank);
   };
 
-  const openGalleryPicker = async selectedPicker => {
+  const openGalleryPicker = async ()  => {
     const result = await launchImageLibrary({
       quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
     });
     if (result) {
-      if (selectedPicker.location == 'card') {
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      } else {
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      }
+      saveImageResult(result)
     }
 
-    // console.log(result);
-    // console.log(formStateBank);
   };
 
-  const openImagePicker = async (id, location) => {
+  const saveImageResult = (result) => {
+      selectedPicker.dispatch({
+          type: 'input',
+          id: selectedPicker.id,
+          input: result.assets[0].base64,
+          isValid: true,
+      })
+      selectedPicker.dispatch({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: result.assets[0].uri,
+          isValid: true,
+      })
+  }
+
+  const openImagePicker = async (id, location, dispatch) => {
     setselectedPicker({
       id,
       location,
+      dispatch
     });
     setTimeout(() => {
       pickerSheet.current.expand();
@@ -444,7 +382,7 @@ const RegisterScreen = ({navigation, route}) => {
 
 
 
-  const openPicker = (id, title, data) => {
+  const openPicker = (id, title, data, dispatch) => {
     var selectedId;
     if (id == 'driver_company_id') {
       selectedId = formStateDetail.inputValues[id];
@@ -460,7 +398,8 @@ const RegisterScreen = ({navigation, route}) => {
       data: data,
       selectedId: selectedId,
       isEdit: isEdit,
-      previousRoute: 'Register'
+      previousRoute: 'Register',
+      dispatch: dispatch
     });
   };
 
@@ -484,16 +423,19 @@ const RegisterScreen = ({navigation, route}) => {
 
     if (route.params?.pickerId) {
       const id = route.params.pickerId;
-      if (id == 'driver_company_id') {
-        dispatchDetail({
+      const dispatch = route.params.dispatch;
+
+      dispatch({
           type: 'picker',
           id: id,
           input: route.params.id,
           desc: route.params.name,
           isValid: true,
-        });
+      })
+
+      if (id == 'driver_company_id') {
         //make bank null if company is picked
-        dispatchDetail({
+        dispatch({
           type: 'input',
           id: 'bank',
           input: null,
@@ -515,21 +457,8 @@ const RegisterScreen = ({navigation, route}) => {
           })
         })
       } else if (id == 'bank_id') {
-        dispatchBank({
-          type: 'picker',
-          id: id,
-          input: route.params.id,
-          desc: route.params.name,
-          isValid: true,
-        });
+        return
       } else {
-        dispatchAddress({
-          type: 'picker',
-          id: id,
-          input: route.params.id,
-          desc: route.params.name,
-          isValid: true,
-        });
         if (id == 'province_id') {
           getCity(route.params.id).then(cityData => {
             setcityData(cityData);
@@ -626,7 +555,7 @@ const RegisterScreen = ({navigation, route}) => {
 
             <TouchableOpacity
               style={{alignItems: 'center', margin: 16}}
-              onPress={() => openImagePicker('profile_image', 'Detail')}>
+              onPress={() => openImagePicker('profile_image', 'Detail', dispatchDetail)}>
               <View>
                 {formStateDetail.inputValues.profile_image_uri ? (
                   <Image
@@ -691,7 +620,7 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('company_placeholder')}
               value={formStateDetail.inputValues.driver_company_id_value}
               onPress={() =>
-                openPicker('driver_company_id', 'company_title', companyData)
+                openPicker('driver_company_id', 'company_title', companyData, dispatchDetail)
               }
               isCheck={formState.isChecked}
             />
@@ -716,7 +645,7 @@ const RegisterScreen = ({navigation, route}) => {
               value={formStateAddress.inputValues.province_id_value}
               isCheck={formState.isChecked}
               onPress={() =>
-                openPicker('province_id', 'province_title', provinceData)
+                openPicker('province_id', 'province_title', provinceData, dispatchAddress)
               }
             />
             
@@ -728,7 +657,7 @@ const RegisterScreen = ({navigation, route}) => {
               value={formStateAddress.inputValues.city_id_value}
               isCheck={formState.isChecked}
               disabled={formStateAddress.inputValues.province_id == null }
-              onPress={() => openPicker('city_id', 'city_title', cityData)}
+              onPress={() => openPicker('city_id', 'city_title', cityData, dispatchAddress)}
             />
 
             <PickerInput
@@ -739,7 +668,7 @@ const RegisterScreen = ({navigation, route}) => {
               isCheck={formState.isChecked}
               disabled={formStateAddress.inputValues.city_id == null }
               onPress={() =>
-                openPicker('district_id', 'district_title', districtData)
+                openPicker('district_id', 'district_title', districtData, dispatchAddress)
               }
             />
 
@@ -752,7 +681,7 @@ const RegisterScreen = ({navigation, route}) => {
               isCheck={formState.isChecked}
               disabled={formStateAddress.inputValues.district_id == null }
               onPress={() =>
-                openPicker('village_id', 'village_title', villageData)
+                openPicker('village_id', 'village_title', villageData, dispatchAddress)
               }
             />
 
@@ -793,6 +722,7 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('birthdate_placeholder')}
               value={formStateDetail.inputValues.birth_date_value}
               isCheck={formState.isChecked}
+              Icon={IconCalendar}
               required
               onPress={() => setopenDate(true)}
             />
@@ -808,7 +738,7 @@ const RegisterScreen = ({navigation, route}) => {
                   isCheck={formState.isChecked}
                   required
                   disabled={formStateDetail.inputValues.driver_company_id }
-                  onPress={() => openPicker('bank_id', 'bank_title', bankData)}
+                  onPress={() => openPicker('bank_id', 'bank_title', bankData, dispatchBank)}
                 />
 
                 <CustomInput
@@ -860,7 +790,7 @@ const RegisterScreen = ({navigation, route}) => {
             <IDCard
               title={translate('ktp')}
               navigation={navigation}
-              onPress={() => openImagePicker('ktp_image', 'card')}
+              onPress={() => openImagePicker('ktp_image', 'card', dispatchCard)}
               imageUri={formStateCard.inputValues.ktp_image_uri}
               isCheck={formState.isChecked}
               required
@@ -881,7 +811,7 @@ const RegisterScreen = ({navigation, route}) => {
             <IDCard
               title={translate('sim_a')}
               navigation={navigation}
-              onPress={() => openImagePicker('sim_a_image', 'card')}
+              onPress={() => openImagePicker('sim_a_image', 'card', dispatchCard)}
               imageUri={formStateCard.inputValues.sim_a_image_uri}
               isCheck={formState.isChecked}
               required
@@ -900,7 +830,7 @@ const RegisterScreen = ({navigation, route}) => {
             <IDCard
               navigation={navigation}
               title={translate('sim_b')}
-              onPress={() => openImagePicker('sim_b_image', 'card')}
+              onPress={() => openImagePicker('sim_b_image', 'card', dispatchCard)}
               imageUri={formStateCard.inputValues.sim_b_image_uri}
             />
 

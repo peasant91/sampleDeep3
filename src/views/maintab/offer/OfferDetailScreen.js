@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Image } from 'react-native-elements'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import CustomButton from '../../../components/atoms/CustomButton'
 import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText'
 import NavBar from '../../../components/atoms/NavBar'
@@ -20,6 +19,7 @@ import { displayProvince, getFullLink, openMaps, toCurrency } from '../../../act
 import ListTag from '../../../components/atoms/list/ListTag'
 import { ShimmerOfferDetail } from '../../../components/atoms/shimmer/Shimmer'
 import { applyContract } from '../../../services/contract'
+import SafeAreaView from 'react-native-safe-area-view'
 
 const data = {
     imageUrl: 'https://picsum.photos/200/300',

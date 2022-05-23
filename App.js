@@ -66,7 +66,6 @@ import IncomeDetailScreen from './src/views/maintab/account/IncomeDetailScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
-import { Freshchat } from 'react-native-freshchat-sdk';
 import CustomisableAlert from 'react-native-customisable-alert';
 import Config from './src/constants/Config';
 import MainTabScreen from './src/views/maintab/MainTabScreen';
@@ -184,7 +183,6 @@ const App = ({ navigation, route }) => {
   const saveFirebaseToken = token => {
     AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token);
 
-    Freshchat.setPushRegistrationToken(token);
   };
 
   useEffect(() => {
@@ -209,16 +207,6 @@ const App = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Freshchat.isFreshchatNotification(
-        remoteMessage.data,
-        freshchatNotification => {
-          if (freshchatNotification) {
-            Freshchat.handlePushNotification(remoteMessage.data);
-          } else {
-            console.log(`forground notification ${remoteMessage}`);
-          }
-        },
-      );
     });
 
     return unsubscribe;
