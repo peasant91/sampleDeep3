@@ -29,8 +29,8 @@ import CustomInput, {
 } from '../../components/atoms/CustomInput';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import formReducer from '../../reducers/formReducer.js';
-import {showDialog, dismissDialog} from '../../actions/commonActions';
-import {register, updateProfile} from '../../services/auth';
+import {showDialog, dismissDialog, showLocationAlwaysDialog} from '../../actions/commonActions';
+import {register, updateProfile, validateRegister} from '../../services/auth';
 import NavBar from '../../components/atoms/NavBar';
 import {Image} from 'react-native-elements';
 import DatePicker from 'react-native-date-picker';
@@ -56,6 +56,7 @@ import Config from '../../constants/Config';
 import { getFullLink } from '../../actions/helper';
 import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
+import { check, openSettings, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const dummyDivision = [
   {
@@ -245,6 +246,7 @@ const RegisterScreen = ({navigation, route}) => {
 
     const data = {
       ...formState.inputValues,
+      password: 'thisisdummypassword',
       detail: detail
     }
 
@@ -254,12 +256,27 @@ const RegisterScreen = ({navigation, route}) => {
         setIsLoading(false)
         navigation.navigate('Account', { isChangeProfile: true} , true)
       }).catch(err => {
+        setIsLoading(false)
         showDialog(err.message)
       })
     } else {
-      navigation.navigate('RegisterPassword', {data: data});
+      validate(data)
     }
   }
+
+    const validate = (data) => {
+      setIsLoading(true)
+      validateRegister(data).then(response => {
+        setIsLoading(false)
+        data.password = ""
+        navigation.navigate('RegisterPassword', {data: data});
+      }
+      ).catch(error => {
+        setIsLoading(false)
+        showDialog(error.message)
+      })
+    }
+    
 
   const onGenderPicked = value => {
     dispatchDetail({
@@ -313,6 +330,15 @@ const RegisterScreen = ({navigation, route}) => {
   }
 
   const openCameraPicker =  async () => {
+    if (Platform.OS == 'android'){
+      const permission = await check(PERMISSIONS.ANDROID.CAMERA)
+      console.log(permission)
+      if (permission == RESULTS.DENIED) {
+        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+    }
+
     const result = await launchCamera({
       quality: 0.5,
       includeBase64: true,
@@ -325,6 +351,14 @@ const RegisterScreen = ({navigation, route}) => {
   };
 
   const openGalleryPicker = async ()  => {
+    if (Platform.OS == 'android'){
+      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+      console.log(permission)
+      if (permission == RESULTS.DENIED) {
+        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+    }
     const result = await launchImageLibrary({
       quality: 0.5,
       includeBase64: true,
@@ -333,7 +367,6 @@ const RegisterScreen = ({navigation, route}) => {
     if (result) {
       saveImageResult(result)
     }
-
   };
 
   const saveImageResult = (result) => {
@@ -685,7 +718,7 @@ const RegisterScreen = ({navigation, route}) => {
               }
             />
 
-              {formStateAddress.inputValues.village_id == null && formStateAddress.inputValues.village_id_value != null &&
+              {formStateAddress.inputValues.village_id == -99 && formStateAddress.inputValues.village_id_value != null &&
 
             <CustomInput
               id={'village_name'}
@@ -706,6 +739,7 @@ const RegisterScreen = ({navigation, route}) => {
               value={formStateAddress.inputValues.postal_code}
               dispatcher={dispatchAddress}
               isCheck={formState.isChecked}
+              keyboardType={'number-pad'}
               required
             />
 
@@ -749,6 +783,7 @@ const RegisterScreen = ({navigation, route}) => {
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
                   disabled={formStateDetail.inputValues.driver_company_id}
+                  keyboardType={'number-pad'}
                   required
                 />
 
@@ -784,6 +819,7 @@ const RegisterScreen = ({navigation, route}) => {
               value={formStateCard.inputValues.ktp}
               dispatcher={dispatchCard}
               isCheck={formState.isChecked}
+              keyboardType={'number-pad'}
               required
             />
 
@@ -804,9 +840,9 @@ const RegisterScreen = ({navigation, route}) => {
               value={formStateCard.inputValues.sim_a}
               dispatcher={dispatchCard}
               isCheck={formState.isChecked}
+              keyboardType={'number-pad'}
               required
             />
-
               
             <IDCard
               title={translate('sim_a')}
@@ -824,6 +860,7 @@ const RegisterScreen = ({navigation, route}) => {
               containerStyle={{paddingVertical: 16}}
               value={formStateCard.inputValues.sim_b}
               dispatcher={dispatchCard}
+              keyboardType={'number-pad'}
               isCheck={formState.isChecked}
             />
 

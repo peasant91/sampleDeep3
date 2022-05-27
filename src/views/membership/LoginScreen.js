@@ -112,14 +112,17 @@ const LoginScreen = ({navigation, route}) => {
 
   return (
     <>
-      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+      <SafeAreaView style={{flexGrow: 1, backgroundColor: 'white'}}>
         <StatusBar backgroundColor={'white'} barStyle={'dark-content'} />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
+          keyboardVerticalOffset={100}
+          contentContainerStyle={{flexGrow: 1}}
+          style={{flexGrow: 1}}>
+
           <ScrollView
-            style={{flex: 1}}
-            contentContainerStyle={{flexGrow: 1, flexShrink: 0}}>
+            style={{flexGrow: 1}}
+            contentContainerStyle={{flexGrow: 1}}>
             <View style={style.container}>
               <View style={{flex: 1}}>
                 <Image
@@ -145,6 +148,7 @@ const LoginScreen = ({navigation, route}) => {
                   error={''}
                   keyboardType={'default'}
                 />
+                
                 <PasswordInput
                   id="password"
                   value={formState.inputValues.password}
@@ -183,8 +187,6 @@ const LoginScreen = ({navigation, route}) => {
                   />
                 </View>
               </View>
-            </View>
-          </ScrollView>
 
           <View
             style={{
@@ -226,6 +228,9 @@ const LoginScreen = ({navigation, route}) => {
             </View>
 
           </View>
+            </View>
+          </ScrollView>
+
 
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -236,7 +241,6 @@ const LoginScreen = ({navigation, route}) => {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    flexGrow: 0,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     backgroundColor: 'white',

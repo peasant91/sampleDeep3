@@ -18,6 +18,7 @@ import IconGallery from '../../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../../assets/images/ic_camera_picker.svg';
 import IconDelete from '../../../assets/images/ic_trash_black.svg';
 import Colors from '../../../constants/Colors'
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
 const CrudReportScreen = ({ navigation, route }) => {
 
@@ -146,6 +147,13 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const openCameraPicker = async selectedPicker => {
+    if (Platform.OS == 'android'){
+      const permission = await check(PERMISSIONS.ANDROID.CAMERA)
+      if (permission == RESULTS.DENIED) {
+        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+    }
         const result = await launchCamera({
             quality: 0.5,
             includeBase64: true,
@@ -155,6 +163,13 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const openGalleryPicker = async selectedPicker => {
+    if (Platform.OS == 'android'){
+      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+      if (permission == RESULTS.DENIED) {
+        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+    }
         const result = await launchImageLibrary({
             quality: 0.5,
             includeBase64: true,
@@ -293,21 +308,6 @@ const CrudReportScreen = ({ navigation, route }) => {
         <CustomSheet ref={pickerSheet}>
             <View style={{ padding: 16 }}>
                 <LatoBold>{translate('pick_photo')}</LatoBold>
-                <TouchableOpacity
-                    onPress={() => setimagePickerId(1)}
-                    style={{ marginVertical: 10 }}>
-                    <LatoRegular Icon={IconGallery}>
-                        {translate('pick_gallery')}
-                    </LatoRegular>
-                </TouchableOpacity>
-                <View
-                    style={{
-                        height: 1,
-                        backgroundColor: Colors.divider,
-                        marginBottom: 10,
-                        marginLeft: 28,
-                    }}
-                />
                 <TouchableOpacity onPress={() => setimagePickerId(0)}>
                     <LatoRegular Icon={IconCamera}>
                         {translate('pick_camera')}

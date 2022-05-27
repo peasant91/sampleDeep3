@@ -130,6 +130,7 @@
     "vehicle_can_be_change": "Kendaraan tidak bisa diubah ketika sudah diverifikasi hubungin admin untuk melakukan perubahan.",
     "info_not_verified": "Tambahkan kendaraan agar mendapatkan penawaran pekerjaan dari Kami.",
     "see_this_offer": "Lihat Penawaran Ini",
+    "add_vehicle": "Tambahkan Kendaraan",
 
     "my_contract": "Kontrak Saya",
     "change_profile": "Ubah Profil",
@@ -265,7 +266,15 @@
     "error_image": "Mohon tambahkan gambar %{string}",
     "find_picker": "Cari %{title}",
     "company_bank_info": "Jika memilih perusahaan maka rekening yang digunakan adalah rekening perusahaan.",
-    "report_send_success": "Berhasil mengirim Laporan"
+    "report_send_success": "Berhasil mengirim Laporan",
+    "please_allow_camera": "Mohon ijinkan akses kamera untuk mengambil gambar",
+    "please_allow_storage": "Mohon ijinkan akses media penyimpanan untuk mengambil gambar",
+    "error_agree_to_terms": "Anda harus menyetujui Syarat & Ketentuan untuk melakukan pendaftaran",
+
+    "empty_offer_title": "Perkerjaan tidak ditemukan",
+    "empty_offer_desc": "Tidak ada pekerjaan sesuai kata kunci, Coba \ngunakan kata kunci lainnya ya.",
+    "empty_notif_title": "Tidak ada notifikasi",
+    "empty_notif_desc": "Notifikasi terkait pekerjaan dan lainnya akan \nditampilkan disini."
     
 
 

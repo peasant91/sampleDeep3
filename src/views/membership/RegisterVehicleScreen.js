@@ -7,7 +7,6 @@ import CustomInput, { PickerInput } from '../../components/atoms/CustomInput'
 
 import IconGallery from '../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../assets/images/ic_camera_picker.svg';
-import IconDelete from '../../assets/images/ic_trash_black.svg';
 
 import translate from '../../locales/translate'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -23,6 +22,7 @@ import CustomButton from '../../components/atoms/CustomButton'
 import { getCity, getDistrict, getVehicleBrand, getVehicleModel, getVehicleType, getVillage } from '../../services/utilities'
 import { getVehicle, registerVehicle, updateVehicle } from '../../services/user'
 import { showDialog } from '../../actions/commonActions'
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
 
 
@@ -151,6 +151,13 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   }
 
   const openCameraPicker = async () => {
+    if (Platform.OS == 'android'){
+      const permission = await check(PERMISSIONS.ANDROID.CAMERA)
+      if (permission == RESULTS.DENIED) {
+        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+    }
     const result = await launchCamera({
       quality: 0.5,
       includeBase64: true,
@@ -163,6 +170,13 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   };
 
   const openGalleryPicker = async () => {
+    if (Platform.OS == 'android'){
+      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+      if (permission == RESULTS.DENIED) {
+        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+    }
     const result = await launchImageLibrary({
       quality: 0.5,
       includeBase64: true,
@@ -485,6 +499,19 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
             openPicker('village_id', 'village_title', villageData, formState, dispatch)
           }
         />
+              {formState.inputValues.village_id == -99 && formState.inputValues.village_id_value != null &&
+
+            <CustomInput
+              id={'village_name'}
+              title={translate('manual_input')}
+              containerStyle={{paddingBottom: 16}}
+              placeholder={translate('village_placeholder')}
+              value={formState.inputValues.village_name}
+              isCheck={formState.isChecked}
+              dispatcher={dispatch}
+              required
+            />
+              }
 
         <PickerInput
           id={'vehicle_type'}
@@ -528,6 +555,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           value={formStateDetail.inputValues.year}
           dispatcher={dispatchDetail}
           isCheck={formState.isChecked}
+          keyboardType={'number-pad'}
           required
         />
 
@@ -578,7 +606,12 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
                   isChecked={isChecked}
                   onPress={() => {
                     if (isChecked) {
-                      stickerArea.pop(item.value)
+                      const index = stickerArea.indexOf(item.value)
+                      if (index == 0) {
+                        stickerArea.shift()
+                      } else {
+                        stickerArea.splice(index, 1)
+                      }
                     } else {
                       stickerArea.push(item.value)
                     }

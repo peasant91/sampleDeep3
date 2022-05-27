@@ -144,6 +144,10 @@ const HomeScreen = ({ navigation, route }) => {
       })
     }
   }
+  
+  const goToAddVehicle = () => {
+    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})
+  }
 
   useEffect(() => {
     if (backPressedCount === 2) {
@@ -223,8 +227,14 @@ const HomeScreen = ({ navigation, route }) => {
 
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <IconCar />
-                    <LatoRegular style={{ marginHorizontal: 5 }}>{homeData.vehicle ? homeData.vehicle?.brand + ' -   ' + homeData.vehicle?.vehicle_plate : translate('vehicle_not_registered')}</LatoRegular>
-                    <IconVerified style={{ color: homeData.vehicle_status == 'verified' ? Colors.primarySecondary : Colors.grey }} />
+                    {homeData.vehicle ? 
+                    <LatoRegular style={{ marginHorizontal: 5, }}>{homeData.vehicle?.brand + ' -   ' + homeData.vehicle?.vehicle_plate}</LatoRegular>
+                     :
+                    <TouchableOpacity onPress={goToAddVehicle}>
+                      <LatoRegular style={{ marginHorizontal: 5, textDecorationLine: 'underline', color: Colors.primarySecondary }}>{translate('add_vehicle')}</LatoRegular>
+                    </TouchableOpacity>
+                    }
+                    {homeData.vehicle && <IconVerified style={{ color: homeData.vehicle_status == 'verified' ? Colors.primarySecondary : Colors.grey }} />}
                   </View>
 
                 </View>

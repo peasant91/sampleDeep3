@@ -1,7 +1,7 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
-import {View, Platform} from 'react-native';
+import {View, Platform, Keyboard} from 'react-native';
 
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator, BottomTabBar} from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeScreen from './HomeScreen';
@@ -22,6 +22,36 @@ import { calcDistance } from '../../actions/helper';
 import { sendDistance } from '../../services/contract';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import Config from '../../constants/Config';
+
+const CustomBottomTabBar = props => {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    let keyboardEventListeners;
+    if (Platform.OS === 'android') {
+      keyboardEventListeners = [
+        Keyboard.addListener('keyboardDidShow', () => setVisible(false)),
+        Keyboard.addListener('keyboardDidHide', () => setVisible(true)),
+      ];
+    }
+    return () => {
+      if (Platform.OS === 'android') {
+        keyboardEventListeners &&
+          keyboardEventListeners.forEach(eventListener => eventListener.remove());
+      }
+    };
+  }, []);
+
+  const render = () => {
+    if (Platform.OS === 'ios') {
+      return <BottomTabBar {...props} />;
+    }
+    if (!visible) return null;
+    return <BottomTabBar {...props} />;
+  };
+
+  return render();
+};
 
 const Tab = createBottomTabNavigator();
 
@@ -141,6 +171,7 @@ const MainTabScreen = ({navigation, route}) => {
 
   return (
     <Tab.Navigator
+      tabBar={props => <CustomBottomTabBar {...props} />}
       screenOptions={({route}) => ({
         headerShown: false,
         tabBarLabelStyle: {fontSize: 13, marginBottom: 10},

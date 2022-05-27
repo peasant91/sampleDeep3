@@ -9,8 +9,13 @@ export default {
         NEWS_TOPIC: "news-id-dev"
     },
     live: {
-        API_URL: "https://dev-otomedia.timedoor-host.web.id/api/",
-        DOMAIN: "https://dev-otomedia.timedoor-host.web.id",
+        API_URL: "https://otomedia.timedoor-host.web.id/api/",
+        DOMAIN: "https://otomedia.timedoor-host.web.id",
+        NEWS_TOPIC: "news-id-dev"
+    },
+    staging: {
+        API_URL: "https://staging-otomedia.timedoor-host.web.id/api/",
+        DOMAIN: "https://staging-otomedia.timedoor-host.web.id",
         NEWS_TOPIC: "news-id-dev"
     }
 

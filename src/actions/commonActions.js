@@ -132,7 +132,7 @@ export const showLocationAlwaysDialog = (onConfirm) => {
             style={{width: 200, height: 100, alignSelf: 'center'}}
             source={require('../assets/lottie/location.json')}
           />
-          <LatoBold>{translate('always_location_title')}</LatoBold>
+          <LatoBold style={{textAlign: 'center', alignSelf: 'center'}}>{translate('always_location_title')}</LatoBold>
           <LatoRegular
             containerStyle={{marginVertical: 16}}
             style={{

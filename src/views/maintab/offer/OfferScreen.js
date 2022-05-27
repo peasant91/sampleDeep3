@@ -1,10 +1,12 @@
-import { FlatList, RefreshControl, SafeAreaView, StyleSheet, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, RefreshControl, SafeAreaView, StyleSheet, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import CardContract from '../../../components/atoms/list/CardContract';
 import { Input } from 'react-native-elements';
 
 import IconSearch from '../../../assets/images/ic_search_offer.svg';
 import IconFilter from '../../../assets/images/ic_filter.svg';
+import IconEmpty from '../../../assets/images/ic_empty_offer.svg';
+
 import { getCampaignList } from '../../../services/campaign';
 import ErrorNotRegisterVehicle from '../../../components/atoms/ErrorNotRegisterVehicle';
 import { showDialog } from '../../../actions/commonActions';
@@ -13,6 +15,8 @@ import { ShimmerCardContract } from '../../../components/atoms/shimmer/Shimmer';
 import { Shadow } from 'react-native-shadow-2';
 import { useIsFocused } from '@react-navigation/native';
 import Colors from '../../../constants/Colors';
+import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText';
+
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -94,9 +98,24 @@ const OfferScreen = ({ navigation, route }) => {
     }
   }, [search, isFocused])
 
+
+  const EmptyOffer = () => {
+    return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30}}>
+      <IconEmpty/>
+      <LatoBold containerStyle={{marginVertical: 10}}>{translate('empty_offer_title')}</LatoBold>
+      <LatoRegular style={{textAlign: 'center', fontSize: 12, color: Colors.grey}}>{translate('empty_offer_desc')}</LatoRegular>
+    </View>
+  }
+
   return (
     <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
-      <View style={{ backgroundColor: '#FAFAFA', flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={100}
+          contentContainerStyle={{flexGrow: 1}}
+          style={{flexGrow: 1}}>
+
+      <View style={{ flex: 1 }}>
         <Shadow viewStyle={{width: '100%'}} offset={[0, 10]} distance={10} startColor={Colors.divider}>
 
         <View style={styles.topHeader}>
@@ -120,12 +139,13 @@ const OfferScreen = ({ navigation, route }) => {
                 return <ShimmerCardContract
                   containerStyle={{ marginHorizontal: 16, marginTop: 16 }}
                 />
-          }) :
+          }) : (data.length == 0 ? <EmptyOffer/> : 
           <FlatList
             refreshControl={<RefreshControl
               refreshing={isLoading}
               onRefresh={onRefresh}
             />}
+            style={{backgroundColor: '#FAFAFA'}}
             data={data}
             contentContainerStyle={{ paddingBottom: 16, overflow: 'visible' }}
             keyExtractor={item => item.id}
@@ -141,8 +161,10 @@ const OfferScreen = ({ navigation, route }) => {
               )
             }}
           />)
+          )
         }
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

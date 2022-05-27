@@ -170,7 +170,11 @@ const App = ({ navigation, route }) => {
           })
           
         }).catch(err => {
-          showDialog(err.message)
+          BackgroundGeolocation.stop()
+          AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
+            dispatch({ type: 'SIGN_OUT' });
+          })
+          // showDialog(err.message)
         })
       },
       doneLoading: async data => {
@@ -301,7 +305,19 @@ const App = ({ navigation, route }) => {
                   />
                 ) : !state.userToken ? (
                   <>
+                    <Stack.Screen
+                      name="RegisterPassword"
+                      component={RegisterPasswordScreen}
+                      initialParams={{data: {}}}
+                      options={{ headerShown: false }}
+                    />
                     
+                    <Stack.Screen
+                      name="ResetPassword"
+                      component={ResetPasswordScreen}
+                      options={{ headerShown: false }}
+                    />
+
                     <Stack.Screen
                       name="Login"
                       component={LoginScreen}
@@ -332,23 +348,12 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false }}
                     />
 
-
-                    <Stack.Screen
-                      name="ResetPassword"
-                      component={ResetPasswordScreen}
-                      options={{ headerShown: false }}
-                    />
-
                     <Stack.Screen
                       name="Register"
                       component={RegisterScreen}
                       options={{ headerShown: false }}
                     />
-                    <Stack.Screen
-                      name="RegisterPassword"
-                      component={RegisterPasswordScreen}
-                      options={{ headerShown: false }}
-                    />
+
 
 
                     <Stack.Screen

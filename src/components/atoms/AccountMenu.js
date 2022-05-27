@@ -7,7 +7,7 @@ import {LatoBold} from '../atoms/CustomText';
 const AccountMenu = ({Icon, text, onPress, containerStyle, tintColor}) => {
   return (
     <View style={containerStyle}>
-      <Shadow viewStyle={{width: '100%'}} radius={8} distance={5} offset={[0,3]} startColor={Colors.divider}  >
+      <Shadow viewStyle={{width: '100%', backgroundColor: 'white', borderRadius: 8}} radius={8} distance={3} offset={[0,2]} startColor={Colors.divider} containerViewStyle={{backgroundColor: 'white'}} >
     <TouchableOpacity onPress={onPress} >
       <View style={styles.container}>
         <LatoBold Icon={Icon} style={{color: tintColor ?? Colors.primary}} iconTint={tintColor}>{text}</LatoBold>

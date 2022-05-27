@@ -27,22 +27,20 @@ const OtpScreen = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(false)
 
   const sendOtpApi = async () => {
-    setisLoading(true)
     if (isRegister) {
     sendOtp({
       address: data.email,
       type: 'email',
       otp_id: otpId
     }).then(response => {
-      setisLoading(false)
       console.log(response)
       setotpId(response.id)
     }).catch(error => {
-      setisLoading(false)
       console.log(error)
       showDialog(error.message)
     })
     } else {
+    setisLoading(true)
       forgotPassword({
         address: data.phone,
         otp_id: otpId

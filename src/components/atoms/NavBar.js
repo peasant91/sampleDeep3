@@ -3,9 +3,13 @@ import BackButton from '../../assets/images/ic_arrow_back.svg';
 import {LatoBold } from './CustomText';
 import {View, TouchableOpacity} from 'react-native';
 import {StyleSheet} from 'react-native';
+import { Shadow } from 'react-native-shadow-2';
+import Colors from '../../constants/Colors';
 
 const NavBar = ({navigation, title, style, shadowEnabled, RightView}) => {
   return (
+    <Shadow distance={10} startColor={shadowEnabled ? Colors.divider : 'white'} offset={[0,5]}>
+
     <View
       style={[
         {flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'white', width: '100%', zIndex: 0},
@@ -26,6 +30,7 @@ const NavBar = ({navigation, title, style, shadowEnabled, RightView}) => {
       {RightView}
       </View>
     </View>
+    </Shadow>
   );
 };
 
