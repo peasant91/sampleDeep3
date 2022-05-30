@@ -31,6 +31,7 @@ import StorageKey from '../../constants/StorageKey';
 import {AuthContext} from '../../../App';
 import translate from '../../locales/translate';
 import Config from '../../constants/Config';
+import Constant from '../../constants/Constant';
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
@@ -61,7 +62,7 @@ const LoginScreen = ({navigation, route}) => {
   };
 
   const seeTerm = () => {
-    navigation.navigate('SingleWeb', {url: 'https://www.facebook.com'})
+    navigation.navigate('SingleWeb', {url: Constant.TERMS_URL})
   }
 
   const doLogin = () => {

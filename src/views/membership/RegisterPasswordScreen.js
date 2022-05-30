@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useEffect } from 'react'
-import { Platform, SafeAreaView, ScrollView, View } from 'react-native'
+import { Platform, SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native'
 import Animated from 'react-native-reanimated';
 import { showDialog } from '../../actions/commonActions';
 import CustomCheckbox from '../../components/atoms/Checkbox';
@@ -8,6 +8,7 @@ import CustomInput, { PasswordInput, PhoneInput } from '../../components/atoms/C
 import { LatoBold, LatoRegular } from '../../components/atoms/CustomText';
 import NavBar from '../../components/atoms/NavBar';
 import Colors from '../../constants/Colors';
+import Constant from '../../constants/Constant';
 import translate from '../../locales/translate';
 import formReducer from '../../reducers/formReducer';
 import { validateRegister } from '../../services/auth';
@@ -55,6 +56,10 @@ const RegisterPasswordScreen = ({ navigation, route }) => {
     }
   }
 
+  const goToTerms = () => {
+    navigation.navigate('SingleWeb', { url: Constant.TERMS_URL })
+  }
+
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
     <NavBar navigation={navigation} title={translate('password_title')} />
@@ -78,6 +83,8 @@ const RegisterPasswordScreen = ({ navigation, route }) => {
           dispatcher={dispatch}
           keyboardType={'default'}
           required
+          minChar={8}
+          maxChar={20}
         />
         <PasswordInput
           id={'password_confirmation'}
@@ -90,15 +97,21 @@ const RegisterPasswordScreen = ({ navigation, route }) => {
           isCheck={formState.isChecked}
           dispatcher={dispatch}
           keyboardType={'default'}
+          maxChar={20}
+          minChar={8}
           required
         />
 
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
           <CustomCheckbox isChecked={isChecked} onPress={() => setisChecked(!isChecked)}/>
-          <LatoRegular style={{ paddingLeft: 16 }}>{translate('i_have_read')} <LatoBold style={{ paddingLeft: Platform.OS === 'ios' ? 16 : 0 }}>{translate('term_and_condition')}</LatoBold></LatoRegular>
+          <View>
+            <LatoRegular style={{ paddingLeft: 0 }}>{translate('i_have_read')}</LatoRegular>
+            <TouchableOpacity onPress={goToTerms}>
+              <LatoBold >{translate('term_and_condition')}</LatoBold>
+            </TouchableOpacity>
+          </View>
         </View>
         
-
       {formState.isChecked && !isChecked && (
         <LatoBold style={{color: 'red', marginTop: 5}}>
           {translate('error_agree_to_terms' )}
@@ -108,7 +121,7 @@ const RegisterPasswordScreen = ({ navigation, route }) => {
     </ScrollView>
     <CustomButton types='primary' containerStyle={{ padding: 16 }} title={translate('register')} onPress={goToOtp} />
   </SafeAreaView>
-    ;
+    
 }
 
 export default RegisterPasswordScreen

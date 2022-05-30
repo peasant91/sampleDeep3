@@ -306,21 +306,22 @@ const App = ({ navigation, route }) => {
                 ) : !state.userToken ? (
                   <>
                     <Stack.Screen
-                      name="RegisterPassword"
-                      component={RegisterPasswordScreen}
-                      initialParams={{data: {}}}
-                      options={{ headerShown: false }}
-                    />
-                    
-                    <Stack.Screen
-                      name="ResetPassword"
-                      component={ResetPasswordScreen}
+                      name="Login"
+                      component={LoginScreen}
                       options={{ headerShown: false }}
                     />
 
                     <Stack.Screen
-                      name="Login"
-                      component={LoginScreen}
+                      name="Register"
+                      component={RegisterScreen}
+                      options={{ headerShown: false }}
+                      initialParams={{isEdit: false}}
+                    />
+
+                    <Stack.Screen
+                      name="RegisterPassword"
+                      component={RegisterPasswordScreen}
+                      initialParams={{data: {}}}
                       options={{ headerShown: false }}
                     />
 
@@ -328,7 +329,17 @@ const App = ({ navigation, route }) => {
                       name="RegisterVehicle"
                       component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
+                      initialParams={{isEdit: false}}
                     />
+
+                    
+                    <Stack.Screen
+                      name="ResetPassword"
+                      component={ResetPasswordScreen}
+                      options={{ headerShown: false }}
+                    />
+
+
 
                     <Stack.Screen
                       name="RegisterSuccess"
@@ -347,13 +358,6 @@ const App = ({ navigation, route }) => {
                       component={ForgotPasswordSuccessScreen}
                       options={{ headerShown: false }}
                     />
-
-                    <Stack.Screen
-                      name="Register"
-                      component={RegisterScreen}
-                      options={{ headerShown: false }}
-                    />
-
 
 
                     <Stack.Screen

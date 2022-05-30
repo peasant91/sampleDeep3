@@ -56,7 +56,7 @@ import Config from '../../constants/Config';
 import { getFullLink } from '../../actions/helper';
 import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
-import { check, openSettings, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
 const dummyDivision = [
   {
@@ -106,7 +106,13 @@ const RegisterScreen = ({navigation, route}) => {
 
   const [formStateCard, dispatchCard] = useReducer(formReducer, {
     inputValues: {},
-    inputValidities: {},
+    inputValidities: {
+      ktp_image: isEdit,
+      ktp: isEdit,
+      sim_a: isEdit,
+      sim_a_image: isEdit
+
+    },
     formIsValid: isEdit,
   });
 
@@ -234,13 +240,23 @@ const RegisterScreen = ({navigation, route}) => {
 
   }
 
+  //delete village_id if manual input
+  const getFormAddress = () => {
+    if (formStateAddress.inputValues.village_name) {
+      const { village_id, ...object } = formStateAddress.inputValues
+      return object
+    } else {
+      return formStateAddress.inputValues
+    }
+  }
+
 
   const buildForm = (formState) => {
 
     const detail = {
       ...formStateDetail.inputValues,
       bank: formStateDetail.inputValues.driver_company_id ? null : formStateBank.inputValues,
-      address: formStateAddress.inputValues,
+      address: getFormAddress(),
       card: buildCardForm()
     }
 
@@ -264,20 +280,18 @@ const RegisterScreen = ({navigation, route}) => {
     }
   }
 
-    const validate = (data) => {
+  const validate = (data) => {
       setIsLoading(true)
       validateRegister(data).then(response => {
         setIsLoading(false)
         data.password = ""
         navigation.navigate('RegisterPassword', {data: data});
-      }
-      ).catch(error => {
+      }).catch(error => {
         setIsLoading(false)
         showDialog(error.message)
       })
-    }
+  }
     
-
   const onGenderPicked = value => {
     dispatchDetail({
       id: 'gender',
@@ -330,23 +344,15 @@ const RegisterScreen = ({navigation, route}) => {
   }
 
   const openCameraPicker =  async () => {
-    if (Platform.OS == 'android'){
-      const permission = await check(PERMISSIONS.ANDROID.CAMERA)
-      console.log(permission)
-      if (permission == RESULTS.DENIED) {
-        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-        return
-      }
-    }
-
-    const result = await launchCamera({
+    launchCamera({
       quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
-    });
+    }, (result) => {
     if (result) {
       saveImageResult(result)
     }
+    })
 
   };
 
@@ -354,15 +360,24 @@ const RegisterScreen = ({navigation, route}) => {
     if (Platform.OS == 'android'){
       const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
       console.log(permission)
-      if (permission == RESULTS.DENIED) {
-        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+      if (permission == RESULTS.BLOCKED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
         return
+      }
+
+      if (permission == RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        console.log(result)
+        if (result != RESULTS.GRANTED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+        }
       }
     }
     const result = await launchImageLibrary({
       quality: 0.5,
       includeBase64: true,
-      mediaType: 'photo',
+      mediaType: 'photo', 
     });
     if (result) {
       saveImageResult(result)
@@ -680,6 +695,7 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() =>
                 openPicker('province_id', 'province_title', provinceData, dispatchAddress)
               }
+              required
             />
             
             <PickerInput
@@ -691,6 +707,7 @@ const RegisterScreen = ({navigation, route}) => {
               isCheck={formState.isChecked}
               disabled={formStateAddress.inputValues.province_id == null }
               onPress={() => openPicker('city_id', 'city_title', cityData, dispatchAddress)}
+              required
             />
 
             <PickerInput
@@ -703,6 +720,7 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() =>
                 openPicker('district_id', 'district_title', districtData, dispatchAddress)
               }
+              required
             />
 
             <PickerInput
@@ -716,6 +734,7 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() =>
                 openPicker('village_id', 'village_title', villageData, dispatchAddress)
               }
+              required
             />
 
               {formStateAddress.inputValues.village_id == -99 && formStateAddress.inputValues.village_id_value != null &&

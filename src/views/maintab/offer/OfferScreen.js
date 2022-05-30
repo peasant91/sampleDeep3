@@ -1,5 +1,5 @@
 import { FlatList, KeyboardAvoidingView, RefreshControl, SafeAreaView, StyleSheet, View } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import CardContract from '../../../components/atoms/list/CardContract';
 import { Input } from 'react-native-elements';
 
@@ -16,6 +16,8 @@ import { Shadow } from 'react-native-shadow-2';
 import { useIsFocused } from '@react-navigation/native';
 import Colors from '../../../constants/Colors';
 import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText';
+
+import debounce from 'lodash.debounce';
 
 
 const dummyContractData = {
@@ -43,6 +45,7 @@ const OfferScreen = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(true)
   const [search, setsearch] = useState('')
   const isFocused = useIsFocused();
+  const searchText = useRef(true)
 
   const goToDetail = (item) => {
     navigation.navigate('OfferDetail', { id: item.id })
@@ -57,8 +60,9 @@ const OfferScreen = ({ navigation, route }) => {
     if (canLoadData.current) {
     getCampaignList({
       page: page.current,
-      search: search
+      search: searchText.current
     }).then(response => {
+      setisNotRegisterVehicle(false)
       setisLoading(false)
       if (response.length > 0) {
         if (page.current == 1) {
@@ -90,9 +94,16 @@ const OfferScreen = ({ navigation, route }) => {
     getCampaignListApi()
   }
 
+  const debounceSearch = useCallback(
+   debounce(onRefresh, 1000),
+    [],
+  )
+
+
   useEffect(() => {
     if (isFocused) {
-      onRefresh()
+      searchText.current = search
+      debounceSearch()
     } else {
       setisLoading(true)
     }

@@ -114,7 +114,7 @@
     "home_info": "Selalu nyalakan GPS ketika berkendara agar jarak tempuh tercatat disistem",
     "do_job": "Melakukan Pekerjaan",
     "active_contract": "Kontrak Aktif",
-    "see_contract": "Lihat Kontrak",
+    "see_contract": "Lihat Penawaran Ini",
     "no_active_contract": "Belum ada kontrak aktif. \nSilahkan cari penawaran yang terbaik untuk Anda.",
     "no_history_contract": "Belum ada riwayat kontrak. \nSilahkan cari penawaran yang terbaik untuk Anda.",
     "see_offer": "Lihat Penawaran",
@@ -274,7 +274,10 @@
     "empty_offer_title": "Perkerjaan tidak ditemukan",
     "empty_offer_desc": "Tidak ada pekerjaan sesuai kata kunci, Coba \ngunakan kata kunci lainnya ya.",
     "empty_notif_title": "Tidak ada notifikasi",
-    "empty_notif_desc": "Notifikasi terkait pekerjaan dan lainnya akan \nditampilkan disini."
+    "empty_notif_desc": "Notifikasi terkait pekerjaan dan lainnya akan \nditampilkan disini.",
+
+    "password_min": "Kata Sandi tidak boleh kurang dari %{min} karakter",
+    "password_max": "Kata Sandi tidak boleh lebih dari %{max} karakter"
     
 
 

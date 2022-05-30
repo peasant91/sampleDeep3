@@ -416,6 +416,8 @@ export const PasswordInput = ({
   dispatcher,
   keyboardType,
   disabled,
+  minChar,
+  maxChar,
   required
 }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -429,6 +431,21 @@ export const PasswordInput = ({
       if (text !== match) {
         isValid = false;
         setError(translate('password_not_match'));
+      }
+    }
+
+    if (minChar) {
+      if (text?.length < minChar) {
+        isValid = false;
+        setError(translate('password_min', {min: minChar}));
+      }
+    }
+
+    if (maxChar) {
+      console.log(text?.length)
+      if (text?.length > maxChar) {
+        isValid = false;
+        setError(translate('password_max', {max: maxChar}));
       }
     }
 

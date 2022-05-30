@@ -18,7 +18,6 @@ const CardContract = ({data, onPress, containerStyle}) => {
   return (
     <View style={containerStyle}>
     <Shadow  radius={10} offset={[0,0]} distance={3} startColor={Colors.divider} viewStyle={[{backgroundColor: 'white', borderRadius: 9, width: '100%'}, ]}>
-    <TouchableOpacity onPress={onPress} >
       <View style={styles.container}>
         <View style={{flexDirection: 'row', padding: 16}}>
           <Image
@@ -64,6 +63,7 @@ const CardContract = ({data, onPress, containerStyle}) => {
           <LatoRegular style={{fontSize: 10, color: Colors.greyLight}}>
             {getPostTime(data.created_at)}
           </LatoRegular>
+          <TouchableOpacity onPress={onPress}>
           <LatoBold
             style={{
               fontSize: 10,
@@ -72,9 +72,9 @@ const CardContract = ({data, onPress, containerStyle}) => {
             }}>
             {translate(data.carList ? 'see_this_offer' : 'see_contract')}
           </LatoBold>
+          </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
     </Shadow>
     </View>
   );

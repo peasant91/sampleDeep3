@@ -147,13 +147,6 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const openCameraPicker = async selectedPicker => {
-    if (Platform.OS == 'android'){
-      const permission = await check(PERMISSIONS.ANDROID.CAMERA)
-      if (permission == RESULTS.DENIED) {
-        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-        return
-      }
-    }
         const result = await launchCamera({
             quality: 0.5,
             includeBase64: true,
@@ -165,9 +158,19 @@ const CrudReportScreen = ({ navigation, route }) => {
     const openGalleryPicker = async selectedPicker => {
     if (Platform.OS == 'android'){
       const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
-      if (permission == RESULTS.DENIED) {
-        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+      console.log(permission)
+      if (permission == RESULTS.BLOCKED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
         return
+      }
+
+      if (permission == RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        console.log(result)
+        if (result != RESULTS.GRANTED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+        }
       }
     }
         const result = await launchImageLibrary({
@@ -256,8 +259,8 @@ const CrudReportScreen = ({ navigation, route }) => {
     }, [])
 
     return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-        <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} />
-        <ScrollView style={{ padding: 16 }}>
+        <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} shadowEnabled />
+        <ScrollView style={{ padding: 16, flex: 1 }}>
             <CustomInput
                 id={'desc'}
                 title={translate('report_detail')}
@@ -275,6 +278,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                     return <View style={{ marginBottom: 16 }}>
                         <LatoBold>{translate('report_string', { body: value.name })}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
                         <FlatList
+                            style={{zIndex: -99}}
                             scrollEnabled={false}
                             columnWrapperStyle={{ justifyContent: 'space-between' }}
                             data={value.images}
@@ -291,14 +295,21 @@ const CrudReportScreen = ({ navigation, route }) => {
 
             <LatoBold>{translate('odometer_photo')}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
 
-            <ReportImage imageUri={formState.inputValues.odometer} onPress={() => openImagePicker('odometer', 'odometer')} navigation={navigation} title={translate('odometer')} />
+            <View style={{paddingBottom: 24}}>
 
+            <ReportImage 
+                imageUri={formState.inputValues.odometer} 
+                onPress={() => openImagePicker('odometer', 'odometer')} 
+                navigation={navigation} 
+                title={translate('odometer')} />
+
+            </View>
             {
                 !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_odometer')}</LatoBold>
             }
 
             {
-                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginVertical: 24 }} isLoading={isloading} />
+                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginBottom: 24 }} isLoading={isloading} />
             }
 
 
@@ -307,7 +318,7 @@ const CrudReportScreen = ({ navigation, route }) => {
 
         <CustomSheet ref={pickerSheet}>
             <View style={{ padding: 16 }}>
-                <LatoBold>{translate('pick_photo')}</LatoBold>
+                <LatoBold style={{marginBottom: 10}}>{translate('pick_photo')}</LatoBold>
                 <TouchableOpacity onPress={() => setimagePickerId(0)}>
                     <LatoRegular Icon={IconCamera}>
                         {translate('pick_camera')}

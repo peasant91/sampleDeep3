@@ -172,9 +172,19 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   const openGalleryPicker = async () => {
     if (Platform.OS == 'android'){
       const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
-      if (permission == RESULTS.DENIED) {
-        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+      console.log(permission)
+      if (permission == RESULTS.BLOCKED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
         return
+      }
+
+      if (permission == RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        console.log(result)
+        if (result != RESULTS.GRANTED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+        }
       }
     }
     const result = await launchImageLibrary({

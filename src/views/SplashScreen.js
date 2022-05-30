@@ -171,6 +171,7 @@ const SplashScreen = ({ navigation, route }) => {
             }
           })
         }
+        return
       }
 
       showOpenSetting()
@@ -182,7 +183,6 @@ const SplashScreen = ({ navigation, route }) => {
     if (Platform.OS == 'ios') {
       request(PERMISSIONS.IOS.LOCATION_ALWAYS).then(result => {
         if (result == RESULTS.GRANTED) {
-
           requestNotificationPermission()
         } else {
           openSettings().catch(() => console.warn('cannot open settings'));
@@ -190,6 +190,7 @@ const SplashScreen = ({ navigation, route }) => {
       })
     } else {
       const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+        console.log('result fine', result)
         if (result == RESULTS.DENIED) {
           showLocationAlwaysDialog(() => {
             requestAndroidLocationPermission()
@@ -199,10 +200,9 @@ const SplashScreen = ({ navigation, route }) => {
 
         if (Platform.Version >= 29) {
             const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
+            console.log('result background', result)
               if (result == RESULTS.DENIED) {
-                showLocationAlwaysDialog(() => {
                   requestAndroidLocationPermission()
-                })
                 return
               }
 
