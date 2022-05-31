@@ -271,13 +271,15 @@
     "please_allow_storage": "Mohon ijinkan akses media penyimpanan untuk mengambil gambar",
     "error_agree_to_terms": "Anda harus menyetujui Syarat & Ketentuan untuk melakukan pendaftaran",
 
-    "empty_offer_title": "Perkerjaan tidak ditemukan",
-    "empty_offer_desc": "Tidak ada pekerjaan sesuai kata kunci, Coba \ngunakan kata kunci lainnya ya.",
+    "empty_offer_title": "%{title} tidak ditemukan",
+    "empty_offer_desc": "Tidak ada %{title} sesuai kata kunci, Coba \ngunakan kata kunci lainnya ya.",
+
     "empty_notif_title": "Tidak ada notifikasi",
     "empty_notif_desc": "Notifikasi terkait pekerjaan dan lainnya akan \nditampilkan disini.",
 
     "password_min": "Kata Sandi tidak boleh kurang dari %{min} karakter",
-    "password_max": "Kata Sandi tidak boleh lebih dari %{max} karakter"
+    "password_max": "Kata Sandi tidak boleh lebih dari %{max} karakter",
+    "work": "Pekerjaan",
     
 
 

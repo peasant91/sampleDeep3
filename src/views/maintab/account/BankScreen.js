@@ -27,7 +27,9 @@ const BankScreen = ({ navigation, route }) => {
     })
 
     const updateBankAPI = () => {
-        dispatch('check')
+        dispatch({
+            type: 'check'
+        })
 
         if (formState.formIsValid) {
             updateBank(formState.inputValues)
@@ -95,6 +97,7 @@ const BankScreen = ({ navigation, route }) => {
                 value={formState.inputValues.bank_id_value}
                 isCheck={formState.isChecked}
                 onPress={() => openPicker('bank_id', 'bank_account', bankData)}
+                required
             />
 
             <CustomInput
@@ -106,6 +109,8 @@ const BankScreen = ({ navigation, route }) => {
                 viewOnly={isReadOnly}
                 value={formState.inputValues.number}
                 isCheck={formState.isChecked}
+                keyboardType={'number-pad'}
+                required
             />
 
             <CustomInput
@@ -116,6 +121,7 @@ const BankScreen = ({ navigation, route }) => {
                 viewOnly={isReadOnly}
                 value={formState.inputValues.branch}
                 isCheck={formState.isChecked}
+                required
             />
 
             <CustomInput
@@ -127,6 +133,7 @@ const BankScreen = ({ navigation, route }) => {
                 dispatcher={dispatch}
                 value={formState.inputValues.name}
                 isCheck={formState.isChecked}
+                required
             />
 
         </ScrollView>

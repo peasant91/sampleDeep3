@@ -44,8 +44,41 @@ const JobScreen = ({ navigation, route }) => {
     AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
     AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
 
+    if(!isStart) {
+      checkBackroundLocation()
+    } else {
+      setisStart(!isStart)
+    }
 
+
+  }
+
+  const checkBackroundLocation = async () => {
+      const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+        console.log('result fine', result)
+        if (result == RESULTS.DENIED) {
+          showLocationAlwaysDialog(() => {
+            requestAndroidLocationPermission()
+          })
+          return
+        } 
+
+        if (Platform.Version >= 29) {
+            const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
+            console.log('result background', result)
+              if (result == RESULTS.DENIED) {
+                  requestAndroidLocationPermission()
+                return
+              }
+
+              if (result == RESULTS.BLOCKED) {
+              showOpenSetting()
+              return
+              }
+        }
+        
     setisStart(!isStart)
+      
   }
 
   const reset = async () => {

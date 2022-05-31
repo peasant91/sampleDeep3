@@ -446,7 +446,7 @@ const RegisterScreen = ({navigation, route}) => {
       data: data,
       selectedId: selectedId,
       isEdit: isEdit,
-      previousRoute: 'Register',
+      previousRoute: !isEdit ? 'Register' : 'EditProfile',
       dispatch: dispatch
     });
   };

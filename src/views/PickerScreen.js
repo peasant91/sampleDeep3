@@ -14,6 +14,7 @@ import ListArea from '../components/atoms/list/ListArea';
 import { LatoRegular } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
 import { Shadow } from 'react-native-shadow-2';
+import EmptySearch from '../components/atoms/EmptySearch';
 
 const PickerScreen = ({ navigation, route }) => {
 
@@ -53,6 +54,7 @@ const PickerScreen = ({ navigation, route }) => {
       <View style={{flex: 1}}>
 
 
+      {filteredData.length <= 0 ? <EmptySearch title={translate(title)}/> : 
       <FlatList
         contentContainerStyle={{ paddingTop: 16 }}
         style={{flex: 0, flexShrink: 1}}
@@ -64,7 +66,7 @@ const PickerScreen = ({ navigation, route }) => {
           else
             return <ListArea data={item} onPress={onPressList} selectedId={selectedId} />
         }}
-      />
+      />}
 
       {pickerId == 'village_id' && 
       <View

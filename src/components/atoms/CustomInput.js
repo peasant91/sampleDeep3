@@ -54,6 +54,7 @@ const CustomInput = ({
 
       if (required) {
         if (text == undefined || text?.trim().length <= 0) {
+          console.log('error', isCheck)
           isValid = false;
           setError(translate('must_not_empty', {s: title.replaceAll('?', '')}));
         }

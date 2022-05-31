@@ -18,6 +18,7 @@ import Colors from '../../../constants/Colors';
 import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText';
 
 import debounce from 'lodash.debounce';
+import EmptySearch from '../../../components/atoms/EmptySearch';
 
 
 const dummyContractData = {
@@ -110,14 +111,6 @@ const OfferScreen = ({ navigation, route }) => {
   }, [search, isFocused])
 
 
-  const EmptyOffer = () => {
-    return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30}}>
-      <IconEmpty/>
-      <LatoBold containerStyle={{marginVertical: 10}}>{translate('empty_offer_title')}</LatoBold>
-      <LatoRegular style={{textAlign: 'center', fontSize: 12, color: Colors.grey}}>{translate('empty_offer_desc')}</LatoRegular>
-    </View>
-  }
-
   return (
     <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
         <KeyboardAvoidingView
@@ -150,7 +143,7 @@ const OfferScreen = ({ navigation, route }) => {
                 return <ShimmerCardContract
                   containerStyle={{ marginHorizontal: 16, marginTop: 16 }}
                 />
-          }) : (data.length == 0 ? <EmptyOffer/> : 
+          }) : (data.length == 0 ? <EmptySearch title={translate('work')}/> : 
           <FlatList
             refreshControl={<RefreshControl
               refreshing={isLoading}
