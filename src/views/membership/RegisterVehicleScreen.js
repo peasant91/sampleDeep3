@@ -21,8 +21,10 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import CustomButton from '../../components/atoms/CustomButton'
 import { getCity, getDistrict, getVehicleBrand, getVehicleModel, getVehicleType, getVillage } from '../../services/utilities'
 import { getVehicle, registerVehicle, updateVehicle } from '../../services/user'
-import { showDialog } from '../../actions/commonActions'
-import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
+import { dismissDialog, showDialog } from '../../actions/commonActions'
+import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions'
+import axios from 'axios'
+import { getFullLink, getImageBase64FromUrl } from '../../actions/helper'
 
 
 
@@ -56,6 +58,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   const [cityData, setcityData] = useState([])
   const [districtData, setdistrictData] = useState([])
   const [villageData, setvillageData] = useState([])
+  const [isPreloading, setisPreloading] = useState(true)
 
   const [images, setimages] = useState([' ', ' ', ' ', ' '])
   const [selectedPickerIndex, setselectedPickerIndex] = useState(0)
@@ -69,9 +72,11 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   const [stickerAreaData, setstickerAreaData] = useState([])
   const [stickerArea, setstickerArea] = useState([])
   const [colorData, setcolorData] = useState([])
+
   // const [isRegister, setisRegister] = useState(route.params.isRegister)
 
   const [isLoading, setisLoading] = useState(false)
+  const [isEdited, setisEdited] = useState(false)
 
 
   const pickerSheet = useRef()
@@ -91,6 +96,21 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     inputValidities: {},
     formIsValid: false,
   })
+
+  const checkIsEdited = () => {
+    if (isEdit && !isEdited && !isPreloading) {
+      setisEdited(true)
+    }
+  }
+
+  const showBackPrompt = () => {
+    if (isEdited) {
+      showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
+      return
+    } 
+
+    navigation.pop()
+  }
 
   const goToRegisterVehicleSuccess = () => {
     navigation.navigate(isRegister ? 'RegisterVehicleSuccess' : 'RegisterVehicleSuccessMain', { isRegister: isRegister })
@@ -151,21 +171,12 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   }
 
   const openCameraPicker = async () => {
-    if (Platform.OS == 'android'){
-      const permission = await check(PERMISSIONS.ANDROID.CAMERA)
-      if (permission == RESULTS.DENIED) {
-        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-        return
-      }
-    }
     const result = await launchCamera({
       quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
     });
-    if (result) {
       setImage(result)
-    }
 
   };
 
@@ -192,12 +203,15 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       includeBase64: true,
       mediaType: 'photo',
     });
-    if (result) {
-      setImage(result)
-    }
+    
+    setImage(result)
   };
 
   const setImage = (result) => {
+    if (result == null || result == undefined || result.assets == undefined) {
+      return
+    }
+
     const image = images
     const base64 = `data:image/png;base64,${result.assets[0].base64}`
     image[selectedPickerIndex] = base64
@@ -263,6 +277,16 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     console.log('stickerArea', form.detail.sticker_area)
 
     const isFullBody = form.detail.sticker_area.includes(StickerType[0].id)
+
+    for (index in form.images) {
+      console.log('imagesbro', images)
+      const imageUrl = form.images[index]
+      getImageBase64FromUrl(getFullLink(imageUrl)).then(base64 => {
+        const image = images
+        image[index] = base64
+        setimages([...image])
+      })
+    }
 
     const formStateDetail = {
       inputValues: {
@@ -342,8 +366,26 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     }, 500);
   }, [imagePickerId]);
 
-  //reset if parent changed
   useEffect(() => {
+    if (isEdit && isPreloading) {
+      axios.all([
+        getCity(formState.inputValues.province_id),
+        getDistrict(formState.inputValues.city_id),
+        getVillage(formState.inputValues.district_id)
+      ]).then(axios.spread((city, district, village) => {
+        setcityData(city)
+        setdistrictData(district)
+        setvillageData(village)
+        setTimeout(() => {
+          setisPreloading(false)
+        }, 1500);
+      }))
+    }
+  }, [formState])
+
+  //reset if region changed
+  useEffect(() => {
+    if (!isEdit || !isPreloading) {
     dispatch({
       type: 'picker',
       id: 'city_id',
@@ -351,9 +393,12 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       desc: null,
       isValid: false,
     });
+    }
   }, [cityData]);
 
   useEffect(() => {
+    if (!isEdit || !isPreloading) {
+
     dispatch({
       type: 'picker',
       id: 'district_id',
@@ -361,9 +406,11 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       desc: null,
       isValid: false,
     });
+    }
   }, [cityData, districtData]);
 
   useEffect(() => {
+    if (!isEdit || !isPreloading) {
     dispatch({
       type: 'picker',
       id: 'village_id',
@@ -371,7 +418,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       desc: null,
       isValid: false,
     });
+    }
   }, [cityData, districtData, villageData]);
+
 
   useEffect(() => {
     console.log(route.params);
@@ -437,13 +486,18 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     ).then(model => setmodelData(model))
   }, [formStateDetail.inputValues.vehicle_brand_id])
 
+  useEffect(() => {
+    checkIsEdited()
+  }, [formState, formStateDetail])
+
 
 
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-    <NavBar title={isEdit ? translate('edit_vehicle') : translate('register_vehicle')} navigation={navigation} />
+    <NavBar title={isEdit ? translate('edit_vehicle') : translate('register_vehicle')} navigation={navigation} onBackPress={showBackPrompt} />
     <ScrollView style={{ flex: 1, padding: 16 }}>
       <View style={{ paddingBottom: 16 }}>
+
         <PickerInput
           id={'vehicle_ownership'}
           title={translate('vehicle_owner_title')}
@@ -453,6 +507,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           isCheck={formState.isChecked}
           required
         />
+
         <PickerInput
           id={'vehicle_usage'}
           title={translate('vehicle_usage_title')}
@@ -463,6 +518,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           isCheck={formState.isChecked}
           required
         />
+        
         <PickerInput
           id={'province_id'}
           title={translate('province_title')}

@@ -89,7 +89,7 @@ const CustomInput = ({
 
   useEffect(() => {
     onTextChange(value);
-  }, [isCheck]);
+  }, [isCheck, required]);
 
   return (
     <View style={containerStyle} pointerEvents={viewOnly || disabled ? 'none' : 'auto'}>

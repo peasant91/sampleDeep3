@@ -21,6 +21,8 @@ import BackgroundGeolocation from '@mauron85/react-native-background-geolocation
 import moment from 'moment'
 import { makeMutable } from 'react-native-reanimated'
 import { useFocusEffect } from '@react-navigation/native'
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
+import { reject } from 'lodash'
 
 
 const JobScreen = ({ navigation, route }) => {
@@ -40,11 +42,10 @@ const JobScreen = ({ navigation, route }) => {
   const { id } = route.params
 
   const switchJob = () => {
-    reset()
     AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
     AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
 
-    if(!isStart) {
+    if (!isStart) {
       checkBackroundLocation()
     } else {
       setisStart(!isStart)
@@ -54,31 +55,35 @@ const JobScreen = ({ navigation, route }) => {
   }
 
   const checkBackroundLocation = async () => {
-      const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-        console.log('result fine', result)
-        if (result == RESULTS.DENIED) {
-          showLocationAlwaysDialog(() => {
-            requestAndroidLocationPermission()
-          })
-          return
-        } 
+    const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+    console.log('result fine', result)
+    if (result == RESULTS.DENIED) {
+      showLocationAlwaysDialog(() => {
+        requestAndroidLocationPermission()
+      })
+      return
+    }
 
-        if (Platform.Version >= 29) {
-            const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
-            console.log('result background', result)
-              if (result == RESULTS.DENIED) {
-                  requestAndroidLocationPermission()
-                return
-              }
+    if (Platform.Version >= 29) {
+      const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
+      console.log('result background', result)
+      if (result == RESULTS.DENIED) {
+        requestAndroidLocationPermission()
+        return
+      }
 
-              if (result == RESULTS.BLOCKED) {
-              showOpenSetting()
-              return
-              }
-        }
-        
-    setisStart(!isStart)
-      
+      if (result == RESULTS.BLOCKED) {
+        showOpenSetting()
+        return
+      }
+    }
+
+    setisStart(true)
+
+  }
+
+  const showOpenSetting = () => {
+    showDialog(translate('please_allow_location_always'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
   }
 
   const reset = async () => {
@@ -124,26 +129,62 @@ const JobScreen = ({ navigation, route }) => {
 
   }
 
-  const printTime = (time) => {
-    loop.current = setInterval(() => {
-      const startTime = moment(time)
-      const now = moment(Date())
-      const diff = moment.duration(now.diff(startTime)).asSeconds()
-      const second = moment().startOf('day').seconds(diff).format('HH:mm:ss')
-      console.log(second)
-      settime(second.split(':'))
+  const startTimer = async (time) => {
+    const diff = await getElapsedSecond(time)
+    showFormattedElapsedTime(diff)
+    loop.current = setInterval(async () => {
+      const diff = await getElapsedSecond(time)
+      showFormattedElapsedTime(diff)
     }, 1000)
   }
 
-  const checkTime = () => {
-    AsyncStorage.getItem(StorageKey.KEY_START_TIME).then(time => {
-      console.log('time', time)
-      if (time) {
-        printTime(time)
-      } else {
-        AsyncStorage.setItem(StorageKey.KEY_START_TIME, Date()).then(printTime(Date()))
+  const showFormattedElapsedTime = (diff) => {
+    const elapsedTime = moment().startOf('day').seconds(diff).format('HH:mm:ss')
+    settime(elapsedTime.split(':'))
+  }
+
+  //get elapsed time in second since the start time
+  //if there is previous recorded time add it to current time
+  const getElapsedSecond = async (startTime) => new Promise(async (resolve, reject) => {
+    const previousElapsedTime = await AsyncStorage.getItem(StorageKey.KEY_ELAPSED_TIME)
+    const momentStartTime = moment(startTime)
+    const now = moment(Date())
+    var diff
+    if (previousElapsedTime) {
+      diff = moment.duration(now.diff(momentStartTime)).asSeconds() + parseInt(previousElapsedTime)
+    } else {
+      diff = moment.duration(now.diff(momentStartTime)).asSeconds()
+    }
+    resolve(diff)
+  })
+
+  //if date is different on start reset the time
+  const checkDateIsDifferent = async () => {
+    const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
+    console.log('previous', previousDate)
+    if (previousDate) {
+      const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
+      console.log('iscurrent', isCurrentDate)
+      if (!isCurrentDate) {
+        reset()
       }
-    })
+    }
+
+    AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
+
+
+    checkStartTime()
+  }
+
+  //if there is previous time start the timer with the previous time
+  //else start the timer with current date
+  const checkStartTime = async () => {
+    var startTime = await AsyncStorage.getItem(StorageKey.KEY_START_TIME)
+    if (startTime) {
+      startTimer(startTime)
+      return
+    }
+    AsyncStorage.setItem(StorageKey.KEY_START_TIME, Date()).then(startTimer(Date()))
   }
 
   const startBackgroundLocation = () => {
@@ -165,11 +206,23 @@ const JobScreen = ({ navigation, route }) => {
     })
   }
 
+  const saveElapsedTime = async () => {
+    var startTime = await AsyncStorage.getItem(StorageKey.KEY_START_TIME)
+    getElapsedSecond(startTime).then(elapsedTime => {
+      if (!elapsedTime) { return }
+      AsyncStorage.setItem(StorageKey.KEY_ELAPSED_TIME, elapsedTime.toString())
+    })
+  }
+
   useFocusEffect(useCallback(() => {
     AsyncStorage.getItem(StorageKey.KEY_DO_JOB).then(job => {
-      if (job) {
-        setisStart(JSON.parse(job))
+      const isDoingJob = JSON.parse(job)
+      if (isDoingJob) {
+        setisStart(isDoingJob)
       } else {
+        getLastElapsedSecond().then(second => {
+          showFormattedElapsedTime(second)
+        })
         setisStart(false)
       }
     })
@@ -180,33 +233,40 @@ const JobScreen = ({ navigation, route }) => {
       onLocationChange()
     })
 
-    return () => { 
+    return () => {
       clearInterval(loop.current)
       console.log('cleaning')
     }
 
   }, []))
 
+  const getLastElapsedSecond = () => new Promise(async (resolve, reject) => {
+    const elapsedSecond = await AsyncStorage.getItem(StorageKey.KEY_ELAPSED_TIME)
+    if (elapsedSecond) {
+      resolve(elapsedSecond)
+    }
+    resolve(0)
+  })
 
   useFocusEffect(useCallback(() => {
-    if (isStart != undefined) {
-
-      if (isStart) {
-        startBackgroundLocation()
-        checkTime()
-      } else {
-        stopBackgroundLocation()
-        AsyncStorage.removeItem(StorageKey.KEY_START_TIME).then(() => clearInterval(loop))
-      }
-
+    if (isStart == undefined) {
+      return
     }
 
-    return () => { 
+    if (isStart) {
+      startBackgroundLocation()
+      checkDateIsDifferent()
+    } else {
+      stopBackgroundLocation()
+      saveElapsedTime()
+      AsyncStorage.removeItem(StorageKey.KEY_START_TIME).then(() => clearInterval(loop))
+    }
+
+    return () => {
       clearInterval(loop.current)
       console.log('cleaning')
     }
   }, [isStart]))
-
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
     <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -242,7 +302,7 @@ const JobScreen = ({ navigation, route }) => {
       <Button
         title={translate(isStart ? 'stop' : 'start')}
         style={{ padding: 24, width: 180, alignSelf: 'center' }}
-        containerStyle={{width: 180, padding: 24, alignSelf: 'center'}}
+        containerStyle={{ width: 180, padding: 24, alignSelf: 'center' }}
         buttonStyle={{ borderRadius: 25, height: 50, backgroundColor: isStart ? 'red' : Colors.primarySecondary }}
         iconPosition={'left'}
         titleStyle={{ padding: 5 }}

@@ -84,19 +84,19 @@ const CrudReportScreen = ({ navigation, route }) => {
         console.log(formState)
         let imageIsValid = true
 
-        for(index in stickerLayoutData) {
-            const item  = stickerLayoutData[index]
+        for (index in stickerLayoutData) {
+            const item = stickerLayoutData[index]
             imageIsValid = !item.images.includes(" ")
         }
 
         if (formState.formIsValid && imageIsValid) {
-        setisloading(true)
-        postReport(formState.inputValues).then(response => {
-            reportId.current = response.report_id
-            makeImageQueue()
-        }).catch(err => {
-            // showDialog(err.message)
-        })
+            setisloading(true)
+            postReport(formState.inputValues).then(response => {
+                reportId.current = response.report_id
+                makeImageQueue()
+            }).catch(err => {
+                // showDialog(err.message)
+            })
         }
     }
 
@@ -156,23 +156,23 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const openGalleryPicker = async selectedPicker => {
-    if (Platform.OS == 'android'){
-      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
-      console.log(permission)
-      if (permission == RESULTS.BLOCKED) {
-          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-        return
-      }
+        if (Platform.OS == 'android') {
+            const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+            console.log(permission)
+            if (permission == RESULTS.BLOCKED) {
+                showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+                return
+            }
 
-      if (permission == RESULTS.DENIED) {
-        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
-        console.log(result)
-        if (result != RESULTS.GRANTED) {
-          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-        return
+            if (permission == RESULTS.DENIED) {
+                const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+                console.log(result)
+                if (result != RESULTS.GRANTED) {
+                    showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+                    return
+                }
+            }
         }
-      }
-    }
         const result = await launchImageLibrary({
             quality: 0.5,
             includeBase64: true,
@@ -182,22 +182,23 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const processResult = (result) => {
-        if (result) {
-            if (selectedPicker.location != 'odometer') {
-                const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
-                if (data.length == 1) {
-                    data[0].images[selectedPicker.index] = 'data:image/jpg;base64,' + result.assets[0].base64
-                    console.log('data', data)
-                    setStickerLayoutData([...stickerLayoutData])
-                }
-            } else {
-                dispatch({
-                    type: 'input',
-                    id: selectedPicker.id,
-                    input: 'data:image/jpg;base64,' + result.assets[0].base64,
-                    isValid: true,
-                });
+        if (result == null || result == undefined || result.assets == undefined) {
+            return
+        }
+        if (selectedPicker.location != 'odometer') {
+            const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
+            if (data.length == 1) {
+                data[0].images[selectedPicker.index] = 'data:image/jpg;base64,' + result.assets[0].base64
+                console.log('data', data)
+                setStickerLayoutData([...stickerLayoutData])
             }
+        } else {
+            dispatch({
+                type: 'input',
+                id: selectedPicker.id,
+                input: 'data:image/jpg;base64,' + result.assets[0].base64,
+                isValid: true,
+            });
         }
     }
 
@@ -267,7 +268,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                 placeholder={translate('report_detail_placeholder')}
                 dispatcher={dispatch}
                 value={formState.inputValues.desc}
-                containerStyle={{paddingBottom: 16}}
+                containerStyle={{ paddingBottom: 16 }}
                 disabled={!isAdd}
                 required
                 isCheck={formState.isChecked}
@@ -278,7 +279,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                     return <View style={{ marginBottom: 16 }}>
                         <LatoBold>{translate('report_string', { body: value.name })}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
                         <FlatList
-                            style={{zIndex: -99}}
+                            style={{ zIndex: -99 }}
                             scrollEnabled={false}
                             columnWrapperStyle={{ justifyContent: 'space-between' }}
                             data={value.images}
@@ -286,26 +287,26 @@ const CrudReportScreen = ({ navigation, route }) => {
                             renderItem={({ item, index }) => {
                                 return <ReportImage imageUri={item} navigation={navigation} title={value.name} onPress={() => openImagePicker(value.value, value.value, index)} />
                             }} />
-            {
-                 stickerLayoutData.filter(item =>  item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_image', {string: value.name})}</LatoBold>
-            }
+                        {
+                            stickerLayoutData.filter(item => item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ marginTop: 10 }}>{translate('error_image', { string: value.name })}</LatoBold>
+                        }
                     </View>
                 })
             }
 
             <LatoBold>{translate('odometer_photo')}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
 
-            <View style={{paddingBottom: 24}}>
+            <View style={{ paddingBottom: 24 }}>
 
-            <ReportImage 
-                imageUri={formState.inputValues.odometer} 
-                onPress={() => openImagePicker('odometer', 'odometer')} 
-                navigation={navigation} 
-                title={translate('odometer')} />
+                <ReportImage
+                    imageUri={formState.inputValues.odometer}
+                    onPress={() => openImagePicker('odometer', 'odometer')}
+                    navigation={navigation}
+                    title={translate('odometer')} />
 
             </View>
             {
-                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_odometer')}</LatoBold>
+                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ marginTop: 10 }}>{translate('error_odometer')}</LatoBold>
             }
 
             {
@@ -318,7 +319,7 @@ const CrudReportScreen = ({ navigation, route }) => {
 
         <CustomSheet ref={pickerSheet}>
             <View style={{ padding: 16 }}>
-                <LatoBold style={{marginBottom: 10}}>{translate('pick_photo')}</LatoBold>
+                <LatoBold style={{ marginBottom: 10 }}>{translate('pick_photo')}</LatoBold>
                 <TouchableOpacity onPress={() => setimagePickerId(0)}>
                     <LatoRegular Icon={IconCamera}>
                         {translate('pick_camera')}

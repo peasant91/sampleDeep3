@@ -25,6 +25,7 @@ import { getChartData, getReportList } from '../../../services/report'
 import ListReport from '../../../components/atoms/list/ListReport'
 import DistanceChart from '../../../components/atoms/DistanceChart'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useIsFocused } from '@react-navigation/native'
 
 const CurrentContractScreen = ({navigation, route}) => {
 
@@ -34,6 +35,8 @@ const CurrentContractScreen = ({navigation, route}) => {
 
     const [isLoading, setisLoading] = useState(true)
     const {id, isEmpty, isCurrent} = route.params
+
+    const isFocus = useIsFocused()
 
     const seeOffer = () => {
         navigation.navigate('Offer')
@@ -61,6 +64,8 @@ const CurrentContractScreen = ({navigation, route}) => {
     }
 
     useEffect(() => {
+        console.log(isFocus)
+        if (isFocus){
         if (id) {
             axios.all([
                 getReportList(id),
@@ -75,7 +80,9 @@ const CurrentContractScreen = ({navigation, route}) => {
                 showDialog(err.message)
             })
         }
-    }, [])
+
+        }
+    }, [isFocus])
     
 
     return <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
@@ -150,14 +157,16 @@ const CurrentContractScreen = ({navigation, route}) => {
                     </View>
 
 
-                    {
-                        chartData.length > 0 && <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            <DistanceChart data={chartData}/>
-                            <TouchableOpacity onPress={goToTripDetail}>
+                    
+                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <DistanceChart data={chartData}/> 
+                            {
+                            chartData.length > 0  && <TouchableOpacity onPress={goToTripDetail}>
                                 <LatoRegular style={{marginTop: 16, color: Colors.primarySecondary, fontSize: 10, textDecorationLine: 'underline'}}>{translate('see_detail')}</LatoRegular>
                             </TouchableOpacity>
+                            }
                         </View>
-                    }
+                    
 
                     { isCurrent &&
                     <View style={{paddingTop: 16}}>

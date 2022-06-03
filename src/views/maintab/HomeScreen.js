@@ -30,6 +30,7 @@ import IconArrow from '../../assets/images/ic_arrow_right_white.svg';
 import IconActiveContract from '../../assets/images/ic_home_active_contract.svg';
 import IconReport from '../../assets/images/ic_home_report.svg';
 import IconCarEmpty from '../../assets/images/ic_car_empty.svg';
+import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.svg';
 
 
 
@@ -215,7 +216,11 @@ const HomeScreen = ({ navigation, route }) => {
 
               <View style={{ flexDirection: 'row' }}>
 
-                <Image source={{ uri: getFullLink(profileData.profile_image) }} style={styles.topImage} />
+                {
+                  profileData.profile_image ?
+                  <Image source={{ uri: getFullLink(profileData.profile_image) }} style={styles.topImage} /> :
+                  <IconProfilePlaceholder width={50} height={50}/>
+                }
 
                 <View style={{ marginLeft: 16, justifyContent: 'space-between', paddingVertical: 4 }}>
 

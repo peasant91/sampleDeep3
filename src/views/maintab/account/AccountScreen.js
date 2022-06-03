@@ -22,7 +22,7 @@ import { AuthContext } from '../../../../App';
 import { showDialog } from '../../../actions/commonActions';
 import { getProfile } from '../../../services/user';
 import { getDriverVehicle, getVehicleRoute } from '../../../services/utilities';
-import { isEmpty } from '../../../actions/helper';
+import { isEmpty, openWhatsapp } from '../../../actions/helper';
 import axios from 'axios';
 import { ShimmerPlaceholder } from '../../../components/atoms/shimmer/Shimmer';
 import { getHome } from '../../../services/home';
@@ -204,6 +204,7 @@ const AccountScreen = ({navigation, route}) => {
               Icon={IconContactUs}
               text={translate('contact_us')}
               containerStyle={{marginTop: 16}}
+              onPress={openWhatsapp}
             />
 
           </View>

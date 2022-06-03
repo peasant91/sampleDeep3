@@ -7,6 +7,9 @@ import openMap from 'react-native-open-maps'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageKey from "../constants/StorageKey";
 import Realm from 'realm'
+import messaging, { firebase } from '@react-native-firebase/messaging';
+import { Linking, Platform } from "react-native";
+import RNFetchBlob from "rn-fetch-blob";
 
 export const getCurrentWeek = () => {
   currentdate = new Date();
@@ -125,7 +128,7 @@ export const average = (array) => array.reduce((a, b) => a + b) / array.length;
 export const sum = (array) => array.reduce((a, b) => a + b);
 
  //This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
- export function calcDistance(lat1, lon1, lat2, lon2) 
+ export const calcDistance = (lat1, lon1, lat2, lon2) =>
  {
    var R = 6371; // km
    var dLat = toRad(lat2-lat1);
@@ -141,7 +144,67 @@ export const sum = (array) => array.reduce((a, b) => a + b);
  }
 
  // Converts numeric degrees to radians
- function toRad(Value) 
+ const toRad = (Value)  =>
  {
      return Value * Math.PI / 180;
  }
+
+ export const openWhatsapp = () => {
+  let phoneWithCountryCode = Constant.PHONE_NUMBER
+
+  let mobile = Platform.OS == 'ios' ? phoneWithCountryCode : '+' + phoneWithCountryCode;
+  if (mobile) {
+      let url = 'whatsapp://send?phone=' + mobile;
+      Linking.openURL(url).then(() => {
+        console.log('WhatsApp Opened');
+      }).catch(() => {
+        if (Platform.OS == 'android') {
+          Linking.openURL(`market://details?id=${Constant.PACKAGE_ID}`)
+          return
+        }
+
+        alert('Make sure WhatsApp installed on your device');
+      });
+  } else {
+    alert('Please insert mobile no');
+  }
+}
+
+ export const getFirebaseToken = new Promise(async (reject, resolve) => {
+    const authStatus = await messaging().requestPermission();
+    const fMessagging = firebase.messaging()
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+      fMessagging.getToken().then(token => {
+        AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token)
+        resolve(token)
+      }).catch(err => {
+        reject(err.message)
+      })
+    }
+ })
+
+ export const getImageBase64FromUrl = (url) => new Promise((resolve, reject) => {
+  let imagePath = null;
+  RNFetchBlob.config({
+    fileCache: true,
+  })
+    .fetch("GET", url)
+    // the image is now dowloaded to device's storage
+    .then(response => {
+      // the image path you can use it directly with Image component
+      return response.readFile("base64");
+    })
+    .then(base64Data => {
+      // here's base64 encoded image
+      console.log(base64Data);
+      resolve(base64Data)
+      // remove the file from storage
+    }).catch(err => {
+      reject(err)
+    })
+ })

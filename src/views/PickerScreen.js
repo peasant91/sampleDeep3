@@ -68,7 +68,7 @@ const PickerScreen = ({ navigation, route }) => {
         }}
       />}
 
-      {pickerId == 'village_id' && 
+      {pickerId == 'village_id' && filteredData.length > 0 &&
       <View
         style={{flex: 0 , flexGrow: 100,}}>
           <View style={{flexDirection: 'row', backgroundColor: selectedId == manualInputId ? '#EEEEFF' : 'white', alignItems: 'center'}}>
@@ -82,6 +82,7 @@ const PickerScreen = ({ navigation, route }) => {
           </View>
         </View>}
       </View>
+
     </SafeAreaView>
   );
 };

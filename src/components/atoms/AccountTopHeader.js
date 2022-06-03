@@ -5,6 +5,8 @@ import { LatoRegular } from './CustomText';
 
 import IconVerified from '../../assets/images/ic_home_verified.svg';
 import IconLock from '../../assets/images/ic_lock.svg';
+import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.svg';
+
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
 import { getFullLink, isEmpty } from '../../actions/helper';
@@ -24,10 +26,13 @@ const AccountTopHeader = ({ data, isLoading }) => {
 
       {!isLoading ?
         <View style={{flexDirection: 'row', zIndex: 999, elevation: 10}}>
-          <Avatar 
+          {
+            data.profile_image ? <Avatar 
             rounded
             size={'medium'}
-            source={{ uri: getFullLink(data.profile_image) }} />
+            source={{ uri: getFullLink(data.profile_image) }} /> : 
+            <IconProfilePlaceholder height={50} width={50}/>
+          }
           <View
             style={{
               marginLeft: 10,

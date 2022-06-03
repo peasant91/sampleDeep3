@@ -8,7 +8,7 @@ const SingleWebScreen = ({navigation, route}) => {
   const [isLoading, setisLoading] = useState(true);
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'white', opacity: 0.99}}>
       <NavBar navigation={navigation} shadowEnabled={true} />
       {isLoading && (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -16,7 +16,7 @@ const SingleWebScreen = ({navigation, route}) => {
         </View>
       )}
       <WebView
-        style={{display: isLoading ? 'none' : 'flex'}}
+        style={{display: 'flex',  opacity: isLoading ? 0 : 1, overflow: 'hidden'}}
         source={{uri: url}}
         onLoadEnd={() => setisLoading(false)}></WebView>
     </SafeAreaView>
@@ -24,3 +24,4 @@ const SingleWebScreen = ({navigation, route}) => {
 };
 
 export default SingleWebScreen;
+ 

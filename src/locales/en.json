@@ -88,7 +88,7 @@
     "register_form_desc" : "Silahkan Isi Data diri Anda dengan lengkap.",
 
     "back_to_login": "Kembali ke Login",
-    "back_to_home": "Kembali ke Beranda",
+    "back_to_home": "Kembali ke Beranda",   
 
     "my_profile": "Profilku",
     "change_password": "Ganti Kata Sandi",
@@ -97,6 +97,7 @@
     "must_not_empty": "%{s} tidak boleh kosong.",
     "retry": "Coba Lagi",
     "cancel": "Batalkan",
+    "cancel_short": "Batal",
     "invalid_phone": "Nomor telepon tidak valid",
     "invalid_email": "Email tidak valid",
     "password_not_match": "Kata Sandi tidak sama",
@@ -280,6 +281,9 @@
     "password_min": "Kata Sandi tidak boleh kurang dari %{min} karakter",
     "password_max": "Kata Sandi tidak boleh lebih dari %{max} karakter",
     "work": "Pekerjaan",
+
+    "edit_confirm_title": "Yakin ingin kembali?",
+    "edit_confirm_desc": "Data Anda tidak akan tersimpan jika Anda kembali ke halaman sebelumnya."
     
 
 

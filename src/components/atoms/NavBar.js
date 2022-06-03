@@ -6,7 +6,7 @@ import {StyleSheet} from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
 import Colors from '../../constants/Colors';
 
-const NavBar = ({navigation, title, style, shadowEnabled, RightView}) => {
+const NavBar = ({navigation, title, style, shadowEnabled, RightView, onBackPress}) => {
   return (
     <Shadow distance={10} startColor={shadowEnabled ? Colors.divider : 'white'} offset={[0,5]}>
 
@@ -15,7 +15,7 @@ const NavBar = ({navigation, title, style, shadowEnabled, RightView}) => {
         {flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'white', width: '100%', zIndex: 0},
         style, shadowEnabled ? styles.bottomShadow : null
       ]}>
-      <TouchableOpacity style={{flex: 1}} onPress={() => navigation.pop()}>
+      <TouchableOpacity style={{flex: 1}} onPress={ !onBackPress ? () => navigation.pop() : () => onBackPress()}>
         <BackButton />
       </TouchableOpacity>
       {title ? (

@@ -87,6 +87,7 @@ const RegisterScreen = ({navigation, route}) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [openDate, setopenDate] = useState(false);
+  const [isEdited, setisEdited] = useState(false)
 
   const { isEdit, data} = route.params
 
@@ -110,8 +111,9 @@ const RegisterScreen = ({navigation, route}) => {
       ktp_image: isEdit,
       ktp: isEdit,
       sim_a: isEdit,
-      sim_a_image: isEdit
-
+      sim_a_image: isEdit,
+      sim_b: formStateCard?.inputValues?.sim_b_image?.length <= 0,
+      sim_b_image: formStateCard?.inputValues?.sim_b?.length <= 0
     },
     formIsValid: isEdit,
   });
@@ -134,18 +136,35 @@ const RegisterScreen = ({navigation, route}) => {
     isChecked: false,
   });
 
+
+  const showBackPrompt = () => {
+    if (isEdited) {
+      showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
+      return
+    } 
+
+    navigation.pop()
+  }
+
+  const checkEdited = () => {
+    if (isEdit && !isEdited) {
+      setisEdited(true)
+    }
+  }
+
   const doRegister = () => {
     dispatch({
       type: 'check',
     });
 
-    console.log(formState.formIsValid ,formStateCard.formIsValid , formStateDetail.formIsValid , formStateAddress.formIsValid ,formStateBank.formIsValid);
-
-    if (formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null)) {
-
+    if (isAllFormValid()) {
       buildForm(formState)
     }
   };
+
+  const isAllFormValid = () => {
+    return formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null) 
+  }
 
   //translate form into input state if edit profile
   const translateForm = () => {
@@ -166,6 +185,7 @@ const RegisterScreen = ({navigation, route}) => {
         birth_date: data.birth_date,
         driver_company_id: data.driver_company?.id,
         driver_company_id_value: data.driver_company?.name,
+        profile_image: data.profile_image,
         profile_image_uri: data.profile_image,
         gender: data.gender
       },
@@ -330,16 +350,11 @@ const RegisterScreen = ({navigation, route}) => {
 
   const deleteImage = selectedPicker => {
     selectedPicker.dispatch({
-          type: 'input',
+          type: 'image',
           id: selectedPicker.id,
           input: undefined,
-          isValid: false,
-    })
-    selectedPicker.dispatch({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: undefined,
-          isValid: false,
+          uri: undefined,
+          isValid: selectedPicker.id == 'profile_image' ? true : false,
     })
   }
 
@@ -349,9 +364,7 @@ const RegisterScreen = ({navigation, route}) => {
       includeBase64: true,
       mediaType: 'photo',
     }, (result) => {
-    if (result) {
-      saveImageResult(result)
-    }
+      processResult(result)
     })
 
   };
@@ -379,12 +392,15 @@ const RegisterScreen = ({navigation, route}) => {
       includeBase64: true,
       mediaType: 'photo', 
     });
-    if (result) {
-      saveImageResult(result)
-    }
+    processResult(result)
   };
 
-  const saveImageResult = (result) => {
+  const processResult = (result) => {
+    if (result == null || result == undefined || result.assets == undefined) {
+      return
+    }
+
+    console.log('result image', result)
       selectedPicker.dispatch({
           type: 'input',
           id: selectedPicker.id,
@@ -578,6 +594,11 @@ const RegisterScreen = ({navigation, route}) => {
     }
   }, [cityData, districtData, villageData]);
 
+  useEffect(() => {
+    if (isEdit && !preloading )
+    checkEdited()
+  },[formState, formStateDetail, formStateAddress, formStateCard, formStateBank])
+
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
@@ -586,6 +607,7 @@ const RegisterScreen = ({navigation, route}) => {
         navigation={navigation}
         title={isEdit ? translate('edit_profile') : translate('register_form')}
         shadowEnabled={true}
+        onBackPress={showBackPrompt}
       />
       <KeyboardAvoidingView
         style={{flex: 1, zIndex: -1}}
@@ -881,6 +903,7 @@ const RegisterScreen = ({navigation, route}) => {
               dispatcher={dispatchCard}
               keyboardType={'number-pad'}
               isCheck={formState.isChecked}
+              required={formStateCard.inputValues.sim_b_image?.length > 0}
             />
 
             <IDCard
@@ -888,6 +911,8 @@ const RegisterScreen = ({navigation, route}) => {
               title={translate('sim_b')}
               onPress={() => openImagePicker('sim_b_image', 'card', dispatchCard)}
               imageUri={formStateCard.inputValues.sim_b_image_uri}
+              isCheck={formState.isChecked}
+              required={formStateCard.inputValues.sim_b?.length > 0}
             />
 
             <CustomButton
@@ -897,6 +922,7 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={doRegister}
               isLoading={isLoading}
             />
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
