@@ -23,6 +23,7 @@ import { makeMutable } from 'react-native-reanimated'
 import { useFocusEffect } from '@react-navigation/native'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 import { reject } from 'lodash'
+import RNAndroidLocationEnabler from 'react-native-android-location-enabler'
 
 
 const JobScreen = ({ navigation, route }) => {
@@ -46,7 +47,7 @@ const JobScreen = ({ navigation, route }) => {
     AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
 
     if (!isStart) {
-      checkBackroundLocation()
+      checkGpsEnable()
     } else {
       setisStart(!isStart)
     }
@@ -80,6 +81,17 @@ const JobScreen = ({ navigation, route }) => {
 
     setisStart(true)
 
+  }
+
+  const checkGpsEnable = () => {
+    RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({
+      interval: 10000,
+      fastInterval: 5000,
+    }).then(data => {
+      checkBackroundLocation()
+    }).catch(err => {
+
+    }) 
   }
 
   const showOpenSetting = () => {

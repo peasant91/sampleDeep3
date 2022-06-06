@@ -53,7 +53,7 @@ import {getCity, getDistrict, getProvince, getVillage} from '../../services/util
 import moment from 'moment';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
-import { getFullLink } from '../../actions/helper';
+import { getFullLink, getImageBase64FromUrl } from '../../actions/helper';
 import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
@@ -163,11 +163,12 @@ const RegisterScreen = ({navigation, route}) => {
   };
 
   const isAllFormValid = () => {
+    console.log(formState.formIsValid, formStateCard.formIsValid)
     return formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null) 
   }
 
   //translate form into input state if edit profile
-  const translateForm = () => {
+  const translateForm = async () => {
     console.log('translateForm', data.city.id)
     const state = {
       inputValues:
@@ -185,7 +186,7 @@ const RegisterScreen = ({navigation, route}) => {
         birth_date: data.birth_date,
         driver_company_id: data.driver_company?.id,
         driver_company_id_value: data.driver_company?.name,
-        profile_image: data.profile_image,
+        profile_image: await getImageBase64FromUrl(getFullLink(data.profile_image)),
         profile_image_uri: data.profile_image,
         gender: data.gender
       },
@@ -213,7 +214,9 @@ const RegisterScreen = ({navigation, route}) => {
         ktp: data.ktp.number,
         ktp_image_uri: data.ktp.image,
         sim_a: data.sim_a.number,
-        sim_a_image_uri: data.sim_a.image
+        sim_a_image_uri: data.sim_a.image,
+        sim_b: data.sim_b?.number,
+        sim_b_image_uri: data.sim_b?.image
       },
       formIsValid: true
     }
@@ -244,14 +247,15 @@ const RegisterScreen = ({navigation, route}) => {
   }
 
   const buildCardForm = () => {
+    console.log('cardform', formStateCard.inputValues)
     var card = []
     for (item in Config.cardList) {
-      if (formStateCard.inputValues[Config.cardList[item]]) {
+      if (formStateCard.inputValues[Config.cardList[item]] || formStateCard.inputValues[Config.cardList[item]] == '') {
         // console.log('push', Config.cardList[item])
       card.push({
         type: Config.cardList[item],
-        number: formStateCard.inputValues[Config.cardList[item]],
-        image: formStateCard.inputValues[`${Config.cardList[item]}_image`]
+        number: formStateCard.inputValues[Config.cardList[item]] ?? null,
+        image: formStateCard.inputValues[`${Config.cardList[item]}_image`] ?? null
       })
       }
     }
@@ -349,12 +353,13 @@ const RegisterScreen = ({navigation, route}) => {
   }, [imagePickerId]);
 
   const deleteImage = selectedPicker => {
+    console.log(selectedPicker.id)
     selectedPicker.dispatch({
           type: 'image',
           id: selectedPicker.id,
-          input: undefined,
+          input: null,
           uri: undefined,
-          isValid: selectedPicker.id == 'profile_image' ? true : false,
+          isValid: selectedPicker.id == 'profile_image' || selectedPicker.id == 'sim_b_image' ? true : false,
     })
   }
 
@@ -404,7 +409,7 @@ const RegisterScreen = ({navigation, route}) => {
       selectedPicker.dispatch({
           type: 'input',
           id: selectedPicker.id,
-          input: result.assets[0].base64,
+          input: 'data:image/png;base64,' + result.assets[0].base64,
           isValid: true,
       })
       selectedPicker.dispatch({
@@ -430,13 +435,13 @@ const RegisterScreen = ({navigation, route}) => {
     if (selectedPicker) {
       if (selectedPicker.location == 'card') {
         return (
-          formStateCard.inputValues[selectedPicker.id] == '' ||
-          formStateCard.inputValues[selectedPicker.id] == undefined
+          formStateCard.inputValues[selectedPicker.id + '_uri'] == '' ||
+          formStateCard.inputValues[selectedPicker.id + '_uri'] == undefined
         );
       } else {
         return (
-          formStateDetail.inputValues[selectedPicker.id] == '' ||
-          formStateDetail.inputValues[selectedPicker.id] == undefined
+          formStateDetail.inputValues[selectedPicker.id + '_uri'] == '' ||
+          formStateDetail.inputValues[selectedPicker.id + '_uri'] == undefined
         );
       }
     } else {
@@ -630,7 +635,7 @@ const RegisterScreen = ({navigation, route}) => {
                 {formStateDetail.inputValues.profile_image_uri ? (
                   <Image
                     source={{
-                      uri: formStateDetail.inputValues.profile_image ? formStateDetail.inputValues.profile_image_uri : getFullLink(formStateDetail.inputValues.profile_image_uri),
+                      uri: formStateDetail.inputValues.profile_image ? formStateDetail.inputValues.profile_image : getFullLink(formStateDetail.inputValues.profile_image_uri),
                     }}
                     style={{width: 80, height: 80, borderRadius: 50, resizeMode: 'cover'}}
                   />

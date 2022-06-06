@@ -42,7 +42,6 @@ import RegisterScreen from './src/views/membership/RegisterScreen';
 import RegisterPasswordScreen from './src/views/membership/RegisterPasswordScreen';
 import ForgotPasswordScreen from './src/views/membership/ForgotPasswordScreen';
 import SuccessScreen from './src/views/SuccessScreen';
-import MyProfileScreen from './src/views/MyProfileScreen';
 import ChangePasswordScreen from './src/views/membership/ChangePasswordScreen';
 import SingleWebScreen from './src/views/SingleWebScreen';
 import PickerScreen from './src/views/PickerScreen';
@@ -242,7 +241,7 @@ const App = ({ navigation, route }) => {
         'Notification caused app to open from background state:',
         remoteMessage.notification,
       );
-      RootNavigation.navigate('NewsDetail', {
+      RootNavigation.navigate('Home', {
         data: { id: remoteMessage.data.news_id },
       });
 
@@ -457,11 +456,6 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false }}
                     />
 
-                    <Stack.Screen
-                      name="MyProfile"
-                      component={MyProfileScreen}
-                      options={{ headerShown: false, animationEnabled: enableAnimation }}
-                    />
 
                     <Stack.Screen
                       name="OfferDetail"

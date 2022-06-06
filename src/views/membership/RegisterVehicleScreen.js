@@ -273,20 +273,10 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     }
   }
 
-  const translateEditForm = (form) => {
+  const translateEditForm = async (form) => {
     console.log('stickerArea', form.detail.sticker_area)
 
     const isFullBody = form.detail.sticker_area.includes(StickerType[0].id)
-
-    for (index in form.images) {
-      console.log('imagesbro', images)
-      const imageUrl = form.images[index]
-      getImageBase64FromUrl(getFullLink(imageUrl)).then(base64 => {
-        const image = images
-        image[index] = base64
-        setimages([...image])
-      })
-    }
 
     const formStateDetail = {
       inputValues: {
@@ -348,6 +338,15 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       state: formState
     })
 
+    var image = images
+
+    for (index in form.images) {
+      const imageUrl = form.images[index]
+      const base64 = await getImageBase64FromUrl(getFullLink(imageUrl))
+      image[index] = base64
+      setimages([...image])
+      console.log('imagenyajing', image)
+    }
     // if (!isFullBody) {
     //   setstickerArea(form.detail.sticker_area)
     // }

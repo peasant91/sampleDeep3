@@ -190,30 +190,30 @@ const SplashScreen = ({ navigation, route }) => {
       })
     } else {
       const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-        console.log('result fine', result)
+      console.log('result fine', result)
+      if (result == RESULTS.DENIED) {
+        showLocationAlwaysDialog(() => {
+          requestAndroidLocationPermission()
+        })
+        return
+      }
+
+      if (Platform.Version >= 29) {
+        const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
+        console.log('result background', result)
         if (result == RESULTS.DENIED) {
-          showLocationAlwaysDialog(() => {
-            requestAndroidLocationPermission()
-          })
+          requestAndroidLocationPermission()
           return
-        } 
-
-        if (Platform.Version >= 29) {
-            const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
-            console.log('result background', result)
-              if (result == RESULTS.DENIED) {
-                  requestAndroidLocationPermission()
-                return
-              }
-
-              if (result == RESULTS.BLOCKED) {
-              showOpenSetting()
-              return
-              }
         }
-        
-        getFirebaseToken()
-      
+
+        if (result == RESULTS.BLOCKED) {
+          showOpenSetting()
+          return
+        }
+      }
+
+      getFirebaseToken()
+
     }
   }
 
@@ -221,11 +221,14 @@ const SplashScreen = ({ navigation, route }) => {
     try {
       const response = await checkAppVersion(appVersion);
       const token = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
-      if (response.need_update === true) {
-        showUpdateAlert(response);
-      } else {
-        requestBackgroundPermission()
+      if (response) {
+        if (response.need_update === true) {
+          showUpdateAlert(response);
+        } else {
+          requestBackgroundPermission()
+        }
       }
+
     } catch (err) {
       showDialog(
         err.message,
