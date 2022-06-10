@@ -151,6 +151,7 @@ const App = ({ navigation, route }) => {
       signIn: async data => {
         console.log('dispatch login');
         try {
+          console.log('uid', uid)
           const uid = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
           if (Config.isMockDesign) {
             dispatch({ type: 'SIGN_IN', token: "mock" });
@@ -403,7 +404,7 @@ const App = ({ navigation, route }) => {
                     />
 
                     <Stack.Screen
-                      name="RegisterVehicle"
+                      name="RegisterVehicleMain"
                       component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
                     />

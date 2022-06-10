@@ -6,6 +6,7 @@ import { showDialog } from '../../../actions/commonActions'
 import BlueHeader from '../../../components/atoms/BlueHeader'
 import { LatoRegular } from '../../../components/atoms/CustomText'
 import Divider from '../../../components/atoms/Divider'
+import EmptyContract from '../../../components/atoms/EmptyContract'
 import NavBar from '../../../components/atoms/NavBar'
 import PeriodStrip from '../../../components/atoms/PeriodStrip'
 import { ShimmerTripDetail } from '../../../components/atoms/shimmer/Shimmer'
@@ -27,7 +28,9 @@ const TripDetailScreen = ({ navigation, route }) => {
         getTripDetail(id).then(response => {
             setdata(response.reverse())
             setSelectedIndex(0)
-            setChildrenData([...response[0].trips])
+            if (response[0]){
+                setChildrenData([...response[0].trips])
+            }
             setisLoading(false)
         }).catch(err => {
             showDialog(err.message)
@@ -45,7 +48,7 @@ const TripDetailScreen = ({ navigation, route }) => {
 
     return <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
         <NavBar navigation={navigation} title={translate('trip_detail')} />
-        {isLoading ? <ShimmerTripDetail/> : 
+        {isLoading ? <ShimmerTripDetail/> : (data.length <= 0 ? <EmptyContract desc={translate('empty_trip')}/> :
         <View>
             <BlueHeader title={data[selectedIndex]?.period.split(' ')[0]} sub={data[selectedIndex]?.period?.split(' ')[1]} />
             <View style={{ width: '100%', backgroundColor: Colors.lightPrimary, height: 50 }}>
@@ -72,7 +75,7 @@ const TripDetailScreen = ({ navigation, route }) => {
                     </View>
                 }}
             />
-        </View>}
+        </View>)}
     </SafeAreaView>
 
 }

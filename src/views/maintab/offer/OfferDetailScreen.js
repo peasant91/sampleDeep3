@@ -98,8 +98,7 @@ const OfferDetailScreen = ({ navigation, route }) => {
 
             {isLoading ?
                 <ShimmerOfferDetail containerStyle={{padding: 16}}/>
-
-                :
+                : 
 
                 <View>
                     <View style={{ flexDirection: 'row', padding: 16 }}>

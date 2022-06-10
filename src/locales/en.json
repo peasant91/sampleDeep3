@@ -20,7 +20,7 @@
     "notification": "Notifikasi",
     "change_password_success": "Ganti Kata Sandi Berhasil.",
     "see_report": "Lihat Report",
-    
+    "empty_trip": "Anda belum pernah melakukan perjalanan.",
     "network_error": "Tidak dapat terhubung, Mohon periksa Koneksi",
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",
@@ -198,7 +198,7 @@
     "manual_input" : "Input Manual",
     "add_manual_input": "+Input Manual",
     "sticker_area_placeholder": "cth: Full Body",
-
+    "press_again": "Tekan sekali lagi untuk keluar",
     "contract_end":"Selesai Kontrak",
     "installation_time_title": "Lokasi & Waktu Pemasangan",
     "company_detail": "Detail Perusahaan",

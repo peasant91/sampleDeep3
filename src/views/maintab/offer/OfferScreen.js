@@ -100,7 +100,6 @@ const OfferScreen = ({ navigation, route }) => {
     [],
   )
 
-
   useEffect(() => {
     if (isFocused) {
       searchText.current = search

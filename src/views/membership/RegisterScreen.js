@@ -113,7 +113,7 @@ const RegisterScreen = ({navigation, route}) => {
       sim_a: isEdit,
       sim_a_image: isEdit,
       sim_b: formStateCard?.inputValues?.sim_b_image?.length <= 0,
-      sim_b_image: formStateCard?.inputValues?.sim_b?.length <= 0
+      sim_b_image: formStateCard?.inputValues?.sim_b?.length == undefined || formStateCard?.inputValues?.sim_b?.length <= 0
     },
     formIsValid: isEdit,
   });
@@ -163,7 +163,7 @@ const RegisterScreen = ({navigation, route}) => {
   };
 
   const isAllFormValid = () => {
-    console.log(formState.formIsValid, formStateCard.formIsValid)
+    console.log(formState.formIsValid, formStateCard.inputValidities, formStateCard?.inputValues?.sim_b?.length)
     return formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null) 
   }
 
@@ -393,7 +393,9 @@ const RegisterScreen = ({navigation, route}) => {
       }
     }
     const result = await launchImageLibrary({
-      quality: 0.5,
+      quality: 0.4,
+      maxWidth: 1024,
+      maxHeight: 768,
       includeBase64: true,
       mediaType: 'photo', 
     });

@@ -33,7 +33,6 @@ const JobScreen = ({ navigation, route }) => {
   const [distance, setDistance] = useState('00')
   const [isStart, setisStart] = useState()
   const loop = useRef()
-  const lastSentTime = useRef()
 
   const currentPosition = useRef({
     latitude: 0,
@@ -98,7 +97,7 @@ const JobScreen = ({ navigation, route }) => {
     showDialog(translate('please_allow_location_always'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
   }
 
-  const reset = async () => {
+  const reset = () => new Promise(async (resolve, reject) => {
     settime(['00', '00', '00'])
     setSpeed('00')
     setDistance('00')
@@ -113,8 +112,10 @@ const JobScreen = ({ navigation, route }) => {
     )
 
     realm.write(() => realm.deleteAll())
-
-  }
+    await AsyncStorage.removeItem(StorageKey.KEY_START_TIME)
+    await AsyncStorage.removeItem(StorageKey.KEY_ELAPSED_TIME)
+    resolve(true)
+  })
 
   const onLocationChange = async () => {
 
@@ -170,7 +171,7 @@ const JobScreen = ({ navigation, route }) => {
     resolve(diff)
   })
 
-  //if date is different on start reset the time
+  //if date is different on last start date reset the time
   const checkDateIsDifferent = async () => {
     const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
     console.log('previous', previousDate)
@@ -178,7 +179,7 @@ const JobScreen = ({ navigation, route }) => {
       const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
       console.log('iscurrent', isCurrentDate)
       if (!isCurrentDate) {
-        reset()
+        await reset()
       }
     }
 
@@ -196,6 +197,7 @@ const JobScreen = ({ navigation, route }) => {
       startTimer(startTime)
       return
     }
+    
     AsyncStorage.setItem(StorageKey.KEY_START_TIME, Date()).then(startTimer(Date()))
   }
 
@@ -229,19 +231,19 @@ const JobScreen = ({ navigation, route }) => {
   useFocusEffect(useCallback(() => {
     AsyncStorage.getItem(StorageKey.KEY_DO_JOB).then(job => {
       const isDoingJob = JSON.parse(job)
-      if (isDoingJob) {
-        setisStart(isDoingJob)
-      } else {
+
+      if (!isDoingJob) {
         getLastElapsedSecond().then(second => {
           showFormattedElapsedTime(second)
         })
-        setisStart(false)
       }
+      
+      setisStart(isDoingJob)
     })
 
     onLocationChange()
 
-    const background = BackgroundGeolocation.on('location', (location) => {
+    BackgroundGeolocation.on('location', (location) => {
       onLocationChange()
     })
 
