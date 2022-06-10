@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useReducer, useState, useEffect } from 'react'
 import { SafeAreaView, ScrollView } from 'react-native'
-import { showDialog } from '../../../actions/commonActions'
+import { showDialog,dismissDialog } from '../../../actions/commonActions'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomInput, { PickerInput } from '../../../components/atoms/CustomInput'
 import NavBar from '../../../components/atoms/NavBar'
@@ -15,6 +15,8 @@ const BankScreen = ({ navigation, route }) => {
 
     const { isReadOnly, prevData } = route.params
     const [bankData, setbankData] = useState()
+    const [isEdited, setisEdited] = useState(false)
+    const [preloading, setpreloading] = useState(true)
 
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {
@@ -25,6 +27,27 @@ const BankScreen = ({ navigation, route }) => {
         formIsValid: true,
         isChecked: false
     })
+
+    const showBackPrompt = () => {
+        if (isEdited) {
+            showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
+            return
+        } 
+
+        navigation.pop()
+    }
+
+    const checkEdited = () => {
+        if (!isEdited) {
+            setisEdited(true)
+        }
+    }
+
+    useEffect(()=>{
+        if (!preloading){
+            checkEdited()
+        }
+    },[formState])
 
     const updateBankAPI = () => {
         dispatch({
@@ -64,6 +87,7 @@ const BankScreen = ({ navigation, route }) => {
                 input: JSON.parse(data).filter(item => item.short_name == prevData?.bank_name)[0].id,
                 isValid: true
             })
+            setpreloading(false)
         }).catch(err => {
             showDialog(err.message)
         })
@@ -79,13 +103,14 @@ const BankScreen = ({ navigation, route }) => {
           desc: route.params.name,
           isValid: true,
             })
+            setpreloading(false)
         }
     }, [route.params])
     
 
     return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
 
-        <NavBar title={translate('bank_account')} navigation={navigation} />
+        <NavBar title={translate('bank_account')} navigation={navigation} onBackPress={showBackPrompt} />
 
         <ScrollView style={{ padding: 16 }}>
 

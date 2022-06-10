@@ -306,7 +306,7 @@ const CrudReportScreen = ({ navigation, route }) => {
 
             </View>
             {
-                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ marginTop: 10 }}>{translate('error_odometer')}</LatoBold>
+                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ paddingBottom: 10 }}>{translate('error_odometer')}</LatoBold>
             }
 
             {

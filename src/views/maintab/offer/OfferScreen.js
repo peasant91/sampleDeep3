@@ -59,6 +59,7 @@ const OfferScreen = ({ navigation, route }) => {
     }
 
     if (canLoadData.current) {
+      console.log("page current",page.current);
     getCampaignList({
       page: page.current,
       search: searchText.current
@@ -152,7 +153,7 @@ const OfferScreen = ({ navigation, route }) => {
             style={{backgroundColor: '#FAFAFA'}}
             data={data}
             contentContainerStyle={{ paddingBottom: 16, overflow: 'visible' }}
-            keyExtractor={item => item.id}
+            keyExtractor={(item,index) => `key ${index}-${item.id}`}
             onEndReachedThreshold={0.2}
             onEndReached={getCampaignListApi}
             renderItem={({ item, index }) => {
