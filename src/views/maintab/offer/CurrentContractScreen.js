@@ -159,12 +159,12 @@ const CurrentContractScreen = ({navigation, route}) => {
 
                     
                         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                            <DistanceChart data={chartData}/> 
-                            {
-                            chartData.length > 0  && <TouchableOpacity onPress={goToTripDetail}>
+                            <View style={{marginLeft: -30}}>
+                                <DistanceChart data={chartData}/> 
+                            </View>
+                            <TouchableOpacity onPress={goToTripDetail}>
                                 <LatoRegular style={{marginTop: 16, color: Colors.primarySecondary, fontSize: 10, textDecorationLine: 'underline'}}>{translate('see_detail')}</LatoRegular>
                             </TouchableOpacity>
-                            }
                         </View>
                     
 

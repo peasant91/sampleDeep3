@@ -36,7 +36,8 @@ const DistanceChart = ({data}) => {
       color: (opacity = 1) => Colors.greyDark,
       labelColor: (opacity = 1) => Colors.secondary,
       style: {
-          paddingTop: 20
+          paddingTop: 20,
+          marginLeft: -20
       },
       paddingTop: 20,
       paddingRight: 20,

@@ -200,6 +200,8 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     }
     const result = await launchImageLibrary({
       quality: 0.5,
+      maxWidth: 1024,
+      maxHeight: 768,
       includeBase64: true,
       mediaType: 'photo',
     });
@@ -341,12 +343,14 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     var image = images
 
     for (index in form.images) {
+      setisPreloading(true)
       const imageUrl = form.images[index]
       const base64 = await getImageBase64FromUrl(getFullLink(imageUrl))
       image[index] = base64
       setimages([...image])
-      console.log('imagenyajing', image)
     }
+
+    setisPreloading(false)
     // if (!isFullBody) {
     //   setstickerArea(form.detail.sticker_area)
     // }

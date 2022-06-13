@@ -28,8 +28,6 @@ import IconVerified from '../../assets/images/ic_home_verified.svg';
 import IconCar from '../../assets/images/ic_home_car.svg';
 import IconArrow from '../../assets/images/ic_arrow_right_white.svg';
 import IconActiveContract from '../../assets/images/ic_home_active_contract.svg';
-import IconReport from '../../assets/images/ic_home_report.svg';
-import IconCarEmpty from '../../assets/images/ic_car_empty.svg';
 import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.svg';
 
 
@@ -53,6 +51,7 @@ import axios from 'axios';
 import ErrorNotRegisterVehicle from '../../components/atoms/ErrorNotRegisterVehicle';
 import { getChartData } from '../../services/report';
 import { getNotification } from '../../services/notification';
+import { useToast } from "react-native-toast-notifications";
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -71,6 +70,7 @@ const HomeScreen = ({ navigation, route }) => {
   const [profileData, setprofileData] = useState({})
   const [chartData, setChartData] = useState([])
 
+  const toast = useToast();
 
   const data = {
     imageUrl:
@@ -281,8 +281,8 @@ const HomeScreen = ({ navigation, route }) => {
                         <View style={{ padding: 16 }}>
                           <CardContract data={homeData.active_contract} onPress={goToContractDetail} />
                           <LatoBold Icon={IconActiveContract} style={{ color: Colors.primary }} containerStyle={{ paddingVertical: 16 }}>{translate('travel_report')}</LatoBold>
-                          <DistanceChart data={chartData} />
                         </View>
+                          <DistanceChart data={chartData} />
                       </View>
                       :
                       //registered but no offer

@@ -91,11 +91,11 @@ const AccountScreen = ({navigation, route}) => {
   }
 
   const goToEditVehicle = () => {
-    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: true})
+    navigation.navigate('RegisterVehicleMain', {isRegister: false, isEdit: true})
   }
 
   const goToAddVehicle = () => {
-    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})
+    navigation.navigate('RegisterVehicleMain', {isRegister: false, isEdit: false})
   }
 
   const goToContract = () => {
@@ -160,7 +160,7 @@ const AccountScreen = ({navigation, route}) => {
 
             <View style={{margin: 12}}>
 
-              {!isEmpty(incomeData) && <IncomeProfile data={incomeData} onPress={() => navigation.navigate('IncomeDetail')}/>}
+              {!isEmpty(incomeData) && <IncomeProfile data={incomeData} onPress={() => navigation.navigate('IncomeDetail')} />}
 
             <ShimmerPlaceholder
             isLoading={isLoading}
