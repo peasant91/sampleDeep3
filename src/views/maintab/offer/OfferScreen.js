@@ -46,7 +46,8 @@ const OfferScreen = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(true)
   const [search, setsearch] = useState('')
   const isFocused = useIsFocused();
-  const searchText = useRef(true)
+  const searchText = useRef(null)
+  const timeout = useRef(null);
 
   const goToDetail = (item) => {
     navigation.navigate('OfferDetail', { id: item.id })
@@ -58,24 +59,24 @@ const OfferScreen = ({ navigation, route }) => {
       setisLoading(true)
     }
 
-    if (canLoadData.current) {
-      console.log("page current",page.current);
+    if (!canLoadData.current){
+      return
+    }
     getCampaignList({
       page: page.current,
       search: searchText.current
     }).then(response => {
       setisNotRegisterVehicle(false)
       setisLoading(false)
-      if (response.length > 0) {
-        if (page.current == 1) {
-          setdata(response)
-        } else {
-          setdata([...data, ...response])
-        }
-        page.current += 1
+      if (page.current == 1) {
+        setdata(response.data)
       } else {
+        setdata([...data, ...response.data])
+      }
+      if (page.current === response.meta.last_page){
         canLoadData.current = false
       }
+      page.current += 1
     }).catch(err => {
       setisLoading(false)
       if (err.message.includes('verifikasi')) {
@@ -87,29 +88,40 @@ const OfferScreen = ({ navigation, route }) => {
         showDialog(err.message)
       }
     })
-    }
   }
 
   const onRefresh = () => {
+    console.log("search text",searchText.current);
     canLoadData.current = true
     page.current = 1
     getCampaignListApi()
   }
 
-  const debounceSearch = useCallback(
-   debounce(onRefresh, 1000),
-    [],
-  )
+  // const debounceSearch = useCallback(
+  //  debounce(onRefresh, 1000),
+  //   [],
+  // )
 
-  useEffect(() => {
-    if (isFocused) {
-      searchText.current = search
-      debounceSearch()
-    } else {
-      setisLoading(true)
-    }
-  }, [search, isFocused])
+  // useEffect(() => {
+  //   if (isFocused) {
+  //     searchText.current = search
+  //     debounceSearch()
+  //   } else {
+  //     setisLoading(true)
+  //     console.log("is note focused");
+  //   }
+  // }, [search, isFocused])
 
+    useEffect(()=>{
+      if (timeout.current !== null) {          // IF THERE'S A RUNNING TIMEOUT
+        clearTimeout(timeout.current);         // THEN, CANCEL IT
+      }
+      timeout.current = setTimeout(() => {
+          timeout.current=null
+          searchText.current = search
+          onRefresh()
+      }, 500);
+    },[search])
 
   return (
     <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
@@ -130,6 +142,7 @@ const OfferScreen = ({ navigation, route }) => {
             placeholder={translate('find_offer_here')}
             multiline={false}
             onChangeText={(text) => {
+              clearTimeout(timeout.current)
               page.current = 1
               setsearch(text)
             }}
