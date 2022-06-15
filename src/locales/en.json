@@ -284,9 +284,13 @@
     "work": "Pekerjaan",
 
     "edit_confirm_title": "Yakin ingin kembali?",
-    "edit_confirm_desc": "Data Anda tidak akan tersimpan jika Anda kembali ke halaman sebelumnya."
-    
-
+    "edit_confirm_desc": "Data Anda tidak akan tersimpan jika Anda kembali ke halaman sebelumnya.",
+    "reselect_province": "Gagal mengambil data, silahkan pilih ulang provinsi",
+    "reselect_city": "Gagal mengambil data, silahkan pilih ulang kabupaten/kota",
+    "reselect_district": "Gagal mengambil data, silahkan pilih ulang Kecamatan",
+    "reselect_sub_district": "Gagal mengambil data, silahkan pilih ulang Kelurahan",
+    "please_wait": "Mohon tunggu sebentar, data belum siap",
+    "please_select_province": "Mohon pilih provinsi terlebih dahulu"
 
 
 

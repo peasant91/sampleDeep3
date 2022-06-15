@@ -57,6 +57,7 @@ import { getFullLink, getImageBase64FromUrl } from '../../actions/helper';
 import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { useToast } from "react-native-toast-notifications";
 
 const dummyDivision = [
   {
@@ -90,6 +91,8 @@ const RegisterScreen = ({navigation, route}) => {
   const [isEdited, setisEdited] = useState(false)
 
   const { isEdit, data} = route.params
+  const toast = useToast();
+  const toastMessage = useRef(translate('please_select_province'))
 
   const pickerSheet = useRef();
 
@@ -247,7 +250,7 @@ const RegisterScreen = ({navigation, route}) => {
   }
 
   const buildCardForm = () => {
-    console.log('cardform', formStateCard.inputValues)
+    //console.log('cardform', formStateCard.inputValues)
     var card = []
     for (item in Config.cardList) {
       if (formStateCard.inputValues[Config.cardList[item]] || formStateCard.inputValues[Config.cardList[item]] == '') {
@@ -407,7 +410,7 @@ const RegisterScreen = ({navigation, route}) => {
       return
     }
 
-    console.log('result image', result)
+    //console.log('result image', result)
       selectedPicker.dispatch({
           type: 'input',
           id: selectedPicker.id,
@@ -531,16 +534,46 @@ const RegisterScreen = ({navigation, route}) => {
         return
       } else {
         if (id == 'province_id') {
+          toastMessage.current = translate('please_wait')
           getCity(route.params.id).then(cityData => {
             setcityData(cityData);
+          }).catch(err =>{
+            toastMessage.current = translate('reselect_province')
+            toast.show(toastMessage.current, {
+              type: 'custom',
+              placement: 'bottom',
+              duration: 5000,
+              offset: 30,
+              animationType: 'slide-in',
+            });
           });
         } else if (id == 'city_id') {
+          toastMessage.current = translate('please_wait')
           getDistrict(route.params.id).then(districtData => {
             setdistrictData(districtData);
+          }).catch(err =>{
+            toastMessage.current = translate('reselect_city')
+            toast.show(toastMessage.current, {
+              type: 'custom',
+              placement: 'bottom',
+              duration: 5000,
+              offset: 30,
+              animationType: 'slide-in',
+            });
           });
         } else if (id == 'district_id') {
+          toastMessage.current = translate('please_wait')
           getVillage(route.params.id).then(villageData => {
             setvillageData(villageData);
+          }).catch(err =>{
+            toastMessage.current = translate('reselect_district')
+            toast.show(toastMessage.current, {
+              type: 'custom',
+              placement: 'bottom',
+              duration: 5000,
+              offset: 30,
+              animationType: 'slide-in',
+            });
           });
         }
       }
@@ -734,8 +767,16 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('city_placeholder')}
               value={formStateAddress.inputValues.city_id_value}
               isCheck={formState.isChecked}
-              disabled={formStateAddress.inputValues.province_id == null }
-              onPress={() => openPicker('city_id', 'city_title', cityData, dispatchAddress)}
+              //disabled={formStateAddress.inputValues.province_id == null && cityData == null}
+              onPress={() => cityData == null ? 
+                toast.show(toastMessage.current, {
+                  type: 'custom',
+                  placement: 'bottom',
+                  duration: 2000,
+                  offset: 30,
+                  animationType: 'slide-in',
+                })
+                : openPicker('city_id', 'city_title', cityData, dispatchAddress)}
               required
             />
 
@@ -745,9 +786,16 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('district_placeholder')}
               value={formStateAddress.inputValues.district_id_value}
               isCheck={formState.isChecked}
-              disabled={formStateAddress.inputValues.city_id == null }
-              onPress={() =>
-                openPicker('district_id', 'district_title', districtData, dispatchAddress)
+              //disabled={formStateAddress.inputValues.city_id == null }
+              onPress={() => districtData == null ? 
+                toast.show(toastMessage.current, {
+                  type: 'custom',
+                  placement: 'bottom',
+                  duration: 2000,
+                  offset: 30,
+                  animationType: 'slide-in',
+                })
+                :openPicker('district_id', 'district_title', districtData, dispatchAddress)
               }
               required
             />
@@ -759,9 +807,16 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('village_placeholder')}
               value={formStateAddress.inputValues.village_id_value}
               isCheck={formState.isChecked}
-              disabled={formStateAddress.inputValues.district_id == null }
-              onPress={() =>
-                openPicker('village_id', 'village_title', villageData, dispatchAddress)
+              //disabled={formStateAddress.inputValues.district_id == null}
+              onPress={() => villageData == null ?
+                toast.show(toastMessage.current, {
+                  type: 'custom',
+                  placement: 'bottom',
+                  duration: 2000,
+                  offset: 30,
+                  animationType: 'slide-in',
+                })
+                : openPicker('village_id', 'village_title', villageData, dispatchAddress)
               }
               required
             />

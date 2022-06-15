@@ -20,7 +20,7 @@ const PickerScreen = ({ navigation, route }) => {
 
   const { pickerId, title, data, selectedId, isEdit, dispatch, isRegister } = route.params;
 
-  const [filteredData, setfilteredData] = useState(data)
+  const [filteredData, setfilteredData] = useState(data ? data : [])
   const manualInputId = -99
 
   const onPressList = (id, name) => {
