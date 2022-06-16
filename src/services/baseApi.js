@@ -27,7 +27,7 @@ getClient.interceptors.request.use(
 );
 
 getClient.interceptors.response.use(response => {
-    console.log('Response:', JSON.stringify(response.data, null, 2))
+    console.log(`URL:${JSON.stringify(response.config.url,null,2)}\nResponse:`, JSON.stringify(response.data, null, 2))
     return response
   })
 

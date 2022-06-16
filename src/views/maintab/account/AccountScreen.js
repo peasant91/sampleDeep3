@@ -58,26 +58,57 @@ const AccountScreen = ({navigation, route}) => {
 
   const getProfileApi = () => {
     setisLoading(true)
-    axios.all([
-      getProfile(),
-      getVehicleRoute(),
-      getHome(),
-      getIncomeList({
-        year: moment(Date()).format('yyyy')
-      })
-    ]).then(axios.spread((profile, vehicleRoute, contract, income) => {
-      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
-      setprofileData(profile)
-      setvehicleRute(vehicleRoute)
-      setContractData(contract)
-      setincomeData(income)
+    getProfile().then(Response=> {
+      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(Response))
+      setprofileData(Response)
+    }).catch(err=>{
       setrefreshing(false)
       setisLoading(false)
-    })).catch(err => {
+      showDialog(err.message)
+    })
+    getVehicleRoute().then(Response=> {
+      setvehicleRute(Response)
+    }).catch(err=>{
+      setrefreshing(false)
+      setisLoading(false)
+      showDialog(err.message)
+    })
+    getHome().then(Response=> {
+      setContractData(Response)
+    }).catch(err=>{
+      setrefreshing(false)
+      setisLoading(false)
+      showDialog(err.message)
+    })
+    getIncomeList().then(Response=> {
+      setincomeData(Response)
+      setrefreshing(false)
+      setisLoading(false)
+    }).catch(err=>{
       setrefreshing(false)
       setisLoading(false)
       showDialog(error.message)
     })
+    // axios.all([
+    //   getProfile(),
+    //   getVehicleRoute(),
+    //   getHome(),
+    //   getIncomeList({
+    //     year: moment(Date()).format('yyyy')
+    //   })
+    // ]).then(axios.spread((profile, vehicleRoute, contract, income) => {
+    //   AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
+    //   setprofileData(profile)
+    //   setvehicleRute(vehicleRoute)
+    //   setContractData(contract)
+    //   setincomeData(income)
+    //   setrefreshing(false)
+    //   setisLoading(false)
+    // })).catch(err => {
+    //   setrefreshing(false)
+    //   setisLoading(false)
+    //   showDialog(error.message)
+    // })
   }
 
   useEffect( () => {
@@ -87,7 +118,10 @@ const AccountScreen = ({navigation, route}) => {
   }, [route.params])
 
   const goToEdit = () => {
-    navigation.navigate('EditProfile', { isEdit: true, data: profileData})
+    console.log("data",profileData);
+    if (profileData) {
+      navigation.navigate('EditProfile', { isEdit: true, data: profileData})
+    }
   }
 
   const goToEditVehicle = () => {

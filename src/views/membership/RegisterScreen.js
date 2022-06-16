@@ -535,6 +535,9 @@ const RegisterScreen = ({navigation, route}) => {
       } else {
         if (id == 'province_id') {
           toastMessage.current = translate('please_wait')
+          setcityData()
+          setdistrictData()
+          setvillageData()
           getCity(route.params.id).then(cityData => {
             setcityData(cityData);
           }).catch(err =>{
@@ -549,6 +552,8 @@ const RegisterScreen = ({navigation, route}) => {
           });
         } else if (id == 'city_id') {
           toastMessage.current = translate('please_wait')
+          setdistrictData()
+          setvillageData()
           getDistrict(route.params.id).then(districtData => {
             setdistrictData(districtData);
           }).catch(err =>{
@@ -563,6 +568,7 @@ const RegisterScreen = ({navigation, route}) => {
           });
         } else if (id == 'district_id') {
           toastMessage.current = translate('please_wait')
+          setvillageData()
           getVillage(route.params.id).then(villageData => {
             setvillageData(villageData);
           }).catch(err =>{
@@ -583,6 +589,7 @@ const RegisterScreen = ({navigation, route}) => {
   //preload region
   useEffect(() => {
     if (isEdit) {
+      console.log("data",data);
       getCity(data.province.id).then(response => setcityData(response))
       getDistrict(data.city.id).then(response => setdistrictData(response))
       getVillage(data.district.id).then(response => { 
