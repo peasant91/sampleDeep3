@@ -9,6 +9,7 @@ import translate from '../../../locales/translate'
 import DeviceInfo from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
 import moment from 'moment'
+import { momentx } from '../../../actions/helper'
 
 import IconLocation from '../../../assets/images/ic_home_location.svg';
 import Divider from '../../../components/atoms/Divider'
@@ -62,14 +63,14 @@ const OfferDetailScreen = ({ navigation, route }) => {
     }
 
     const getAdsDate = () => {
-        const start = moment(data.start_date)
-        const end = moment(data.end_date)
+        const start = momentx(data.start_date)
+        const end = momentx(data.end_date)
         if (start.format('YYYY') != end.format('YYYY')) {
             return start.format('DD MMMM YYYY') + ' - ' + end.format('DD MMMM YYYY')
         } else if (start.format('MM') != end.format('MM')) {
             return start.format('DD MMMM') + ' - ' + end.format('DD MMMM YYYY')
         } else {
-            return start.format('DD') + ' - ' + end.format('DD MMMM YYYY')
+            return start.format('DD') + ' - ' + end.format('DD MMMM YYYY, HH:mm:ss')
         }
     }
 
@@ -111,7 +112,7 @@ const OfferDetailScreen = ({ navigation, route }) => {
                                 Icon={IconLocation}>{displayProvince(data.contract_area)}</LatoRegular>
                             <LatoRegular
                                 style={{ fontSize: 10, color: '#A7A7A7' }}
-                            >{translate('created_at', {date: moment(data.created_at).format('DD MMMM YYYY')})}</LatoRegular>
+                            >{translate('created_at', {date: momentx(data.created_at).format('DD MMMM YYYY')})}</LatoRegular>
                         </View>
 
                     </View>

@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
-import {ListItem, Image} from 'react-native-elements';
-import {Touchable} from 'react-native';
-import {TouchableOpacity} from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { ListItem, Image } from 'react-native-elements';
+import { Touchable } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import CustomButton from '../atoms/CustomButton';
 import translate from '../../locales/translate';
 import Colors from '../../constants/Colors';
@@ -16,7 +16,7 @@ const GenericCustomAlertComponents = props => {
           fontFamily: 'Lato-Bold',
           marginTop: 10,
           fontSize: 18,
-          marginBottom: 16,
+          marginBottom: props.desc ? 8 : 16,
           alignSelf: 'center',
           textAlign: 'center',
           minWidth: '80%',
@@ -24,6 +24,22 @@ const GenericCustomAlertComponents = props => {
         }}>
         {props.dialogTitle}
       </Text>
+      {
+        props.desc &&
+        <Text
+          style={{
+            fontFamily: 'Lato-Regular',
+            marginTop: 0,
+            fontSize: 14,
+            marginBottom: 16,
+            alignSelf: 'center',
+            textAlign: 'center',
+            minWidth: '80%',
+            color: Colors.subGray
+          }}>
+          {props.desc}
+        </Text>
+      }
       {props.isDoubleButton ? (
         <View
           style={{
@@ -32,21 +48,21 @@ const GenericCustomAlertComponents = props => {
             marginTop: 10,
             marginBottom: 10,
           }}>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <CustomButton
               types="secondary"
               onPress={props.onNegativePress}
-              style={{height: 40, marginHorizontal: 2}}
+              style={{ height: 40, marginHorizontal: 2 }}
               title={
                 props.negativeTitle ? props.negativeTitle : translate('cancel')
               }
             />
           </View>
-          <View style={{flex: 1, marginLeft: 10}}>
+          <View style={{ flex: 1, marginLeft: 10 }}>
             <CustomButton
               types="primary"
               onPress={props.onPositivePress}
-              style={{height: 40, marginHorizontal: 2}}
+              style={{ height: 40, marginHorizontal: 2 }}
               title={
                 props.positiveTitle ? props.positiveTitle : translate('retry')
               }
@@ -61,7 +77,7 @@ const GenericCustomAlertComponents = props => {
             marginTop: 10,
             marginBottom: 10,
           }}>
-          <View style={{flex: 1}}>
+          <View style={{ flex: 1 }}>
             <CustomButton
               types="primary"
               onPress={props.onPositivePress}

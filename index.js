@@ -16,6 +16,6 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 // LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs()
 
-moment.locale('id')
+moment.locale()
 
 AppRegistry.registerComponent(appName, () => App);

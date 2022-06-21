@@ -3,16 +3,16 @@ import { View, Dimensions } from 'react-native'
 import { LineChart } from 'react-native-chart-kit'
 import Colors from '../../constants/Colors'
 import moment from 'moment'
-
+import { momentx } from '../../actions/helper'
 
 const DistanceChart = ({data}) => {
 
-  const label = data.map((value) => moment(value.date).format('DD/MM'))
+  const label = data.map((value) => momentx(value.date).format('DD/MM'))
   const dataset = data.map((value) => parseInt(value.distance))
 
     return   <LineChart
     data={{
-      labels: label.length > 0 ? label.reverse() : [moment(Date()).format('DD/MM')],
+      labels: label.length > 0 ? label.reverse() : [momentx(Date()).format('DD/MM')],
       datasets: [
         {
           data: dataset.length > 0 ? dataset.reverse() : [0],

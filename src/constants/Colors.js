@@ -15,5 +15,7 @@ export default {
     divider: '#F5F5F5',
     footerBlue: '#6388B5',
     backgroundColor: '#F4F4F4',
-    primarySecondary: '#00B2FF'
+    primarySecondary: '#00B2FF',
+    dateGray: '#575757',
+    subGray: '#737373'
 }

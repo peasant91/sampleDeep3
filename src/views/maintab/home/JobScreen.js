@@ -19,6 +19,7 @@ import { sendDistance } from '../../../services/contract'
 import DistanceChart from '../../../components/atoms/DistanceChart'
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import moment from 'moment'
+import { momentx } from '../../../actions/helper'
 import { makeMutable } from 'react-native-reanimated'
 import { useFocusEffect } from '@react-navigation/native'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
@@ -30,6 +31,7 @@ const JobScreen = ({ navigation, route }) => {
 
   const [time, settime] = useState(['00', '00', '00'])
   const [speed, setSpeed] = useState('00')
+  const [speedRaw, setSpeedRaw] = useState('00')
   const [distance, setDistance] = useState('00')
   const [isStart, setisStart] = useState()
   const loop = useRef()
@@ -100,6 +102,7 @@ const JobScreen = ({ navigation, route }) => {
   const reset = () => new Promise(async (resolve, reject) => {
     settime(['00', '00', '00'])
     setSpeed('00')
+    setSpeedRaw('00')
     setDistance('00')
 
     const schema = [SpeedSchema, DistanceSchema]
@@ -128,9 +131,12 @@ const JobScreen = ({ navigation, route }) => {
     )
 
     const speeds = realm.objects('Speed')
+    print(`ini speed ${speeds}`)
     if (speeds.length > 0) {
       const averageSpeed = average(speeds.map(item => item.speed))
+      const kmh = averageSpeed * 3.6
       setSpeed(averageSpeed.toFixed(2))
+      setSpeedRaw(kmh.toFixed(2))
     }
 
 
@@ -152,7 +158,7 @@ const JobScreen = ({ navigation, route }) => {
   }
 
   const showFormattedElapsedTime = (diff) => {
-    const elapsedTime = moment().startOf('day').seconds(diff).format('HH:mm:ss')
+    const elapsedTime = momentx().startOf('day').seconds(diff).format('HH:mm:ss')
     settime(elapsedTime.split(':'))
   }
 
@@ -160,8 +166,8 @@ const JobScreen = ({ navigation, route }) => {
   //if there is previous recorded time add it to current time
   const getElapsedSecond = async (startTime) => new Promise(async (resolve, reject) => {
     const previousElapsedTime = await AsyncStorage.getItem(StorageKey.KEY_ELAPSED_TIME)
-    const momentStartTime = moment(startTime)
-    const now = moment(Date())
+    const momentStartTime = momentx(startTime)
+    const now = momentx(Date())
     var diff
     if (previousElapsedTime) {
       diff = moment.duration(now.diff(momentStartTime)).asSeconds() + parseInt(previousElapsedTime)
@@ -176,14 +182,14 @@ const JobScreen = ({ navigation, route }) => {
     const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
     console.log('previous', previousDate)
     if (previousDate) {
-      const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
+      const isCurrentDate = momentx(previousDate).isSame(Date(), 'day')
       console.log('iscurrent', isCurrentDate)
       if (!isCurrentDate) {
         await reset()
       }
     }
 
-    AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
+    AsyncStorage.setItem(StorageKey.KEY_START_DATE, momentx(Date()).toString())
 
 
     checkStartTime()
@@ -301,8 +307,8 @@ const JobScreen = ({ navigation, route }) => {
 
       <View style={{ padding: 16, justifyContent: 'center', alignItems: 'center', flex: 3 }}>
         <LatoBold style={{ fontSize: 18 }}>{translate('average_speed')}</LatoBold>
-        <LatoBold style={{ fontSize: 48, marginTop: 24 }}>{speed}</LatoBold>
-        <LatoBold style={{ fontSize: 18 }}>Km/s</LatoBold>
+        <LatoBold style={{ fontSize: 48, marginTop: 24 }}>{speedRaw}</LatoBold>
+        <LatoBold style={{ fontSize: 18 }}>Km/h</LatoBold>
       </View>
 
       <Divider />

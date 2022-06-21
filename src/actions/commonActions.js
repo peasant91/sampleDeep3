@@ -18,6 +18,7 @@ import CustomButton from '../components/atoms/CustomButton';
 import {getErrorMessage} from '../services/baseApi';
 import {ModalPortal} from 'react-native-modals';
 import moment from 'moment';
+import { momentx } from './helper';
 import {showAlert, closeAlert} from 'react-native-customisable-alert';
 
 let id = 0;
@@ -29,28 +30,10 @@ export const showDialog = (
   negativeAction,
   positiveTitle,
   negativeTitle,
-  isReversed
+  isReversed,
+  desc
 ) => {
   console.log('alert dialog show');
-  // DialogManager.show({
-  //     animationDuration: 0,
-  //     ScaleAnimation: new ScaleAnimation(),
-  //     width: '80%',
-  //     dialogStyle: { borderRadius: 16, width: '80%' },
-  //     dismissOnTouchOutside: false,
-  //     children: (
-
-  //         <GenericCustomAlert
-  //             dialogTitle={message}
-  //             isDoubleButton={isDoubleButton}
-  //             onPositivePress={positiveAction ? positiveAction : () => dismissDialog()}
-  //             onNegativePress={negativeAction ? negativeAction : () => dismissDialog()}
-  //             positiveTitle={positiveTitle}
-  //             negativeTitle={negativeTitle} />
-  //     ),
-  // }, () => {
-  //     console.log('callback - show');
-  // });
     showAlert({
       alertType: 'custom',
       animationIn: 'fadeIn',
@@ -58,6 +41,7 @@ export const showDialog = (
       customAlert: (
         <GenericCustomAlert
           dialogTitle={message}
+          desc={desc}
           isDoubleButton={isDoubleButton}
           onPositivePress={() => {
             if (positiveAction) {
@@ -78,7 +62,6 @@ export const showDialog = (
         />
       ),
     });
-  
 };
 
 export const showLoadingDialog = message => {
@@ -227,7 +210,7 @@ export const checkAppVersion = async version => {
 };
 
 export const getCalendarYear = () => {
-  console.log(moment().isoWeek(1));
+  console.log(momentx().isoWeek(1));
 };
 
 const styles = StyleSheet.create({

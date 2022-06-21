@@ -5,14 +5,15 @@ import Colors from '../../../constants/Colors'
 import IconLocation from '../../../assets/images/ic_location_schedule.svg'
 import { LatoBold, LatoRegular } from '../CustomText'
 import translate from '../../../locales/translate'
+import {momentx} from '../../../actions/helper'
 import moment from 'moment'
 
 const ListInstallationSchedule = ({data, onPressMap}) => {
 
 
     const getDate = () => {
-        const start = moment(data.start_date)
-        const end = moment(data.start_date)
+        const start = momentx(data.start_date)
+        const end = momentx(data.start_date)
         if (start.format('YYYY') != end.format('YYYY')) {
             return start.format('DD MMMM YYYY') + ' - ' + end.format('DD MMMM YYYY')
         } else if (start.format('MM') != end.format('MM')) {
@@ -23,8 +24,9 @@ const ListInstallationSchedule = ({data, onPressMap}) => {
     }
 
     const getTime = () => {
-        const startTime = moment(data.start_date, ).format('HH:mm')
-        const endTime = moment(data.end_date).format('HH:mm')
+        const startTime = momentx(data.start_date).format('HH:mm')
+        const endTime = momentx(data.end_date).format('HH:mm')
+        console.log(`tanggalnya nih ${getDate() + ', ' + startTime + ' - '  +endTime + ' WIB'}`);
         return getDate() + ', ' + startTime + ' - '  +endTime + ' WIB'
     }
 

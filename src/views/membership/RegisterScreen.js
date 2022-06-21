@@ -51,6 +51,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
 import {getCity, getDistrict, getProvince, getVillage} from '../../services/utilities';
 import moment from 'moment';
+import { momentx } from '../../actions/helper';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
 import { getFullLink, getImageBase64FromUrl } from '../../actions/helper';
@@ -334,8 +335,8 @@ const RegisterScreen = ({navigation, route}) => {
     dispatchDetail({
       type: 'picker',
       id: 'birth_date',
-      input: moment(date).format('YYYY-MM-DD'),
-      desc: moment(date).format('DD MMMM YYYY'),
+      input: momentx(date).format('YYYY-MM-DD'),
+      desc: momentx(date).format('DD MMMM YYYY'),
       isValid: true,
     });
   };

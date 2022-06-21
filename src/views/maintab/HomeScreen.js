@@ -52,6 +52,7 @@ import ErrorNotRegisterVehicle from '../../components/atoms/ErrorNotRegisterVehi
 import { getChartData } from '../../services/report';
 import { getNotification } from '../../services/notification';
 import { useToast } from "react-native-toast-notifications";
+import { getContract } from '../../services/contract';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -61,6 +62,9 @@ const dummyContractData = {
   date: '31 Nov 2022',
 }
 
+const validCampaignStatus = ["Sedang Berjalan"] //status campaign => in_period
+const validContractStatus = ["Ready Mulai Job Masa Tayang"] //status driver terhadap contract => ready
+
 const HomeScreen = ({ navigation, route }) => {
 
   const [backPressedCount, setBackPressedCount] = useState(0);
@@ -69,6 +73,7 @@ const HomeScreen = ({ navigation, route }) => {
   const [homeData, sethomeData] = useState({})
   const [profileData, setprofileData] = useState({})
   const [chartData, setChartData] = useState([])
+  const [contractData,setContractData] = useState({})
 
   const toast = useToast();
 
@@ -103,14 +108,15 @@ const HomeScreen = ({ navigation, route }) => {
     axios.all([
       getHome(),
       getProfile(),
-      getNotification(),
-    ]).then(axios.spread(async (home, profile, notification, refreshToken) => {
+      getNotification()
+    ]).then(axios.spread(async (home, profile, notification, contract) => {
       setisLoading(false)
       sethomeData(home)
+      setContractData(contract)
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
       setprofileData(profile)
       getChartDataAPI(home)
-
+      getContractData(home)
       if (notification.length > 0 && notification.filter(item => !item.read_at).length > 0) {
         setisNotifVisible(true)
       } else {
@@ -141,6 +147,16 @@ const HomeScreen = ({ navigation, route }) => {
       getChartData(home.active_contract.contract_id).then(response => {
         setChartData(response)
       }).catch(err => {
+        showDialog(err.message)
+      })
+    }
+  }
+
+  const getContractData = (home) => {
+    if (home.active_contract){
+      getContract(home.active_contract.contract_id).then(response =>{
+        setContractData(response)
+      }).catch(err =>{
         showDialog(err.message)
       })
     }
@@ -254,14 +270,21 @@ const HomeScreen = ({ navigation, route }) => {
 
             <View>
 
-              {homeData.active_contract &&
+              {
+              homeData.active_contract &&
                 <CustomButton
                   containerStyle={{ marginHorizontal: 16, marginBottom: 16 }}
                   types={'primary'}
                   title={translate('do_job')}
                   iconRight={true}
                   icon={IconArrow}
-                  onPress={() => navigation.navigate('Job', {id: homeData.active_contract.id})}
+                  onPress={() => {
+                    if (validContractStatus.includes(contractData.status) && validCampaignStatus.includes(contractData.campaign.status)){
+                      navigation.navigate('Job', {id: homeData.active_contract.id})
+                    }else{
+                      showDialog("Kontrak Belum Aktif",false,null,null,null,null,null,"Pekerjaan baru dapat dilakukan ketika kontrak dalam masa penayangan.")
+                    }
+                  }}
                 />
               }
 

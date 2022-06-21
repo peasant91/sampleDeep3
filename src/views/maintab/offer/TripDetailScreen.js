@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { momentx } from '../../../actions/helper'
 import React, { useEffect, useState } from 'react'
 import { FlatList, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -68,7 +69,7 @@ const TripDetailScreen = ({ navigation, route }) => {
                 renderItem={({ item, index }) => {
                     return <View style={{ marginHorizontal: 16, marginTop: 16 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
-                            <LatoRegular style={{ color: Colors.primary }}>{moment(item.start_date).format('DD MMMM YYYY')}</LatoRegular>
+                            <LatoRegular style={{ color: Colors.primary }}>{momentx(item.start_date).format('DD MMMM YYYY')}</LatoRegular>
                             <LatoRegular style={{ color: Colors.primary }}>{item.distance + 'Km'}</LatoRegular>
                         </View>
                         <Divider />

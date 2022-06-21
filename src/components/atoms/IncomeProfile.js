@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { momentx } from '../../actions/helper'
 import React from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { Shadow } from 'react-native-shadow-2'
@@ -14,7 +15,7 @@ const IncomeProfile = ({data, onPress}) => {
             <View style={{borderRadius: 8, overflow: 'hidden'}}>
                 <View style={{backgroundColor: '#F5F6FF', padding: 10, justifyContent: 'center', alignItems: 'center'}}>
                     <LatoBold style={{fontSize: 18}}>{toCurrency(data.total)}</LatoBold>
-                    <LatoRegular containerStyle={{marginTop: 10}}>{moment(Date()).format('yyyy')}</LatoRegular>
+                    <LatoRegular containerStyle={{marginTop: 10}}>{momentx(Date()).format('yyyy')}</LatoRegular>
                 </View>
                 <View style={{backgroundColor: 'white'}}>
                 {
@@ -22,7 +23,7 @@ const IncomeProfile = ({data, onPress}) => {
                         if (index < 2) {
                         return <View style={{padding: 5}}>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <LatoRegular>{moment(value.date).format('DD MMMM yyyy')}</LatoRegular>
+                                <LatoRegular>{momentx(value.date).format('DD MMMM yyyy')}</LatoRegular>
                                 <LatoRegular style={{color: Colors.primarySecondary}}>{'+' + toCurrency(value.income)}</LatoRegular>
                             </View>
                             <View style={{height: 1, backgroundColor: Colors.divider, marginTop: 5}}/>
