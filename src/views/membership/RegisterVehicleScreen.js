@@ -229,7 +229,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       title: title,
       data: data,
       selectedId: selectedId,
-      previousRoute: 'RegisterVehicle',
+      previousRoute: isRegister ? 'RegisterVehicle' : 'RegisterVehicleMain',
       dispatch: dispatch,
       isRegister: isRegister,
       isEdit: isEdit

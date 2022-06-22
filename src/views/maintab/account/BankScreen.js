@@ -119,6 +119,7 @@ const BankScreen = ({ navigation, route }) => {
                 title={translate('bank_title')}
                 placeholder={translate('bank_placeholder')}
                 viewOnly={isReadOnly}
+                disabled={isReadOnly}
                 value={formState.inputValues.bank_id_value}
                 isCheck={formState.isChecked}
                 onPress={() => openPicker('bank_id', 'bank_account', bankData)}

@@ -132,6 +132,8 @@ export const average = (array) => array.reduce((a, b) => a + b) / array.length;
 export const sum = (array) => array.reduce((a, b) => a + b);
 
  //This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
+ //poin 1 is location before
+ //poin 2 is current location
  export const calcDistance = (lat1, lon1, lat2, lon2) =>
  {
    var R = 6371; // km

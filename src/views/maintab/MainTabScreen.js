@@ -22,6 +22,8 @@ import { calcDistance } from '../../actions/helper';
 import { sendDistance } from '../../services/contract';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import Config from '../../constants/Config';
+import { useToast } from "react-native-toast-notifications";
+import { sum } from '../../actions/helper';
 
 const CustomBottomTabBar = props => {
   const [visible, setVisible] = useState(true);
@@ -58,12 +60,31 @@ const Tab = createBottomTabNavigator();
 const MainTabScreen = ({navigation, route}) => {
 
   const [isLogin, setisLogin] = useState(false);
+  const toast = useToast();
   const currentPosition = useRef({
     latitude: 0,
     longitude: 0
   });
   const lastSentTime = useRef();
   const sumDistance = useRef(0);
+
+  // useEffect(()=>{
+  //   const test = async()=>{
+  //     const realm = await Realm.open(
+  //       {
+  //         path: 'otomedia',
+  //         schema: [SpeedSchema, DistanceSchema]
+  //       }
+  //     )
+  //     const distances = realm.objects('Distance')
+  //     if (distances.length > 0) {
+  //       const sums = sum(distances.map(item => item.distance))
+  //       sumDistance.current = sums
+  //       console.log("sums distance",sums);
+  //     }
+  //   }
+  //   test()
+  // },[])
 
   useEffect(() => {
     AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN).then(token => {
@@ -101,10 +122,9 @@ const MainTabScreen = ({navigation, route}) => {
   }, []);
 
   const onLocationChange = async (location) => {
+    
     const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude)
     sumDistance.current += distance
-
-    sendLocation(location)
 
     const schema = [SpeedSchema, DistanceSchema]
 
@@ -134,13 +154,15 @@ const MainTabScreen = ({navigation, route}) => {
       latitude: location.latitude,
       longitude: location.longitude
     }
+    sendLocation(location)
   }
 
-  const sendLocation = (location) => {
+  const sendLocation = async(location) => {
     if (!lastSentTime.current) {
       lastSentTime.current = moment(Date())
       return
-    } else {
+    } 
+    else {
       const duration = moment.duration(lastSentTime.current.diff(moment(Date()))).asMinutes()
       
       console.log('momentDuration', duration)
@@ -152,21 +174,29 @@ const MainTabScreen = ({navigation, route}) => {
       }
     }
 
-    AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
-      sendDistance({
-        lat: location.latitude,
-        lng: location.longitude,
-        distance: sumDistance.current * 1000, //in meter
-        contract_id: id
-      }).then(response => {
-        sumDistance.current = 0
-      }).catch(err => {
-
-      })
+    Realm.open({
+      path: 'otomedia',
+      schema: [SpeedSchema, DistanceSchema]
+    }).then(realm=>{
+      const distances = realm.objects('Distance')
+      if (distances.length > 0) {
+        const sums = sum(distances.map(item => item.distance))
+        console.log("total distance sums",sums);
+        AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
+          sendDistance({
+            lat: location.latitude,
+            lng: location.longitude,
+            distance: sums * 1000, //in meter
+            contract_id: id
+          }).then(response => {
+            //sumDistance.current = 0
+          }).catch(err => {
+    
+          })
+        })
+      }
     })
-
     lastSentTime.current = moment(Date())
-
   }
 
   return (

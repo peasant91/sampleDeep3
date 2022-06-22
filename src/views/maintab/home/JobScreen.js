@@ -158,7 +158,7 @@ const JobScreen = ({ navigation, route }) => {
   }
 
   const showFormattedElapsedTime = (diff) => {
-    const elapsedTime = momentx().startOf('day').seconds(diff).format('HH:mm:ss')
+    const elapsedTime = moment().startOf('day').seconds(diff).format('HH:mm:ss')
     settime(elapsedTime.split(':'))
   }
 
@@ -166,8 +166,8 @@ const JobScreen = ({ navigation, route }) => {
   //if there is previous recorded time add it to current time
   const getElapsedSecond = async (startTime) => new Promise(async (resolve, reject) => {
     const previousElapsedTime = await AsyncStorage.getItem(StorageKey.KEY_ELAPSED_TIME)
-    const momentStartTime = momentx(startTime)
-    const now = momentx(Date())
+    const momentStartTime = moment(startTime)
+    const now = moment(Date())
     var diff
     if (previousElapsedTime) {
       diff = moment.duration(now.diff(momentStartTime)).asSeconds() + parseInt(previousElapsedTime)
@@ -180,16 +180,17 @@ const JobScreen = ({ navigation, route }) => {
   //if date is different on last start date reset the time
   const checkDateIsDifferent = async () => {
     const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
-    console.log('previous', previousDate)
+    console.log('previous date', previousDate)
+    console.log('today`s date', Date())
     if (previousDate) {
-      const isCurrentDate = momentx(previousDate).isSame(Date(), 'day')
+      const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
       console.log('iscurrent', isCurrentDate)
       if (!isCurrentDate) {
         await reset()
       }
     }
 
-    AsyncStorage.setItem(StorageKey.KEY_START_DATE, momentx(Date()).toString())
+    AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
 
 
     checkStartTime()

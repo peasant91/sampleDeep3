@@ -6,7 +6,7 @@ import translate from '../../locales/translate'
 import { LatoBold } from '../atoms/CustomText'
 import GenderButton from '../atoms/GenderButton'
 
-const GenderComponents = ({selectedId, onPress, containerStyle, isCheck}) => {
+const GenderComponents = ({selectedId, onPress, containerStyle, isCheck,disabled}) => {
 
     const [gender, setgender] = useState({})
 
@@ -27,7 +27,7 @@ const GenderComponents = ({selectedId, onPress, containerStyle, isCheck}) => {
         data={gender}
         keyExtractor={item => item.id}
         renderItem={({item, index}) => {
-            return <GenderButton title={translate(item.value)} onPress={() => onPress(item.value)} isSelected={selectedId == item.value}/>
+            return <GenderButton title={translate(item.value)} onPress={() =>{ !disabled ? onPress(item.value) : null }} isSelected={selectedId == item.value}/>
         }}
         />
         {isCheck && selectedId == '' && <LatoBold style={{color: 'red', marginTop: 5}}>{translate('error_pick_one')}</LatoBold>}

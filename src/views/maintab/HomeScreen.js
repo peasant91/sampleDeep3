@@ -53,6 +53,7 @@ import { getChartData } from '../../services/report';
 import { getNotification } from '../../services/notification';
 import { useToast } from "react-native-toast-notifications";
 import { getContract } from '../../services/contract';
+import { SpeedSchema,DistanceSchema } from '../../data/realm/speed';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -163,7 +164,8 @@ const HomeScreen = ({ navigation, route }) => {
   }
   
   const goToAddVehicle = () => {
-    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})
+    console.log("clicked");
+    navigation.navigate('RegisterVehicleMain', {isRegister: false, isEdit: false})
   }
 
   useEffect(() => {

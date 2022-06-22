@@ -121,7 +121,7 @@ const AccountScreen = ({navigation, route}) => {
   const goToEdit = () => {
     console.log("data",profileData);
     if (profileData) {
-      navigation.navigate('EditProfile', { isEdit: true, data: profileData})
+      navigation.navigate('EditProfile', { isEdit: true, data: profileData,isVerified: profileData.status == 'verified' ? true : false})
     }
   }
 
