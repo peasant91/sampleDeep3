@@ -70,7 +70,7 @@ export const toCurrency = (number) => {
     });
     return fm.from(number)
   } else {
-    return ''
+    return 'Rp. 0'
   }
 
 }

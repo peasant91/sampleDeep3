@@ -25,6 +25,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 import { reject } from 'lodash'
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler'
+import InfoMenu from '../../../components/atoms/InfoMenu'
 
 
 const JobScreen = ({ navigation, route }) => {
@@ -43,6 +44,22 @@ const JobScreen = ({ navigation, route }) => {
 
   const { id } = route.params
 
+  useEffect(() => {
+    const checkDate = async () => {
+      const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
+      console.log('previous date', previousDate)
+      console.log('today`s date', Date())
+      if (previousDate) {
+        const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
+        console.log('iscurrent', isCurrentDate)
+        if (!isCurrentDate) {
+          await reset()
+        }
+      }
+    }
+    checkDate()
+  }, [])
+
   const switchJob = () => {
     AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
     AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
@@ -52,8 +69,6 @@ const JobScreen = ({ navigation, route }) => {
     } else {
       setisStart(!isStart)
     }
-
-
   }
 
   const checkBackroundLocation = async () => {
@@ -92,7 +107,7 @@ const JobScreen = ({ navigation, route }) => {
       checkBackroundLocation()
     }).catch(err => {
 
-    }) 
+    })
   }
 
   const showOpenSetting = () => {
@@ -204,7 +219,7 @@ const JobScreen = ({ navigation, route }) => {
       startTimer(startTime)
       return
     }
-    
+
     AsyncStorage.setItem(StorageKey.KEY_START_TIME, Date()).then(startTimer(Date()))
   }
 
@@ -244,7 +259,7 @@ const JobScreen = ({ navigation, route }) => {
           showFormattedElapsedTime(second)
         })
       }
-      
+
       setisStart(isDoingJob)
     })
 
@@ -320,6 +335,10 @@ const JobScreen = ({ navigation, route }) => {
         <LatoBold style={{ fontSize: 18 }}>Km</LatoBold>
       </View>
 
+      <InfoMenu
+        containerStyle={{ marginHorizontal: 16 }}
+        text={translate('reset_job_warning')}
+      />
       <Button
         title={translate(isStart ? 'stop' : 'start')}
         style={{ padding: 24, width: 180, alignSelf: 'center' }}

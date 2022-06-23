@@ -282,7 +282,7 @@ const HomeScreen = ({ navigation, route }) => {
                   icon={IconArrow}
                   onPress={() => {
                     if (validContractStatus.includes(contractData.status) && validCampaignStatus.includes(contractData.campaign.status)){
-                      navigation.navigate('Job', {id: homeData.active_contract.id})
+                      navigation.navigate('Job', {id: homeData.active_contract.contract_id})
                     }else{
                       showDialog("Kontrak Belum Aktif",false,null,null,null,null,null,"Pekerjaan baru dapat dilakukan ketika kontrak dalam masa penayangan.")
                     }

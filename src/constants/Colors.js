@@ -17,5 +17,9 @@ export default {
     backgroundColor: '#F4F4F4',
     primarySecondary: '#00B2FF',
     dateGray: '#575757',
-    subGray: '#737373'
+    subGray: '#737373',
+    darkRed: '#CB3A31',
+    darkBrown: '#CD7B2E',
+    lightBrown: '#FFF2E2'
+
 }
