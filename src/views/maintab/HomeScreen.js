@@ -41,7 +41,7 @@ import InfoMenu from '../../components/atoms/InfoMenu';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CardContract from '../../components/atoms/list/CardContract';
 import { getHome } from '../../services/home';
-import { showDialog } from '../../actions/commonActions';
+import { dismissDialog, showDialog, showUploadDialog } from '../../actions/commonActions';
 import { getProfile, updateFcmToken } from '../../services/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
@@ -54,6 +54,7 @@ import { getNotification } from '../../services/notification';
 import { useToast } from "react-native-toast-notifications";
 import { getContract } from '../../services/contract';
 import { SpeedSchema,DistanceSchema } from '../../data/realm/speed';
+import RNLocalize from 'react-native-localize';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',

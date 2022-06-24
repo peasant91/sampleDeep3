@@ -19,13 +19,14 @@ import { sendDistance } from '../../../services/contract'
 import DistanceChart from '../../../components/atoms/DistanceChart'
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import moment from 'moment'
-import { momentx } from '../../../actions/helper'
 import { makeMutable } from 'react-native-reanimated'
 import { useFocusEffect } from '@react-navigation/native'
-import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
+import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { reject } from 'lodash'
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler'
 import InfoMenu from '../../../components/atoms/InfoMenu'
+import { showDialog } from '../../../actions/commonActions'
+import { showLocationAlwaysDialog } from '../../../actions/commonActions'
 
 
 const JobScreen = ({ navigation, route }) => {
@@ -44,31 +45,77 @@ const JobScreen = ({ navigation, route }) => {
 
   const { id } = route.params
 
-  useEffect(() => {
-    const checkDate = async () => {
-      const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
+  const switchJob = () => {
+    AsyncStorage.getItem(StorageKey.KEY_START_DATE).then(previousDate => {
       console.log('previous date', previousDate)
       console.log('today`s date', Date())
+
       if (previousDate) {
         const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
         console.log('iscurrent', isCurrentDate)
         if (!isCurrentDate) {
-          await reset()
+          console.log('iscurrent reset')
+          showDialog(translate("reset_dialog_title"), true, async () => {
+            //oke
+            await reset()
+            AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
+            AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
+
+            if (!isStart) {
+              checkGpsEnable()
+            } else {
+              setisStart(!isStart)
+            }
+          }, () => {
+            //tidak ok
+            console.log("abort the task");
+          }, translate("start"), translate("cancel"), false, translate("reset_dialog_desc"))
+        } else {
+          AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
+          AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
+
+          if (!isStart) {
+            checkGpsEnable()
+          } else {
+            setisStart(!isStart)
+          }
+        }
+      } else {
+        AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
+        AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
+
+        if (!isStart) {
+          checkGpsEnable()
+        } else {
+          setisStart(!isStart)
         }
       }
-    }
-    checkDate()
-  }, [])
 
-  const switchJob = () => {
-    AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart))
-    AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
+    })
+  }
 
-    if (!isStart) {
-      checkGpsEnable()
-    } else {
-      setisStart(!isStart)
-    }
+  const requestAndroidLocationPermission = () => {
+    request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION).then(result => {
+      console.log('background permission', result)
+      if (result == RESULTS.GRANTED) {
+        if (Platform.Version < 29) {
+          setisStart(true)
+          return
+        } else {
+          request(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION).then(result => {
+            console.log('background permission', result)
+            if (result == RESULTS.GRANTED) {
+              setisStart(true)
+              return
+            }
+          })
+        }
+        return
+      }
+
+      showOpenSetting()
+
+    })
   }
 
   const checkBackroundLocation = async () => {
@@ -194,21 +241,48 @@ const JobScreen = ({ navigation, route }) => {
 
   //if date is different on last start date reset the time
   const checkDateIsDifferent = async () => {
-    const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
-    console.log('previous date', previousDate)
-    console.log('today`s date', Date())
-    if (previousDate) {
-      const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
-      console.log('iscurrent', isCurrentDate)
-      if (!isCurrentDate) {
-        await reset()
-      }
-    }
+    // const previousDate = await AsyncStorage.getItem(StorageKey.KEY_START_DATE)
+    // console.log('previous date', previousDate)
+    // console.log('today`s date', Date())
+    // if (previousDate) {
+    //   const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
+    //   console.log('iscurrent', isCurrentDate)
+    //   if (!isCurrentDate) {
+    //     await reset()
+    //   }
+    // }
 
     AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
 
 
     checkStartTime()
+    // AsyncStorage.getItem(StorageKey.KEY_START_DATE).then(previousDate => {
+    //   console.log('previous date', previousDate)
+    //   console.log('today`s date', Date())
+
+    //   if (previousDate) {
+    //     const isCurrentDate = moment(previousDate).isSame(Date(), 'day')
+    //     console.log('iscurrent', isCurrentDate)
+    //     if (!isCurrentDate) {
+    //       console.log('iscurrent reset')
+    //       showDialog(translate("reset_dialog_title"), true, async () => {
+    //         await reset()
+    //         AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
+    //         checkStartTime()
+    //       }, ()=>{
+    //         AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(false))
+    //         setisStart(false)
+    //       }, translate("start"), translate("cancel"), false, translate("reset_dialog_desc"))
+    //     } else {
+    //       AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
+    //       checkStartTime()
+    //     }
+    //   } else {
+    //     AsyncStorage.setItem(StorageKey.KEY_START_DATE, moment(Date()).toString())
+    //     checkStartTime()
+    //   }
+
+    // })
   }
 
   //if there is previous time start the timer with the previous time
@@ -253,7 +327,7 @@ const JobScreen = ({ navigation, route }) => {
   useFocusEffect(useCallback(() => {
     AsyncStorage.getItem(StorageKey.KEY_DO_JOB).then(job => {
       const isDoingJob = JSON.parse(job)
-
+      log("is doing job",isDoingJob)
       if (!isDoingJob) {
         getLastElapsedSecond().then(second => {
           showFormattedElapsedTime(second)
@@ -349,7 +423,6 @@ const JobScreen = ({ navigation, route }) => {
         icon={!isStart ? IconStart : IconStop}
         onPress={switchJob}
       />
-
     </View>
   </SafeAreaView>
 

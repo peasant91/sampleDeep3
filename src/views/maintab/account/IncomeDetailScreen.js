@@ -6,7 +6,6 @@ import translate from '../../../locales/translate'
 import { createWithdraw, getIncomeList } from '../../../services/transaction'
 import { showDialog } from '../../../actions/commonActions'
 import moment from 'moment'
-import { momentx } from '../../../actions/helper'
 import { range, toCurrency } from '../../../actions/helper'
 import { ShimmerIncome, ShimmerTripDetail } from '../../../components/atoms/shimmer/Shimmer'
 import PeriodStrip from '../../../components/atoms/PeriodStrip'
@@ -32,7 +31,7 @@ const statusText = (status) => {
 
 const IncomeDetailScreen = ({ navigation, route }) => {
 
-    const currentYear = momentx(Date()).format('yyyy')
+    const currentYear = moment(Date()).format('yyyy')
     const [data, setdata] = useState({})
     const [selectedYear, setselectedYear] = useState(currentYear)
     const availableYear = range(currentYear - 10, currentYear)
@@ -136,7 +135,7 @@ const IncomeDetailScreen = ({ navigation, route }) => {
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1 }}>
                                                         <View style={{ flex:0.5 }}>
                                                             <LatoBold style={{ color: 'black' }}>{item.title}</LatoBold>
-                                                            <LatoRegular style={{ color: Colors.dateGray,marginTop:5 }}>{momentx(item.date).format('DD MMMM YYYY')}</LatoRegular>
+                                                            <LatoRegular style={{ color: Colors.dateGray,marginTop:5 }}>{moment(item.date).format('DD MMMM YYYY')}</LatoRegular>
                                                         </View>
                                                         <View style={{alignItems:'flex-end',flex:0.5}}>
                                                             <LatoBold style={{ color: Colors.secondary }}>{toCurrency(item.amount)}</LatoBold>
@@ -152,7 +151,7 @@ const IncomeDetailScreen = ({ navigation, route }) => {
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1 }}>
                                                     <View style={{ flex:0.5 }}>
                                                             <LatoBold style={{ color: 'black' }}>{item.title ?? "test"}</LatoBold>
-                                                            <LatoRegular style={{ color: Colors.dateGray,marginTop:5 }}>{momentx(item.date).format('DD MMMM YYYY')}</LatoRegular>
+                                                            <LatoRegular style={{ color: Colors.dateGray,marginTop:5 }}>{moment(item.date).format('DD MMMM YYYY')}</LatoRegular>
                                                         </View>
                                                         <View style={{alignItems:'flex-end',flex:0.5}}>
                                                             <LatoBold style={{ color: Colors.darkRed }}>{"-" + toCurrency(item.amount)}</LatoBold>

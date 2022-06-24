@@ -4,7 +4,6 @@ import { LatoBold, LatoRegular } from '../CustomText'
 import Divider from '../Divider'
 import translate from '../../../locales/translate'
 import moment from 'moment'
-import { momentx } from '../../../actions/helper'
 import Colors from '../../../constants/Colors'
 
 import IconNoReport from '../../../assets/images/ic_no_report'
@@ -39,7 +38,7 @@ const ListReport = ({data, onPress}) => {
     return <View style={{paddingTop: 16, paddingHorizontal: 16}}>
         <Divider/>
         <View style={{flexDirection: 'row', marginTop: 16, justifyContent: 'space-between'}}>
-            <LatoBold>{momentx(data.start_date).format('DD MMM YYYY')}</LatoBold>
+            <LatoBold>{moment(data.start_date).format('DD MMM YYYY')}</LatoBold>
             {data.is_driver && data.desc && <TouchableOpacity onPress={() => onPress(false, data.id)}><LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold></TouchableOpacity>}
         </View>
         {

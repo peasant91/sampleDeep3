@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useState, useRef } from 'react'
 import { FlatList, ScrollView, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { showDialog, showLoadingDialog } from '../../../actions/commonActions'
+import { dismissDialog, showDialog, showLoadingDialog, showUploadDialog } from '../../../actions/commonActions'
 import { mapReportImages, mapStickerArea } from '../../../actions/helper'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomInput from '../../../components/atoms/CustomInput'
@@ -31,6 +31,8 @@ const CrudReportScreen = ({ navigation, route }) => {
     const [imageQueue, setimageQueue] = useState([])
     const [isloading, setisloading] = useState(false)
     const reportId = useRef(0)
+    const totalImageUpload = useRef(0)
+    const [currentUploadTask,setCurrentUploadTask] = useState()
 
 
 
@@ -48,7 +50,7 @@ const CrudReportScreen = ({ navigation, route }) => {
 
     const getStickers = () => {
         mapStickerArea(stickerArea).then(response => {
-            console.log('map sticker', response)
+            //console.log('map sticker', response)
             setStickerLayoutData(response)
         })
     }
@@ -62,7 +64,12 @@ const CrudReportScreen = ({ navigation, route }) => {
             }
             array.push(data)
         }
+        totalImageUpload.current = array[0].images.length
+        console.log("totalImage",totalImageUpload.current);
+        console.log("array image size",JSON.stringify(array));
+        console.log("stiker image size",stickerLayoutData.length);
         setimageQueue([...array])
+        setCurrentUploadTask(0)
         // showLoadingDialog(`mengeirim ${imageIndicator.current}/ ${queue.length}`)
     }
 
@@ -81,7 +88,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             type: 'check'
         })
 
-        console.log(formState)
+        //console.log(formState)
         let imageIsValid = true
 
         for (index in stickerLayoutData) {
@@ -90,6 +97,7 @@ const CrudReportScreen = ({ navigation, route }) => {
         }
 
         if (formState.formIsValid && imageIsValid) {
+            showUploadDialog("Mengunggah",totalImageUpload.current,0)
             setisloading(true)
             postReport(formState.inputValues).then(response => {
                 reportId.current = response.report_id
@@ -108,6 +116,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                     image: image.images[0],
                     sticker_area: image.sticker_area
                 }).then(response => {
+                    setCurrentUploadTask(prev=>prev+1)
                     image.images.shift()
                     setimageQueue([...imageQueue])
                 }).catch(err => {
@@ -189,7 +198,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
             if (data.length == 1) {
                 data[0].images[selectedPicker.index] = 'data:image/jpg;base64,' + result.assets[0].base64
-                console.log('data', data)
+                //console.log('data', data)
                 setStickerLayoutData([...stickerLayoutData])
             }
         } else {
@@ -227,6 +236,19 @@ const CrudReportScreen = ({ navigation, route }) => {
             }
         }
     }, [imageQueue])
+
+
+    useEffect(()=>{
+        if(!currentUploadTask){
+            return
+        }
+        console.log("current upload task",currentUploadTask)
+        console.log("current total task",totalImageUpload.current)
+        showUploadDialog("Mengunggah",totalImageUpload.current,currentUploadTask)
+        if(currentUploadTask == totalImageUpload.current-1){
+            dismissDialog()
+        }
+    },[currentUploadTask])
 
 
     useEffect(() => {
@@ -275,7 +297,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             />
             {
                 stickerLayoutData?.map((value, index) => {
-                    console.log(value)
+                    // console.log(value)
                     return <View style={{ marginBottom: 16 }}>
                         <LatoBold>{translate('report_string', { body: value.name })}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
                         <FlatList

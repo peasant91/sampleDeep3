@@ -30,16 +30,12 @@ export const openMaps = (lat, lng) => {
 
 export const getPostTime = (date) => {
   const utc = moment.utc('2022-04-19T02:20:33.000Z')
-  const now = momentx(Date())
+  const now = moment(Date())
   if (utc.diff(now, 'days') == 0) {
     return 'Sekitar ' + moment(utc).local().fromNow()
   } else {
-    return momentx(date).format('DD MMMM YYYY')
+    return moment(date).format('DD MMMM YYYY')
   }
-}
-
-export const momentx = (date) => {
-  return moment(date).utc()
 }
 
 export const displayProvince = (province) => {

@@ -16,7 +16,6 @@ import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText'
 import { displayProvince, getFullLink, openMaps, toCurrency } from '../../../actions/helper'
 import StatusTag from '../../../components/atoms/StatusTag'
 import Colors from '../../../constants/Colors'
-import {momentx} from '../../../actions/helper'
 import Divider from '../../../components/atoms/Divider'
 import ListInstallationSchedule from '../../../components/atoms/list/ListInstallationSchedule'
 import KeyValueComponent from '../../../components/atoms/KeyValueComponent'
@@ -26,6 +25,7 @@ import ListReport from '../../../components/atoms/list/ListReport'
 import DistanceChart from '../../../components/atoms/DistanceChart'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useIsFocused } from '@react-navigation/native'
+import moment from 'moment'
 
 const CurrentContractScreen = ({navigation, route}) => {
 
@@ -43,8 +43,8 @@ const CurrentContractScreen = ({navigation, route}) => {
     }
 
     const getAdsDate = () => {
-        const start = momentx(contractData.start_date)
-        const end = momentx(contractData.end_date)
+        const start = moment(contractData.start_date)
+        const end = moment(contractData.end_date)
         if (start.format('YYYY') != end.format('YYYY')) {
             return start.format('DD MMMM YYYY') + ' - ' + end.format('DD MMMM YYYY')
         } else if (start.format('MM') != end.format('MM')) {
@@ -141,7 +141,7 @@ const CurrentContractScreen = ({navigation, route}) => {
                     <Divider/>
 
                     <View style={{padding: 16}}>
-                            <KeyValueComponent title={translate('transferred')} value={momentx(contractData.date_transfer).format('DD MMMM YYYY')} isBold style={styles.subHeading}/>
+                            <KeyValueComponent title={translate('transferred')} value={moment(contractData.date_transfer).format('DD MMMM YYYY')} isBold style={styles.subHeading}/>
                             <KeyValueComponent title={translate('bank_account')} value={contractData.bank_number} style={styles.subHeading}/>
                     </View>
 

@@ -18,8 +18,9 @@ import CustomButton from '../components/atoms/CustomButton';
 import {getErrorMessage} from '../services/baseApi';
 import {ModalPortal} from 'react-native-modals';
 import moment from 'moment';
-import { momentx } from './helper';
+
 import {showAlert, closeAlert} from 'react-native-customisable-alert';
+import CustomUploadAlertComponent from '../components/molecules/CustomUploadAlertComponent';
 
 let id = 0;
 
@@ -63,6 +64,21 @@ export const showDialog = (
       ),
     });
 };
+
+export const showUploadDialog = (message,totalData,currentPosition) => {
+  showAlert({
+    alertType: 'custom',
+    animationIn: 'fadeIn',
+    animationOut: 'fadeOut',
+    customAlert: (
+      <CustomUploadAlertComponent
+      dialogTitle={message}
+      totalData={totalData}
+      currentState={currentPosition}
+      />
+    ),
+  });
+}
 
 export const showLoadingDialog = message => {
   console.log('alert dialog show');
@@ -210,7 +226,7 @@ export const checkAppVersion = async version => {
 };
 
 export const getCalendarYear = () => {
-  console.log(momentx().isoWeek(1));
+  console.log(moment().isoWeek(1));
 };
 
 const styles = StyleSheet.create({

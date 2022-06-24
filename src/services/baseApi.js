@@ -35,13 +35,19 @@ getClient.interceptors.response.use(response => {
 //     console.log('Starting Request:', JSON.stringify(request, null, 2))
 //     return request
 //   })
+// getClient.interceptors.request.use(x => {
+//     const printable = `Request: ${x.method.toUpperCase()} \nURL: ${x.baseURL
+//         }${x.url} \nParams: ${JSON.stringify(
+//             x.params,
+//             null,
+//             2,
+//         )} \nData: ${JSON.stringify(x.data, null, 2)}`;
+//     console.log(printable);
+//     return x;
+// });
 getClient.interceptors.request.use(x => {
     const printable = `Request: ${x.method.toUpperCase()} \nURL: ${x.baseURL
-        }${x.url} \nParams: ${JSON.stringify(
-            x.params,
-            null,
-            2,
-        )} \nData: ${JSON.stringify(x.data, null, 2)}`;
+        }${x.url}`;
     console.log(printable);
     return x;
 });

@@ -1,5 +1,4 @@
 import moment from 'moment'
-import { momentx } from '../../../actions/helper'
 import React from 'react'
 import { View } from 'react-native'
 import { Image } from 'react-native-elements'
@@ -23,7 +22,7 @@ const ListNotification = ({data, onPress}) => {
         <View style={{flex: 1, marginLeft: 10}}>
             <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
                 <LatoBold style={{color: Colors.primary }}>{data.title}</LatoBold>
-                <LatoRegular style={{fontSize: 10}}>{momentx(data.date).format('DD MMM yyyy')}</LatoRegular>
+                <LatoRegular style={{fontSize: 10}}>{moment(data.date).format('DD MMM yyyy')}</LatoRegular>
             </View>
 
             <LatoRegular style={{color: Colors.secondText}}>{data.body}</LatoRegular>
