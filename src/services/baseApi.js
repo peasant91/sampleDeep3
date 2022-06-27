@@ -35,19 +35,13 @@ getClient.interceptors.response.use(response => {
 //     console.log('Starting Request:', JSON.stringify(request, null, 2))
 //     return request
 //   })
-// getClient.interceptors.request.use(x => {
-//     const printable = `Request: ${x.method.toUpperCase()} \nURL: ${x.baseURL
-//         }${x.url} \nParams: ${JSON.stringify(
-//             x.params,
-//             null,
-//             2,
-//         )} \nData: ${JSON.stringify(x.data, null, 2)}`;
-//     console.log(printable);
-//     return x;
-// });
 getClient.interceptors.request.use(x => {
     const printable = `Request: ${x.method.toUpperCase()} \nURL: ${x.baseURL
-        }${x.url}`;
+        }${x.url} \nParams: ${JSON.stringify(
+            x.params,
+            null,
+            2,
+        )} \nData: ${JSON.stringify(x.data, null, 2)}`;
     console.log(printable);
     return x;
 });
@@ -58,7 +52,7 @@ export const post = async (route, body, option) => {
         const response = await getClient.post(route, body)
         return response.data.data
     } catch (err) {
-        console.log('error', err)
+        console.log('error', JSON.stringify(err))
         getErrorMessage(err)
     }
 }
@@ -102,6 +96,7 @@ const forceSignOut = async () => {
 export const getErrorMessage = (err) => {
 
     if (err.response) {
+        console.log('ERROR RESPONSE:', JSON.stringify(err.response.config.url, null, 2))
         console.log('ERROR RESPONSE:', JSON.stringify(err.response.data, null, 2))
         const errorData = err.response.data;
         const errorMessage = errorData.error.errors[0].message

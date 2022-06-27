@@ -103,7 +103,9 @@ const CrudReportScreen = ({ navigation, route }) => {
                 reportId.current = response.report_id
                 makeImageQueue()
             }).catch(err => {
-                // showDialog(err.message)
+                setisloading(false)
+                dismissDialog()
+                showDialog(err.message)
             })
         }
     }

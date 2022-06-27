@@ -60,7 +60,7 @@ const IncomeDetailScreen = ({ navigation, route }) => {
     const requestWithdraw = () => {
         withdrawSheet.current.close()
         createWithdraw().then(response => {
-            getDetail(year)
+            getDetail(selectedYear)
         }).catch(err => {
             showDialog(err.message)
         })

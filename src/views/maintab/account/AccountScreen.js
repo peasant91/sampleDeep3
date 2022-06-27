@@ -80,7 +80,9 @@ const AccountScreen = ({navigation, route}) => {
       setisLoading(false)
       showDialog(err.message)
     })
-    getIncomeList().then(Response=> {
+    getIncomeList({
+      year: moment(Date()).format('yyyy')
+  }).then(Response=> {
       setincomeData(Response)
       setrefreshing(false)
       setisLoading(false)
