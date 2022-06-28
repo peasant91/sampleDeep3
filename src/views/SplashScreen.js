@@ -90,9 +90,8 @@ const SplashScreen = ({ navigation, route }) => {
   const getProvinceApi = async () => {
     getProvince()
       .then(response => {
-        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
-          .then(response => getCompaniesApi())
-          .catch(err => console.log(err));
+        getCompaniesApi()
+        await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -103,7 +102,7 @@ const SplashScreen = ({ navigation, route }) => {
     getCompanies()
       .then(response => {
         getGenderApi()
-        AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
+        await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -114,7 +113,7 @@ const SplashScreen = ({ navigation, route }) => {
     getGender()
       .then(response => {
         getBankApi()
-        AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
+        await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -125,7 +124,7 @@ const SplashScreen = ({ navigation, route }) => {
     getBank()
       .then(response => {
         doneLoading()
-        AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(response))
+        await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -243,30 +242,55 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
-  const loadAllData = () => {
-    axios.all([
-      getProvince(),
-      getCompanies(),
-      getGender(),
-      getBank(),
-      getVehicleOwnership(),
-      getVehicleSticker(),
-      getVehicleUsage(),
-      getColor(),
-    ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
-      console.log('axios spread', province, companies)
-      await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
-      await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
-      await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
-      await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
-      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
-      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
-      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
-      await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
-      doneLoading()
-    })).catch(err => {
+  const loadAllData = async () => {
+    try {
+      var province = await getProvince()
+      var companies = await getCompanies()
+      var gender = await getGender()
+      var bank = await getBank()
+      var ownership = await getVehicleOwnership()
+      var sticker = await getVehicleSticker()
+      var usage = await getVehicleUsage()
+      var color = await getColor()
+      if (province && companies && gender && bank && ownership && sticker && usage && color) {
+        await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
+        await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
+        await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
+        await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
+        await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
+        print("saving done loading")
+        doneLoading()
+      }
+    } catch (error) {
       showDialog(err.message)
-    })
+    }
+
+    // axios.all([
+    //   getProvince(),
+    //   getCompanies(),
+    //   getGender(),
+    //   getBank(),
+    //   getVehicleOwnership(),
+    //   getVehicleSticker(),
+    //   getVehicleUsage(),
+    //   getColor(),
+    // ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
+    //   console.log('axios spread', province, companies)
+    //   await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
+    //   await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
+    //   await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
+    //   await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
+    //   await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
+    //   await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
+    //   await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
+    //   await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
+    //   doneLoading()
+    // })).catch(err => {
+    //   showDialog(err.message)
+    // })
   }
 
   useEffect(() => {
