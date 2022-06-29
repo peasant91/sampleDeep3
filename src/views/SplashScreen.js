@@ -91,7 +91,7 @@ const SplashScreen = ({ navigation, route }) => {
     getProvince()
       .then(response => {
         getCompaniesApi()
-        await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
+        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -102,7 +102,7 @@ const SplashScreen = ({ navigation, route }) => {
     getCompanies()
       .then(response => {
         getGenderApi()
-        await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
+        AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -113,7 +113,7 @@ const SplashScreen = ({ navigation, route }) => {
     getGender()
       .then(response => {
         getBankApi()
-        await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
+        AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
@@ -124,7 +124,7 @@ const SplashScreen = ({ navigation, route }) => {
     getBank()
       .then(response => {
         doneLoading()
-        await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(response))
+        AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(response))
       })
       .catch(err => {
         showDialog(err.message);
