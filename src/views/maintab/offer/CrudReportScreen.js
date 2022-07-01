@@ -22,7 +22,7 @@ import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
 const CrudReportScreen = ({ navigation, route }) => {
 
-    const { isAdd, id, stickerArea } = route.params
+    const { isAdd, id, stickerArea,isUpdate } = route.params
     const [stickerLayoutData, setStickerLayoutData] = useState([])
     const [selectedPicker, setselectedPicker] = useState()
     const [imagePickerId, setimagePickerId] = useState(99);

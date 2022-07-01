@@ -8,6 +8,7 @@ import Colors from '../../../constants/Colors'
 
 import IconNoReport from '../../../assets/images/ic_no_report'
 import IconEmptyReport from '../../../assets/images/ic_empty_report'
+import { addDate, isBeforeDate } from '../../../actions/helper'
 
 const ListReport = ({data, onPress}) => {
 
@@ -21,7 +22,7 @@ const ListReport = ({data, onPress}) => {
     const EmptyReport = () => {
         return <TouchableOpacity 
                 style={{backgroundColor: '#EFEFFF', borderRadius: 4, padding: 16, alignItems: 'center', marginTop: 10}} 
-                onPress={() => onPress(true, data.id)}>
+                onPress={() => onPress(true, data.id,true)}>
             <IconEmptyReport/>
             <LatoRegular containerStyle={{marginVertical: 5}}>{translate('empty_report')}</LatoRegular>
             <LatoRegular style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('add_now')}</LatoRegular>
@@ -35,14 +36,26 @@ const ListReport = ({data, onPress}) => {
         </View>
     }
 
+    const isStillAbleAdd = () => {
+        //forigiven date is masa tenggang you still able to create/update report
+        //and then check if today's date is before or in same day with forgivenDate
+        var forgivenDate = moment(data.start_date).add(8,'days')
+        const today = moment(Date()).startOf('day')
+        return isBeforeDate(today,forgivenDate) && ((data.desc==null) || data.desc == "")
+    }
+
     return <View style={{paddingTop: 16, paddingHorizontal: 16}}>
         <Divider/>
         <View style={{flexDirection: 'row', marginTop: 16, justifyContent: 'space-between'}}>
             <LatoBold>{moment(data.start_date).format('DD MMM YYYY')}</LatoBold>
-            {data.is_driver && data.desc && <TouchableOpacity onPress={() => onPress(false, data.id)}><LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold></TouchableOpacity>}
+            {data.is_driver && data.desc && <TouchableOpacity onPress={() => onPress(false, data.id,false)}><LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold></TouchableOpacity>}
         </View>
         {
-            !data.desc ? <EmptyReport/> : (data.is_driver ? <Report/> : <NoReport/>)
+            data.is_driver ?
+            <Report/> : (
+                isStillAbleAdd() ? <EmptyReport/> : <NoReport/>
+            )
+
         }
     </View>
 }

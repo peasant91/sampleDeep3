@@ -27,6 +27,49 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useIsFocused } from '@react-navigation/native'
 import moment from 'moment'
 
+const dummyReport = [
+    {
+      "id": 5,
+      "desc": "",
+      "odometer": "/storage/contract/reports/odometer/dG2OaWwRa7ctmsu2.jpeg",
+      "is_driver": false,
+      "start_date": "2022-06-25T00:00:00.000000Z",
+      "created_at": "2022-06-24T01:38:01.000000Z"
+    },
+    {
+      "id": 4,
+      "desc": "Tes today",
+      "odometer": "/storage/contract/reports/odometer/gByNVTW9AS6zGU96.jpeg",
+      "is_driver": false,
+      "start_date": "2022-06-22T00:00:00.000000Z",
+      "created_at": "2022-06-24T01:35:51.000000Z"
+    },
+    {
+      "id": 3,
+      "desc": "Lagi report",
+      "odometer": "/storage/contract/reports/odometer/Z01yo1qmqENOR94o.jpeg",
+      "is_driver": true,
+      "start_date": "2022-07-05T16:00:00.000000Z",
+      "created_at": "2022-06-22T07:45:18.000000Z"
+    },
+    {
+      "id": 2,
+      "desc": "Tanggal sama",
+      "odometer": "/storage/contract/reports/odometer/mlwVOaJTsFgQJvAp.jpeg",
+      "is_driver": true,
+      "start_date": "2022-06-28T16:00:00.000000Z",
+      "created_at": "2022-06-22T07:42:28.000000Z"
+    },
+    {
+      "id": 1,
+      "desc": "Mantap",
+      "odometer": "/storage/contract/reports/odometer/yh3sF0ThiVo58NHf.jpeg",
+      "is_driver": true,
+      "start_date": "2022-06-21T16:00:00.000000Z",
+      "created_at": "2022-06-22T05:32:34.000000Z"
+    }
+  ]
+
 const CurrentContractScreen = ({navigation, route}) => {
 
     const [contractData, setcontractData] = useState()
@@ -58,9 +101,8 @@ const CurrentContractScreen = ({navigation, route}) => {
         navigation.navigate('TripDetail', {id: id})
     }
 
-    const goToCrudReport = (isAdd, id) => {
-        // navigation.navigate('CrudReport', {isAdd: isAdd, id: id, sticker_area: contractData.campaign.sticker_area})
-        navigation.navigate('CrudReport', {isAdd: isAdd, id: id, stickerArea: contractData.campaign.sticker_area})
+    const goToCrudReport = (isAdd, id,isUpdate) => {
+        navigation.navigate('CrudReport', {isAdd: isAdd,isUpdate: isUpdate, id: id, stickerArea: contractData.campaign.sticker_area})
     }
 
     useEffect(() => {
@@ -73,7 +115,8 @@ const CurrentContractScreen = ({navigation, route}) => {
                 getChartData(id)
             ]).then(axios.spread(async (report, contract, chart) => {
                 setcontractData(contract)
-                setreportData(report)
+                //setreportData(report)
+                setreportData(dummyReport)
                 setChartData(chart)
                 setisLoading(false)
             })).catch(err => {
@@ -83,6 +126,10 @@ const CurrentContractScreen = ({navigation, route}) => {
 
         }
     }, [isFocus])
+
+    const x = () =>{
+        //if today is between first report date - date+7
+    }
     
 
     return <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
@@ -172,7 +219,7 @@ const CurrentContractScreen = ({navigation, route}) => {
                     <View style={{paddingTop: 16}}>
                         <Divider/>
                         <LatoBold containerStyle={{padding:16}}>{translate('weekly_report')}</LatoBold>
-                        <TouchableOpacity onPress={goToCrudReport}>
+                        <TouchableOpacity onPress={goToCrudReport.bind(this,true,null,false)}>
                             <LatoBold style={{color: Colors.primarySecondary}} containerStyle={{alignSelf: 'center', padding: 5}}>{translate('+create_report')}</LatoBold>
                             </TouchableOpacity>
                     </View>

@@ -90,8 +90,12 @@ const SplashScreen = ({ navigation, route }) => {
   const getProvinceApi = async () => {
     getProvince()
       .then(response => {
-        getCompaniesApi()
-        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
+        
+        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response)).then(() =>{
+          getCompaniesApi()
+        }).catch(err=>{
+          showDialog(JSON.stringify(err));  
+        })
       })
       .catch(err => {
         showDialog(err.message);

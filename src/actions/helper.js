@@ -38,6 +38,11 @@ export const getPostTime = (date) => {
   }
 }
 
+export const isBeforeDate = (firstDate,secondDate) => {
+  //first date is current date, secondDate is compared date
+  return firstDate <= secondDate
+}
+
 export const displayProvince = (province) => {
   if (province && province.length > 1) {
     return translate('province_count', { count: province.length })
