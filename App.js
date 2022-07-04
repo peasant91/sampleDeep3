@@ -14,6 +14,7 @@ import {
   View,
   Text,
   StatusBar,
+  Alert,
 } from 'react-native';
 
 import { ThemeProvider, Icon } from 'react-native-elements';
@@ -71,6 +72,7 @@ import MainTabScreen from './src/views/maintab/MainTabScreen';
 import { logout } from './src/services/user';
 import { showDialog } from './src/actions/commonActions';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import notifee from '@notifee/react-native';
 
 //realm
 
@@ -168,7 +170,7 @@ const App = ({ navigation, route }) => {
           AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
             dispatch({ type: 'SIGN_OUT' });
           })
-          
+
         }).catch(err => {
           BackgroundGeolocation.stop()
           AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
@@ -209,10 +211,48 @@ const App = ({ navigation, route }) => {
     bootstrapAsync();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-    });
+  const requestNotifPermission = async () => {
+    try {
+      await notifee.requestPermission()
+      const status = await messaging().requestPermission();
+      if (status === messaging.AuthorizationStatus.AUTHORIZED || status === messaging.AuthorizationStatus.PROVISIONAL) {
+        messaging().onNotificationOpenedApp(remoteMessage => {
+          console.log("MESSAGE - ON NOTIFICATION OPEN APP", remoteMessage);
+        });
+        messaging().getInitialNotification().then(remoteMessage => {
+          console.log("MESSAGE - INITIAL FUNCTION");
+          console.log(remoteMessage);
+        });
+        return
+      } else {
+        requestNotifPermission()
+      }
+    } catch (err) {
+      console.log("request notif permission error", err);
+    }
+  }
 
+  useEffect(() => {
+    requestNotifPermission()
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log("remove messaging", remoteMessage);
+      // Create a channel (required for Android)
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
+      const data = remoteMessage.data
+      if(data){
+        await notifee.displayNotification({
+          title: data.title,
+          body: data.body,
+          data: data,
+          android: {
+            channelId
+          }
+        })
+      }
+    })
     return unsubscribe;
   }, []);
 
@@ -253,6 +293,7 @@ const App = ({ navigation, route }) => {
     messaging()
       .getInitialNotification()
       .then(remoteMessage => {
+        console.log("initial noti");
         if (remoteMessage) {
           console.log(
             'Notification caused app to open from quit state:',
@@ -315,13 +356,13 @@ const App = ({ navigation, route }) => {
                       name="Register"
                       component={RegisterScreen}
                       options={{ headerShown: false }}
-                      initialParams={{isEdit: false}}
+                      initialParams={{ isEdit: false }}
                     />
 
                     <Stack.Screen
                       name="RegisterPassword"
                       component={RegisterPasswordScreen}
-                      initialParams={{data: {}}}
+                      initialParams={{ data: {} }}
                       options={{ headerShown: false }}
                     />
 
@@ -329,10 +370,10 @@ const App = ({ navigation, route }) => {
                       name="RegisterVehicle"
                       component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
-                      initialParams={{isEdit: false}}
+                      initialParams={{ isEdit: false }}
                     />
 
-                    
+
                     <Stack.Screen
                       name="ResetPassword"
                       component={ResetPasswordScreen}
@@ -371,7 +412,7 @@ const App = ({ navigation, route }) => {
                       component={OtpScreen}
                       options={{ headerShown: false }}
                     />
-                    
+
                     <Stack.Screen
                       name="ImageViewer"
                       component={ImageViewerScreen}
@@ -463,7 +504,7 @@ const App = ({ navigation, route }) => {
                       component={OfferDetailScreen}
                       options={{ headerShown: false, animationEnabled: enableAnimation }}
                     />
-                    
+
                     <Stack.Screen
                       name="Picker"
                       component={PickerScreen}

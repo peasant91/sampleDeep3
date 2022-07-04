@@ -79,6 +79,7 @@ const LoginScreen = ({ navigation, route }) => {
         if (!token){
           token = await getFirebaseToken()
         }
+        console.log("fcm",token);
         login({
           ...formState.inputValues,
           fcm_token: token

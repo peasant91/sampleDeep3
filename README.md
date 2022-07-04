@@ -1,0 +1,1 @@
+if you want to clone the project please add change 'android:exported=true' to all intentFilter container in AndroidManifest.xml of ``node_modules/@mauron85/react-native-background-geolocation/android/lib/src/main/AndroidManifest.xml``

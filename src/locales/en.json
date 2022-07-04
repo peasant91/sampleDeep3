@@ -296,6 +296,8 @@
     "withdraw_confirmation_desc": "Dana yang ditarik merupakan akumulasi pendapatan dari pekerjaan yang selesai.",
     "reset_job_warning":"Waktu dan jarak akan diakumulasi setiap hari setiap\n jam 00:00",
     "reset_dialog_title": "Mulai Pekerjaan?",
-    "reset_dialog_desc": "Waktu dan jarak akan direset dari awal, namun data hari sebelumnya sudah diakumulasi pada laporan perjalanan."
+    "reset_dialog_desc": "Waktu dan jarak akan direset dari awal, namun data hari sebelumnya sudah diakumulasi pada laporan perjalanan.",
+    "report_warning_title": "Report minggu ini sudah dibuat",
+    "report_warning_desc": "Anda hanya dapat membuat report 1x seminggu di setiap jobnya."
     
 }
