@@ -90,11 +90,13 @@ const LoginScreen = ({ navigation, route }) => {
             console.log('login success');
           })
           .catch(err => {
+            console.log("login error 1");
             setIsLoading(false);
             showDialog(err.message, false);
           });
       } catch (err) {
-        showDialog(err)
+        console.log("login error 2");
+        showDialog(err.message)
       }
     }
   }

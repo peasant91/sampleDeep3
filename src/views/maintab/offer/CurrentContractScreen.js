@@ -116,8 +116,8 @@ const CurrentContractScreen = ({ navigation, route }) => {
                     getChartData(id)
                 ]).then(axios.spread(async (report, contract, chart) => {
                     setcontractData(contract)
-                    //setreportData(report)
-                    setreportData(dummyReport)
+                    setreportData(report)
+                    //setreportData(dummyReport)
                     setChartData(chart)
                     setisLoading(false)
                 })).catch(err => {
@@ -255,8 +255,8 @@ const CurrentContractScreen = ({ navigation, route }) => {
                         <View style={{ paddingTop: 16 }}>
                             <Divider />
                             <LatoBold containerStyle={{ padding: 16 }}>{translate('weekly_report')}</LatoBold>
-                            {/* <TouchableOpacity onPress={goToCrudReport.bind(this, true, null, false)}> */}
-                            <TouchableOpacity onPress={handleCreateReport}>
+                            <TouchableOpacity onPress={goToCrudReport.bind(this, true, null, false)}>
+                            {/* <TouchableOpacity onPress={handleCreateReport}> */}
                                 <LatoBold style={{ color: Colors.primarySecondary }} containerStyle={{ alignSelf: 'center', padding: 5 }}>{translate('+create_report')}</LatoBold>
                             </TouchableOpacity>
                         </View>

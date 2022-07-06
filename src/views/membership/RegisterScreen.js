@@ -58,6 +58,8 @@ import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { useToast } from "react-native-toast-notifications";
+import ImageResizer from 'react-native-image-resizer';
+import ImgToBase64 from 'react-native-image-base64';
 
 const dummyDivision = [
   {
@@ -396,33 +398,39 @@ const RegisterScreen = ({ navigation, route }) => {
       }
     }
     const result = await launchImageLibrary({
-      quality: 0.4,
-      maxWidth: 1024,
-      maxHeight: 768,
+      quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
     });
     processResult(result)
   };
 
-  const processResult = (result) => {
+  const processResult = async (result) => {
     if (result == null || result == undefined || result.assets == undefined) {
       return
     }
+    const uri = result.assets[0].uri
+    const resizeImage = await ImageResizer.createResizedImage(uri, 1024, 720, 'JPEG', 30, undefined, undefined, false, {
+      onlyScaleDown: true
+    })
+    if (resizeImage) {
+      const base64String = await ImgToBase64.getBase64String(resizeImage.uri)
 
-    //console.log('result image', result)
-    selectedPicker.dispatch({
-      type: 'input',
-      id: selectedPicker.id,
-      input: 'data:image/png;base64,' + result.assets[0].base64,
-      isValid: true,
-    })
-    selectedPicker.dispatch({
-      type: 'input',
-      id: selectedPicker.id + '_uri',
-      input: result.assets[0].uri,
-      isValid: true,
-    })
+      if (base64String) {
+        selectedPicker.dispatch({
+          type: 'input',
+          id: selectedPicker.id,
+          input: 'data:image/png;base64,' + base64String,
+          isValid: true,
+        })
+        selectedPicker.dispatch({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: resizeImage.uri,
+          isValid: true,
+        })
+      }
+    }
   }
 
   const openImagePicker = async (id, location, dispatch) => {

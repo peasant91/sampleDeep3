@@ -3,7 +3,7 @@ import { FlatList, SafeAreaView, View } from 'react-native'
 import ListNotification from '../components/atoms/list/ListNotification'
 import NavBar from '../components/atoms/NavBar'
 import translate from '../locales/translate'
-import { getNotification, readNotif } from '../services/notification'
+import { getNotification, readAllNotif, readNotif } from '../services/notification'
 
 import IconEmpty from '../assets/images/ic_empty_notification'
 import { LatoBold, LatoRegular } from '../components/atoms/CustomText'
@@ -62,8 +62,13 @@ const NotificationScreen = ({ navigation, route }) => {
                 } else {
                     setdata([...data, ...response])
                 }
-
                 page.current += 1
+                readAllNotif().then(response =>{
+                    console.log("success read all notif");
+                }).catch(err =>{
+                    setIsLoading(false)
+                    showDialog(err.message)
+                })
             }).catch(err => {
                 setIsLoading(false)
                 showDialog(err.message)

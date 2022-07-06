@@ -17,6 +17,8 @@ target 'otomedia' do
     :hermes_enabled => true
   )
 
+  pod 'react-native-image-base64', :path => '../node_modules/react-native-image-base64'
+
   target 'otomediaTests' do
     inherit! :complete
     # Pods for testing

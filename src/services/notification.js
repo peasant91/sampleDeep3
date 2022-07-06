@@ -7,3 +7,7 @@ export const getNotification = (query) => {
 export const readNotif = (id) => {
     return patch(`v1/notification/${id}/read`)
 }
+
+export const readAllNotif = () => {
+    return patch('v1/notification/read')
+}
