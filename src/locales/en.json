@@ -298,6 +298,8 @@
     "reset_dialog_title": "Mulai Pekerjaan?",
     "reset_dialog_desc": "Waktu dan jarak akan direset dari awal, namun data hari sebelumnya sudah diakumulasi pada laporan perjalanan.",
     "report_warning_title": "Report minggu ini sudah dibuat",
-    "report_warning_desc": "Anda hanya dapat membuat report 1x seminggu di setiap jobnya."
+    "report_warning_desc": "Anda hanya dapat membuat report 1x seminggu di setiap jobnya.",
+    "partner_title" : "Rekanan",
+    "partner_placeholder": "Pilih Rekanan"
     
 }

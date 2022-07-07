@@ -39,8 +39,8 @@ const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 const LoginScreen = ({ navigation, route }) => {
   const [formState, dispatch] = useReducer(formReducer, {
     inputValues: {
-      phone: Config.isDevMode ? '85156287302' : '',
-      credential: Config.isDevMode ? '85156287302' : '',
+      phone: Config.isDevMode ? '82145145145' : '',
+      credential: Config.isDevMode ? '82145145145' : '',
       password: Config.isDevMode ? 'password' : '',
     },
     inputValidities: {

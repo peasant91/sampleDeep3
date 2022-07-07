@@ -49,7 +49,7 @@ import IDCard from '../../components/atoms/IDCard';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
-import { getCity, getDistrict, getProvince, getVillage } from '../../services/utilities';
+import { getCity, getDistrict, getProvince, getVillage,getDriverRekanan } from '../../services/utilities';
 import moment from 'moment';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
@@ -84,6 +84,7 @@ const RegisterScreen = ({ navigation, route }) => {
   const [districtData, setdistrictData] = useState();
   const [villageData, setvillageData] = useState();
   const [bankData, setbankData] = useState();
+  const [partnerData,setPartnerData] = useState()
   const [selectedPicker, setselectedPicker] = useState();
   const [imagePickerId, setimagePickerId] = useState(99);
   const [preloading, setpreloading] = useState(true)
@@ -191,6 +192,8 @@ const RegisterScreen = ({ navigation, route }) => {
         birth_date: data.birth_date,
         driver_company_id: data.driver_company?.id,
         driver_company_id_value: data.driver_company?.name,
+        driver_partner_id : data.driver_partner?.id,
+        driver_partner_id_value: data.driver_partner?.name,
         profile_image: await getImageBase64FromUrl(getFullLink(data.profile_image)),
         profile_image_uri: data.profile_image,
         gender: data.gender
@@ -466,7 +469,7 @@ const RegisterScreen = ({ navigation, route }) => {
 
   const openPicker = (id, title, data, dispatch) => {
     var selectedId;
-    if (id == 'driver_company_id') {
+    if (id == 'driver_company_id' || id == 'driver_partner_id') {
       selectedId = formStateDetail.inputValues[id];
     } else if (id == 'bank_id') {
       selectedId = formStateBank.inputValues[id];
@@ -500,13 +503,21 @@ const RegisterScreen = ({ navigation, route }) => {
 
   }, []);
 
+  useEffect(()=>{
+    const getDriverPartner = async() =>{
+      const partner = await getDriverRekanan()
+      setPartnerData(partner)
+    }
+    getDriverPartner()
+  },[])
+
   useEffect(() => {
     console.log(route.params);
 
     if (route.params?.pickerId) {
       const id = route.params.pickerId;
       const dispatch = route.params.dispatch;
-
+      console.log(id);
       dispatch({
         type: 'picker',
         id: id,
@@ -538,7 +549,9 @@ const RegisterScreen = ({ navigation, route }) => {
             state: state
           })
         })
-      } else if (id == 'bank_id') {
+      } else if (id == 'driver_partner_id'){
+
+      }else if (id == 'bank_id') {
         return
       } else {
         if (id == 'province_id') {
@@ -761,6 +774,20 @@ const RegisterScreen = ({ navigation, route }) => {
             />
 
             <InfoMenu text={translate('company_bank_info')} containerStyle={{ marginTop: 16 }} />
+
+            <PickerInput
+              id={'driver_partner_id'}
+              title={translate('partner_title')}
+              placeholder={translate('partner_placeholder')}
+              value={formStateDetail.inputValues.driver_partner_id_value}
+              viewOnly={isVerified}
+              containerStyle={{ marginTop: 16 }}
+              disabled={isVerified}
+              onPress={() => {
+                openPicker('driver_partner_id', 'partner_title', partnerData, dispatchDetail)
+              }}
+              isCheck={formState.isChecked}
+            />
 
             <CustomInput
               id={'address'}

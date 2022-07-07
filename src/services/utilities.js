@@ -65,3 +65,7 @@ export const getDriverVehicle = () => {
 export const getVehicleRoute = () => {
     return get(`${Config.apiVersion}/driver/vehicle/rute-distance`, {})
 }
+
+export const getDriverRekanan = () => {
+    return get(`${Config.apiVersion}/driver/partner`)
+}
