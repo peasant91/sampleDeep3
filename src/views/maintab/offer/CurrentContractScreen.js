@@ -33,7 +33,7 @@ const dummyReport = [
         "desc": "",
         "odometer": "/storage/contract/reports/odometer/dG2OaWwRa7ctmsu2.jpeg",
         "is_driver": false,
-        "start_date": "2022-06-25T00:00:00.000000Z",
+        "start_date": "2022-07-02T00:00:00.000000Z",
         "created_at": "2022-06-24T01:38:01.000000Z"
     },
     {
@@ -102,8 +102,8 @@ const CurrentContractScreen = ({ navigation, route }) => {
         navigation.navigate('TripDetail', { id: id })
     }
 
-    const goToCrudReport = (isAdd, id, isUpdate) => {
-        navigation.navigate('CrudReport', { isAdd: isAdd, isUpdate: isUpdate, id: id, stickerArea: contractData.campaign.sticker_area })
+    const goToCrudReport = (isAdd, id) => {
+        navigation.navigate('CrudReport', { isAdd: isAdd, id: id, stickerArea: contractData.campaign.sticker_area })
     }
 
     useEffect(() => {
@@ -117,7 +117,6 @@ const CurrentContractScreen = ({ navigation, route }) => {
                 ]).then(axios.spread(async (report, contract, chart) => {
                     setcontractData(contract)
                     setreportData(report)
-                    //setreportData(dummyReport)
                     setChartData(chart)
                     setisLoading(false)
                 })).catch(err => {
@@ -128,43 +127,21 @@ const CurrentContractScreen = ({ navigation, route }) => {
         }
     }, [isFocus])
 
-    const generateReportAvailability = (contractData) => {
-        let ret = [];
-        const fromDate = moment("01-07-2022", 'DD-MM-YYYY');
-        const toDate = moment("06-07-2022", 'DD-MM-YYYY');
-        let date = fromDate.add(6, 'days');
-        if (date >= fromDate) {
-            //durasi kurang dari 7 hari
-            ret.push(toDate.format('DD-MM-yyyy'))
-        }
-
-        while (date < toDate) {
-            ret.push(date.format('DD-MM-YYYY'));
-            date = moment(date).add(6, 'days');
-        }
-        console.log("ret",JSON.stringify(ret));
-        return ret;
-    }
+    
 
     const handleCreateReport = () => {
-        generateReportAvailability(contractData)
-        //showDialog(translate('report_warning_title'),false,()=>{},null,translate('back'),null,null,translate('report_warning_desc'))
-        /*
-        //check if no report data, then auto add
-        if report list.length == 0, gotoAddReport; return
-
-        //check if driver has create report this week
-        if(hasGenerateReportThisWeek){
-                //show dialog
+        if (reportData.length > 0){
+            //goto crud
+            const firstReport = reportData[0]
+            if (!firstReport.is_driver){
+                goToCrudReport(true,firstReport.id)
             }else{
-                if(isDriverWillCreateOrUpdate){
-                    //update
-                }else{
-                    //add
-                }
+                showDialog(translate('report_warning_title'),false,()=>{},null,translate('back'),null,null,translate('report_warning_desc'))    
             }
-        
-        */
+        }else{
+            //show Dialog
+            showDialog(translate('report_invalid_title'),false,()=>{},null,translate('back'),null,null,translate('report_invalid_desc'))
+        }
     }
 
 
@@ -255,8 +232,8 @@ const CurrentContractScreen = ({ navigation, route }) => {
                         <View style={{ paddingTop: 16 }}>
                             <Divider />
                             <LatoBold containerStyle={{ padding: 16 }}>{translate('weekly_report')}</LatoBold>
-                            <TouchableOpacity onPress={goToCrudReport.bind(this, true, null, false)}>
-                            {/* <TouchableOpacity onPress={handleCreateReport}> */}
+                            {/* <TouchableOpacity onPress={goToCrudReport.bind(this, true, null, false)}> */}
+                            <TouchableOpacity onPress={handleCreateReport}>
                                 <LatoBold style={{ color: Colors.primarySecondary }} containerStyle={{ alignSelf: 'center', padding: 5 }}>{translate('+create_report')}</LatoBold>
                             </TouchableOpacity>
                         </View>

@@ -22,7 +22,7 @@ const ListReport = ({data, onPress}) => {
     const EmptyReport = () => {
         return <TouchableOpacity 
                 style={{backgroundColor: '#EFEFFF', borderRadius: 4, padding: 16, alignItems: 'center', marginTop: 10}} 
-                onPress={() => onPress(true, data.id,true)}>
+                onPress={() => onPress(true, data.id)}>
             <IconEmptyReport/>
             <LatoRegular containerStyle={{marginVertical: 5}}>{translate('empty_report')}</LatoRegular>
             <LatoRegular style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('add_now')}</LatoRegular>
@@ -39,9 +39,9 @@ const ListReport = ({data, onPress}) => {
     const isStillAbleAdd = () => {
         //forigiven date is masa tenggang you still able to create/update report
         //and then check if today's date is before or in same day with forgivenDate
-        var forgivenDate = moment(data.start_date).add(8,'days')
+        var forgivenDate = moment(data.start_date).add(9,'days')
         const today = moment(Date()).startOf('day')
-        return isBeforeDate(today,forgivenDate) && ((data.desc==null) || data.desc == "")
+        return isBeforeDate(today,forgivenDate)
     }
 
     return <View style={{paddingTop: 16, paddingHorizontal: 16}}>

@@ -300,6 +300,8 @@
     "report_warning_title": "Report minggu ini sudah dibuat",
     "report_warning_desc": "Anda hanya dapat membuat report 1x seminggu di setiap jobnya.",
     "partner_title" : "Rekanan",
-    "partner_placeholder": "Pilih Rekanan"
+    "partner_placeholder": "Pilih Rekanan",
+    "report_invalid_title": "Campaign Belum Dimulai",
+    "report_invalid_desc": "Anda bisa membuat laporan jika campaign sudah dimulai."
     
 }

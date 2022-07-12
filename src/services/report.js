@@ -1,4 +1,4 @@
-import {get, post} from '../services/baseApi'
+import {get, post, patch} from '../services/baseApi'
 
 export const getReportList = (id) => {
     return get(`v1/contract/${id}/report`)
@@ -16,8 +16,8 @@ export const getTripDetail =  (id) => {
     return get (`v1/contract/${id}/trip`)
 }
 
-export const postReport = (data) => {
-    return post(`v1/contract/report`, data)
+export const postReport = (id,data) => {
+    return patch(`v1/contract/report/${id}`, data)
 }
 
 export const postReportImage = (id, data) => {

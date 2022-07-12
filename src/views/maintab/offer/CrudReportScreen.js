@@ -22,7 +22,7 @@ import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
 const CrudReportScreen = ({ navigation, route }) => {
 
-    const { isAdd, id, stickerArea,isUpdate } = route.params
+    const { isAdd, id, stickerArea } = route.params
     const [stickerLayoutData, setStickerLayoutData] = useState([])
     const [selectedPicker, setselectedPicker] = useState()
     const [imagePickerId, setimagePickerId] = useState(99);
@@ -99,8 +99,8 @@ const CrudReportScreen = ({ navigation, route }) => {
         if (formState.formIsValid && imageIsValid) {
             showUploadDialog("Mengunggah",totalImageUpload.current,0)
             setisloading(true)
-            postReport(formState.inputValues).then(response => {
-                reportId.current = response.report_id
+            postReport(reportId.current,formState.inputValues).then(response => {
+                // reportId.current = response.report_id
                 makeImageQueue()
             }).catch(err => {
                 setisloading(false)
@@ -279,6 +279,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                     showDialog(err.message)
                 })
         } else {
+            reportId.current = id
             getStickers()
         }
     }, [])
