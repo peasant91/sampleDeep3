@@ -211,7 +211,7 @@ const CurrentContractScreen = ({ navigation, route }) => {
                         <LatoBold Icon={IconReport} style={{ color: Colors.primary }}>{translate('trip_report')}</LatoBold>
                         <KeyValueComponent title={translate('driver_status')} value={contractData.status} style={styles.subHeading} containerStyle={{ marginTop: 10 }} />
                         <KeyValueComponent title={translate('vehicle_type')} value={contractData.vehicle_type} style={styles.subHeading} />
-                        <KeyValueComponent title={translate('ads_type')} value={contractData.campaign.sticker_area.length == 1 ? contractData.campaign.sticker_area[0].name : contractData.sticker_area.map(item => item.name).join(', ')} style={styles.subHeading} />
+                        <KeyValueComponent title={translate('ads_type')} value={contractData.campaign.sticker_area.length == 1 ? contractData.campaign.sticker_area[0].name : contractData.campaign.sticker_area.map(item => item.name).join(', ')} style={styles.subHeading} />
                         <KeyValueComponent title={translate('total_trip')} value={contractData.total_distance + 'Km'} style={styles.subHeading} />
                         <KeyValueComponent title={translate('trip_today')} value={contractData.today_distance + 'Km'} style={styles.subHeading} />
                     </View>
@@ -256,7 +256,7 @@ const CurrentContractScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     subHeading: {
         color: Colors.primary,
-        fontSize: 12
+        fontSize: 12,
     }
 })
 

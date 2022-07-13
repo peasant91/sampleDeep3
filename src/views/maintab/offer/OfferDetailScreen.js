@@ -20,6 +20,7 @@ import ListTag from '../../../components/atoms/list/ListTag'
 import { ShimmerOfferDetail } from '../../../components/atoms/shimmer/Shimmer'
 import { applyContract } from '../../../services/contract'
 import SafeAreaView from 'react-native-safe-area-view'
+import InfoMenu from '../../../components/atoms/InfoMenu'
 
 const data = {
     imageUrl: 'https://picsum.photos/200/300',
@@ -77,7 +78,7 @@ const OfferDetailScreen = ({ navigation, route }) => {
         setisProcessing(true)
         applyContract(id).then(response => {
             setisProcessing(false)
-            navigation.navigate('Home', {isReload: true}, true)
+            navigation.navigate('Home', { isReload: true }, true)
         }).catch(err => {
             showDialog(err.message)
         })
@@ -97,12 +98,12 @@ const OfferDetailScreen = ({ navigation, route }) => {
         <ScrollView style={{ flex: 1 }}>
 
             {isLoading ?
-                <ShimmerOfferDetail containerStyle={{padding: 16}}/>
-                : 
+                <ShimmerOfferDetail containerStyle={{ padding: 16 }} />
+                :
 
                 <View>
                     <View style={{ flexDirection: 'row', padding: 16 }}>
-                    <Image source={{ uri: getFullLink(data?.company_image) }} style={{ height: 64, width: 'auto', aspectRatio: 1 }} />
+                        <Image source={{ uri: getFullLink(data?.company_image) }} style={{ height: 64, width: 'auto', aspectRatio: 1 }} />
 
                         <View style={{ paddingLeft: 16 }}>
                             <LatoBold style={{ color: '#6D6D6D' }}>{data.company_name}</LatoBold>
@@ -111,12 +112,16 @@ const OfferDetailScreen = ({ navigation, route }) => {
                                 Icon={IconLocation}>{displayProvince(data.contract_area)}</LatoRegular>
                             <LatoRegular
                                 style={{ fontSize: 10, color: '#A7A7A7' }}
-                            >{translate('created_at', {date: moment(data.created_at).format('DD MMMM YYYY')})}</LatoRegular>
+                            >{translate('created_at', { date: moment(data.created_at).format('DD MMMM YYYY') })}</LatoRegular>
                         </View>
 
                     </View>
 
                     <Divider />
+                    <InfoMenu
+                        containerStyle={{ marginHorizontal: 16 ,marginTop: 16}}
+                        text={translate('vehicle_can_be_change')}
+                    />
 
                     <View style={{ padding: 16 }}>
                         <LatoBold style={styles.primaryHead}>{translate('offer_info')}</LatoBold>
@@ -140,21 +145,21 @@ const OfferDetailScreen = ({ navigation, route }) => {
                         <LatoRegular style={styles.primarySub} containerStyle={{ marginTop: 8 }}>{translate('operational_province')}</LatoRegular>
                         <FlatList
                             scrollEnabled={false}
-                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}}
+                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
                             data={data.contract_area}
                             keyExtractor={item => item}
-                            renderItem={({item, index}) => {
-                                return <ListTag title={item}/>
+                            renderItem={({ item, index }) => {
+                                return <ListTag title={item} />
                             }}
                         />
                         <LatoRegular style={styles.primarySub} containerStyle={{ marginTop: 8 }}>{translate('operational_city')}</LatoRegular>
                         <FlatList
                             scrollEnabled={false}
-                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}}
+                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
                             data={data.contract_area_city}
                             keyExtractor={item => item}
-                            renderItem={({item, index}) => {
-                                return <ListTag title={item}/>
+                            renderItem={({ item, index }) => {
+                                return <ListTag title={item} />
                             }}
                         />
                     </View>
@@ -173,11 +178,11 @@ const OfferDetailScreen = ({ navigation, route }) => {
                         <LatoRegular style={styles.primarySub} containerStyle={{ marginTop: 8 }}>{translate('vehicle_brand')}</LatoRegular>
                         <FlatList
                             scrollEnabled={false}
-                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap'}}
+                            contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
                             data={data.vehicles}
                             keyExtractor={item => item}
-                            renderItem={({item, index}) => {
-                                return <ListTag title={item}/>
+                            renderItem={({ item, index }) => {
+                                return <ListTag title={item} />
                             }}
                         />
 
@@ -186,7 +191,7 @@ const OfferDetailScreen = ({ navigation, route }) => {
 
                     <View style={{ padding: 16, justifyContent: 'space-between', flexDirection: 'row' }}>
                         <LatoBold style={{ color: Colors.primary }}>{translate('installation_time_title')}</LatoBold>
-                        <TouchableOpacity onPress={() => navigation.navigate('InstallationList', {data: data.installation_schedule})}>
+                        <TouchableOpacity onPress={() => navigation.navigate('InstallationList', { data: data.installation_schedule })}>
                             <LatoBold style={{ textDecorationLine: 'underline', color: Colors.secondary }}>{translate('see_all')}</LatoBold>
                         </TouchableOpacity>
                     </View>

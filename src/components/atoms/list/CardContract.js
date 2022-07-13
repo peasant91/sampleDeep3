@@ -25,7 +25,7 @@ const CardContract = ({data, onPress, containerStyle}) => {
             style={{height: data.contract_status ? 80 : 60, width: undefined, aspectRatio: 1}}
             resizeMode={'cover'}
           />
-          <View style={{paddingLeft: 16, justifyContent: 'space-between'}}>
+          <View style={{paddingLeft: 16, justifyContent: 'space-between',flex:1}}>
             <LatoRegular>{data.sticker_area?.length > 1 ? data.sticker_area.join(', ') : data.sticker_area}</LatoRegular>
             <LatoRegular style={{fontSize: 10}}>{data.company_name}</LatoRegular>
             <LatoRegular

@@ -17,21 +17,34 @@ const AccountTopHeader = ({ data, isLoading }) => {
 
   useEffect(() => {
     console.log(data)
-  
+
   }, [])
-  
+
+  const checkStatus = () => {
+    switch (data.status) {
+      case 'verified':
+        return 'verified'
+      case 'unverified':
+        return 'on_verifying'
+      case 'declined':
+        return 'rejected'
+      case 'disabled':
+        return 'blocked'
+    }
+  }
+
 
   return (
-          <Shadow viewStyle={{width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 999, elevation: 10}} distance={2} offset={[0,2]}>
+    <Shadow viewStyle={{ width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 999, elevation: 10 }} distance={2} offset={[0, 2]}>
 
       {!isLoading ?
-        <View style={{flexDirection: 'row', zIndex: 999, elevation: 10}}>
+        <View style={{ flexDirection: 'row', zIndex: 999, elevation: 10 }}>
           {
-            data.profile_image ? <Avatar 
-            rounded
-            size={'medium'}
-            source={{ uri: getFullLink(data.profile_image) }} /> : 
-            <IconProfilePlaceholder height={50} width={50}/>
+            data.profile_image ? <Avatar
+              rounded
+              size={'medium'}
+              source={{ uri: getFullLink(data.profile_image) }} /> :
+              <IconProfilePlaceholder height={50} width={50} />
           }
           <View
             style={{
@@ -49,13 +62,13 @@ const AccountTopHeader = ({ data, isLoading }) => {
                   color: data.status == 'verified' ? Colors.secondary : Colors.grey,
                   marginLeft: 5,
                 }}>
-                {translate(data.status == 'verified' ? 'verified' : 'on_verifying')}
+                {translate(checkStatus())}
               </LatoRegular>
             </View>
           </View>
-          </View>
+        </View>
         : <ShimmerAccoutTopHeader />}
-          </Shadow>
+    </Shadow>
   );
 };
 

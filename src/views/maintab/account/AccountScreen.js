@@ -139,7 +139,7 @@ const AccountScreen = ({navigation, route}) => {
   }
 
   const goToBank = () => {
-    navigation.navigate('Bank', {isReadOnly: profileData.account_bank ? false : true, prevData: profileData.account_bank ? profileData.account_bank : profileData.driver_company.account_bank})
+    navigation.navigate('Bank', {isReadOnly: profileData.account_bank ? profileData.status === 'verified' ? true : false : true, prevData: profileData.account_bank ? profileData.account_bank : profileData.driver_company.account_bank})
   }
 
   const logout = () => {

@@ -302,6 +302,8 @@
     "partner_title" : "Rekanan",
     "partner_placeholder": "Pilih Rekanan",
     "report_invalid_title": "Campaign Belum Dimulai",
-    "report_invalid_desc": "Anda bisa membuat laporan jika campaign sudah dimulai."
+    "report_invalid_desc": "Anda bisa membuat laporan jika campaign sudah dimulai.",
+    "rejected": "Verifikasi ditolak",
+    "blocked": "Akun di nonaktifkan"
     
 }

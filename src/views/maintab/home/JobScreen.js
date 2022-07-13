@@ -75,8 +75,10 @@ const JobScreen = ({ navigation, route }) => {
           AsyncStorage.setItem(StorageKey.KEY_ACTIVE_CONTRACT, JSON.stringify(id))
 
           if (!isStart) {
+            console.log("start log gps");
             checkGpsEnable()
           } else {
+            console.log("start log start");
             setisStart(!isStart)
           }
         }
@@ -327,7 +329,8 @@ const JobScreen = ({ navigation, route }) => {
   useFocusEffect(useCallback(() => {
     AsyncStorage.getItem(StorageKey.KEY_DO_JOB).then(job => {
       const isDoingJob = JSON.parse(job)
-      log("is doing job",isDoingJob)
+
+      console.log("is doing job",isDoingJob);
       if (!isDoingJob) {
         getLastElapsedSecond().then(second => {
           showFormattedElapsedTime(second)
@@ -360,6 +363,7 @@ const JobScreen = ({ navigation, route }) => {
 
   useFocusEffect(useCallback(() => {
     if (isStart == undefined) {
+      console.log("start is undefined");
       return
     }
 

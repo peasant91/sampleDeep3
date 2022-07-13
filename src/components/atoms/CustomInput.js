@@ -143,8 +143,8 @@ export const PhoneInput = ({
   const onTextChange = text => {
     let isValid = true;
     setError(null);
-    if (id === 'phone') {
-      let reg = /^(\\+628|08|8|628)([0-9]{4,15})$/;
+    if (id === 'phone' || id === 'phone1') {
+      let reg = /^(\\+628|08|8|628)([0-9]{9,11})$/;
       if (reg.test(text) !== true) {
         isValid = false;
         setError(translate('invalid_phone'));
