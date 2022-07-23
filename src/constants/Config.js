@@ -3,6 +3,6 @@ export default {
     isDevMode: true,
     minimumTimeToSend: -1, //-1 = 1 minutes
     cardList: ['ktp', 'sim_a', 'sim_b'],
-    developmentMode: 'dev', //dev | live | staging
+    developmentMode: 'live', //dev | live | staging
     apiVersion: 'v1'
 }
