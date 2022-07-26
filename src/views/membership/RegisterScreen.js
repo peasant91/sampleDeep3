@@ -169,6 +169,7 @@ const RegisterScreen = ({ navigation, route }) => {
   };
 
   const isAllFormValid = () => {
+    console.log("sim b input",formStateCard?.inputValues?.sim_b?.length);
     console.log(formState.formIsValid, formStateCard.inputValidities, formStateCard?.inputValues?.sim_b?.length)
     return formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null)
   }
@@ -258,7 +259,7 @@ const RegisterScreen = ({ navigation, route }) => {
     //console.log('cardform', formStateCard.inputValues)
     var card = []
     for (item in Config.cardList) {
-      if (formStateCard.inputValues[Config.cardList[item]] || formStateCard.inputValues[Config.cardList[item]] == '') {
+      if (formStateCard.inputValues[Config.cardList[item]] && formStateCard.inputValues[`${Config.cardList[item]}_image`]) {
         // console.log('push', Config.cardList[item])
         card.push({
           type: Config.cardList[item],
@@ -745,6 +746,8 @@ const RegisterScreen = ({ navigation, route }) => {
               value={formState.inputValues.phone2}
               isCheck={formState.isChecked}
               optional
+              isUnique={true}
+              isUniqueWith={formState.inputValues.phone1}
               viewOnly={isVerified}
             />
 

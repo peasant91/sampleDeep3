@@ -100,6 +100,7 @@
     "cancel": "Batalkan",
     "cancel_short": "Batal",
     "invalid_phone": "Nomor telepon tidak valid",
+    "invalid_phone_unique": "Nomor telepon tidak unik",
     "invalid_email": "Email tidak valid",
     "password_not_match": "Kata Sandi tidak sama",
     "enable_push_notif": "Mohon ijinkan pemberitahuan untuk mendapatkan berita terbaru.",

@@ -136,14 +136,29 @@ export const PhoneInput = ({
   isCheck,
   dispatcher,
   optional,
+  isUnique,
+  isUniqueWith,
   viewOnly
 }) => {
   const [errorText, setError] = useState(error);
 
   const onTextChange = text => {
+
+    if (text == undefined){
+      return
+    }
+
     let isValid = true;
     setError(null);
-    if (id === 'phone' || id === 'phone1') {
+    console.log("text nih anjing",text);
+    if (!optional){
+      if (text == undefined || text.trim().length <= 0) {
+        isValid = false;
+        setError(translate('must_not_empty', {s: title}));
+      }
+    }
+
+    if (id === 'phone' || id === 'phone1' || id === 'phone2') {
       let reg = /^(\\+628|08|8|628)([0-9]{9,11})$/;
       if (reg.test(text) !== true) {
         isValid = false;
@@ -151,9 +166,11 @@ export const PhoneInput = ({
       }
     }
 
-    if ((text == undefined || text.trim().length <= 0) && !optional) {
-      isValid = false;
-      setError(translate('must_not_empty', {s: title}));
+    if (id === 'phone2' && isUniqueWith.length > 0){
+      if (text === isUniqueWith){
+          isValid = false
+          setError(translate('invalid_phone_unique'))     
+      }
     }
 
     dispatcher({

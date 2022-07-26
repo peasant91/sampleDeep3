@@ -50,7 +50,6 @@ const CrudReportScreen = ({ navigation, route }) => {
 
     const getStickers = () => {
         mapStickerArea(stickerArea).then(response => {
-            //console.log('map sticker', response)
             setStickerLayoutData(response)
         })
     }
@@ -62,15 +61,12 @@ const CrudReportScreen = ({ navigation, route }) => {
                 sticker_area: stickerLayoutData[index].value,
                 images: [...stickerLayoutData[index].images]
             }
+            totalImageUpload.current += stickerLayoutData[index].images.length
             array.push(data)
         }
-        totalImageUpload.current = array[0].images.length
-        console.log("totalImage",totalImageUpload.current);
-        console.log("array image size",JSON.stringify(array));
-        console.log("stiker image size",stickerLayoutData.length);
+        console.log("total image upload",totalImageUpload.current);
+        console.log("image queue",array);
         setimageQueue([...array])
-        setCurrentUploadTask(0)
-        // showLoadingDialog(`mengeirim ${imageIndicator.current}/ ${queue.length}`)
     }
 
     const openImagePicker = async (id, location, index) => {
@@ -101,6 +97,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             setisloading(true)
             postReport(reportId.current,formState.inputValues).then(response => {
                 // reportId.current = response.report_id
+                setCurrentUploadTask(0)
                 makeImageQueue()
             }).catch(err => {
                 setisloading(false)
@@ -128,7 +125,8 @@ const CrudReportScreen = ({ navigation, route }) => {
                 if (imageQueue.length <= 1) {
                     setimageQueue([])
                 } else {
-                    setimageQueue([...imageQueue.shift()])
+                    imageQueue.shift()
+                    setimageQueue([...imageQueue])
                 }
             }
         } else {
@@ -196,6 +194,7 @@ const CrudReportScreen = ({ navigation, route }) => {
         if (result == null || result == undefined || result.assets == undefined) {
             return
         }
+        console.log("get data");
         if (selectedPicker.location != 'odometer') {
             const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
             if (data.length == 1) {
