@@ -1,7 +1,10 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import {View, Platform, Keyboard} from 'react-native';
 
-import {createBottomTabNavigator, BottomTabBar} from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  BottomTabBar,
+} from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeScreen from './HomeScreen';
@@ -14,16 +17,16 @@ import IconAccount from '../../assets/images/ic_account.svg';
 import Colors from '../../constants/Colors';
 import {AuthContext} from '../../../App';
 import StorageKey from '../../constants/StorageKey';
-import { initBackground } from '../../services/background';
-import Realm from 'realm'
+import {initBackground} from '../../services/background';
+import Realm from 'realm';
 import moment from 'moment';
-import { DistanceSchema, SpeedSchema } from '../../data/realm/speed';
-import { calcDistance } from '../../actions/helper';
-import { sendDistance } from '../../services/contract';
+import {DistanceSchema, SpeedSchema} from '../../data/realm/speed';
+import {calcDistance} from '../../actions/helper';
+import {getTrafficFlow, sendDistance} from '../../services/contract';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import Config from '../../constants/Config';
-import { useToast } from "react-native-toast-notifications";
-import { sum } from '../../actions/helper';
+import {useToast} from 'react-native-toast-notifications';
+import {sum} from '../../actions/helper';
 
 const CustomBottomTabBar = props => {
   const [visible, setVisible] = useState(true);
@@ -39,7 +42,9 @@ const CustomBottomTabBar = props => {
     return () => {
       if (Platform.OS === 'android') {
         keyboardEventListeners &&
-          keyboardEventListeners.forEach(eventListener => eventListener.remove());
+          keyboardEventListeners.forEach(eventListener =>
+            eventListener.remove(),
+          );
       }
     };
   }, []);
@@ -58,12 +63,11 @@ const CustomBottomTabBar = props => {
 const Tab = createBottomTabNavigator();
 
 const MainTabScreen = ({navigation, route}) => {
-
   const [isLogin, setisLogin] = useState(false);
   const toast = useToast();
   const currentPosition = useRef({
     latitude: 0,
-    longitude: 0
+    longitude: 0,
   });
   const lastSentTime = useRef();
   const sumDistance = useRef(0);
@@ -95,109 +99,136 @@ const MainTabScreen = ({navigation, route}) => {
       }
     });
 
-    initBackground()
+    initBackground();
 
-        BackgroundGeolocation.on('location', (location) => {
-          // handle your locations here
-          // to perform long running operation on iOS
-          // you need to create background task
+    BackgroundGeolocation.on('location', location => {
+      // handle your locations here
+      // to perform long running operation on iOS
+      // you need to create background task
 
-          console.log('location', location)
-          BackgroundGeolocation.startTask(taskKey => {
-            // execute long running task
-            // eg. ajax post location
-            // IMPORTANT: task has to be ended by endTask
-            onLocationChange(location)
-            BackgroundGeolocation.endTask(taskKey);
-          });
-        });
+      console.log('location', location);
+      BackgroundGeolocation.startTask(taskKey => {
+        // execute long running task
+        // eg. ajax post location
+        // IMPORTANT: task has to be ended by endTask
+        onLocationChange(location);
+        BackgroundGeolocation.endTask(taskKey);
+      });
+    });
 
-        AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(backround => {
-          console.log('background', backround)
-          if (JSON.parse(backround)) {
-            BackgroundGeolocation.start()
-          }
-        })
-    
+    AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(backround => {
+      console.log('background', backround);
+      if (JSON.parse(backround)) {
+        BackgroundGeolocation.start();
+      }
+    });
   }, []);
 
-  const onLocationChange = async (location) => {
-    
-    const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude)
-    sumDistance.current += distance
+  const onLocationChange = async location => {
+    const distance =
+      currentPosition?.current.latitude == 0
+        ? 0
+        : calcDistance(
+            location.latitude,
+            location.longitude,
+            currentPosition?.current.latitude,
+            currentPosition?.current.longitude,
+          );
+    sumDistance.current += distance;
 
-    const schema = [SpeedSchema, DistanceSchema]
+    const schema = [SpeedSchema, DistanceSchema];
 
     try {
-    const realm = await Realm.open(
-      {
+      const realm = await Realm.open({
         path: 'otomedia',
         schema: schema,
-      }
-    )
-    realm.write(() => {
-      realm.create("Speed", {
-        date: Date(),
-        speed: location.speed
-      })
-      realm.create("Distance", {
-        date: Date(),
-        lat: location.latitude,
-        lng: location.longitude,
-        distance: distance
-      })
-    })
+      });
+      realm.write(() => {
+        realm.create('Speed', {
+          date: Date(),
+          speed: location.speed,
+        });
+        realm.create('Distance', {
+          date: Date(),
+          lat: location.latitude,
+          lng: location.longitude,
+          distance: distance,
+        });
+      });
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
     currentPosition.current = {
       latitude: location.latitude,
-      longitude: location.longitude
-    }
-    sendLocation(location)
-  }
+      longitude: location.longitude,
+    };
+    sendLocation(location);
+  };
 
-  const sendLocation = async(location) => {
+  const sendLocation = async location => {
     if (!lastSentTime.current) {
-      lastSentTime.current = moment(Date())
-      return
-    } 
-    else {
-      const duration = moment.duration(lastSentTime.current.diff(moment(Date()))).asMinutes()
-      
-      console.log('momentDuration', duration)
-      console.log('lastsenttime', lastSentTime)
-      console.log('sumdistance', sumDistance.current)
+      lastSentTime.current = moment(Date());
+      return;
+    } else {
+      const duration = moment
+        .duration(lastSentTime.current.diff(moment(Date())))
+        .asMinutes();
+
+      console.log('momentDuration', duration);
+      console.log('lastsenttime', lastSentTime);
+      console.log('sumdistance', sumDistance.current);
 
       if (duration > Config.minimumTimeToSend) {
-        return
+        return;
       }
     }
 
     Realm.open({
       path: 'otomedia',
-      schema: [SpeedSchema, DistanceSchema]
-    }).then(realm=>{
-      const distances = realm.objects('Distance')
+      schema: [SpeedSchema, DistanceSchema],
+    }).then(realm => {
+      const distances = realm.objects('Distance');
       if (distances.length > 0) {
-        const sums = sum(distances.map(item => item.distance))
-        console.log("total distance sums",sums);
+        const sums = sum(distances.map(item => item.distance));
+        console.log('total distance sums', sums);
+        console.log('masuk traffic flow here ');
+        // getTrafficFlow(slat, slong)
+        // .then(response => {
+        //   console.log('traffic tomtom data ', JSON.stringify(response.data, null,2));
+        // })
+        // .catch(err => {
+        //   console.log('error here ', err);
+        // });
+        console.log('location here for tomtom ', location);
+        getTrafficFlow(
+          location.latitude.toString(),
+          location.longitude.toString(),
+        )
+          .then(response => {
+            console.log(
+              'traffic tomtom data ',
+              JSON.stringify(response.data, null, 2),
+            );
+          })
+          .catch(err => {
+            console.log('error here ', err);
+          });
         AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
           sendDistance({
             lat: location.latitude,
             lng: location.longitude,
             distance: sums * 1000, //in meter
-            contract_id: id
-          }).then(response => {
-            //sumDistance.current = 0
-          }).catch(err => {
-    
+            contract_id: id,
           })
-        })
+            .then(response => {
+              //sumDistance.current = 0
+            })
+            .catch(err => {});
+        });
       }
-    })
-    lastSentTime.current = moment(Date())
-  }
+    });
+    lastSentTime.current = moment(Date());
+  };
 
   return (
     <Tab.Navigator
