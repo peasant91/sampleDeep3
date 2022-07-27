@@ -5,13 +5,11 @@ import {
   View,
   StyleSheet,
   Image,
-  ActivityIndicator,
   Linking,
   StatusBar,
   AppState,
   Platform,
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { LatoBold, Subtitle2 } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
 import { default as Splash } from 'react-native-splash-screen';
@@ -31,18 +29,10 @@ import StorageKey from '../constants/StorageKey';
 import pkg from '../../package.json';
 import { AuthContext } from '../../App';
 import translate from '../locales/translate';
-import ImageTopLogo from '../assets/images/img_top_logo.svg';
 import { getBank, getColor, getCompanies, getDivisionApi, getGender, getProvince, getVehicleOwnership, getVehicleSticker, getVehicleType, getVehicleUsage } from '../services/utilities';
-import { Freshchat, FreshchatConfig } from 'react-native-freshchat-sdk';
-import Constant from '../constants/Constant';
-import { postFreshchat } from '../services/freshchat';
-import { getCalendarWeek } from '../data/dummy';
-import { getNumberFormatSettings } from 'react-native-localize';
-import { getSettings } from '../services/settings';
 import messaging, { firebase } from '@react-native-firebase/messaging';
 import { useIsFocused } from '@react-navigation/native';
 
-import BGSplash from '../assets/background/bg_splash.svg'
 import axios from 'axios';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
@@ -100,9 +90,12 @@ const SplashScreen = ({ navigation, route }) => {
   const getProvinceApi = async () => {
     getProvince()
       .then(response => {
-        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response))
-          .then(response => getCompaniesApi())
-          .catch(err => console.log(err));
+        
+        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response)).then(() =>{
+          getCompaniesApi()
+        }).catch(err=>{
+          showDialog(JSON.stringify(err));  
+        })
       })
       .catch(err => {
         showDialog(err.message);
@@ -181,6 +174,7 @@ const SplashScreen = ({ navigation, route }) => {
             }
           })
         }
+        return
       }
 
       showOpenSetting()
@@ -192,7 +186,6 @@ const SplashScreen = ({ navigation, route }) => {
     if (Platform.OS == 'ios') {
       request(PERMISSIONS.IOS.LOCATION_ALWAYS).then(result => {
         if (result == RESULTS.GRANTED) {
-
           requestNotificationPermission()
         } else {
           openSettings().catch(() => console.warn('cannot open settings'));
@@ -200,30 +193,30 @@ const SplashScreen = ({ navigation, route }) => {
       })
     } else {
       const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+      console.log('result fine', result)
+      if (result == RESULTS.DENIED) {
+        showLocationAlwaysDialog(() => {
+          requestAndroidLocationPermission()
+        })
+        return
+      }
+
+      if (Platform.Version >= 29) {
+        const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
+        console.log('result background', result)
         if (result == RESULTS.DENIED) {
-          showLocationAlwaysDialog(() => {
-            requestAndroidLocationPermission()
-          })
+          requestAndroidLocationPermission()
           return
-        } 
-
-        if (Platform.Version >= 29) {
-            const result = await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION)
-              if (result == RESULTS.DENIED) {
-                showLocationAlwaysDialog(() => {
-                  requestAndroidLocationPermission()
-                })
-                return
-              }
-
-              if (result == RESULTS.BLOCKED) {
-              showOpenSetting()
-              return
-              }
         }
-        
-        getFirebaseToken()
-      
+
+        if (result == RESULTS.BLOCKED) {
+          showOpenSetting()
+          return
+        }
+      }
+
+      getFirebaseToken()
+
     }
   }
 
@@ -231,17 +224,14 @@ const SplashScreen = ({ navigation, route }) => {
     try {
       const response = await checkAppVersion(appVersion);
       const token = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
-      if (response.need_update === true) {
-        showUpdateAlert(response);
-        // if (Constant.RESET) {
-        //   clearAppData();
-        // }
-      } else {
-        requestBackgroundPermission()
-        // token
-        //   ? props.navigation.navigate('MainFlow')
-        //   : props.navigation.navigate('Welcome');
+      if (response) {
+        if (response.need_update === true) {
+          showUpdateAlert(response);
+        } else {
+          requestBackgroundPermission()
+        }
       }
+
     } catch (err) {
       showDialog(
         err.message,
@@ -256,59 +246,64 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
-  // const handleAppStateChange = nextAppState => {
-  //   console.log('state', nextAppState);
-  //   console.log('prevstate', appState);
-  //   if (appState.match(/inactive|background/) && nextAppState === 'active') {
-  //     console.log('request permission');
-  //     requestPermission();
-  //   }
-
-  //   appState = nextAppState
-
-  // };
-
-  const loadAllData = () => {
-    axios.all([
-      getProvince(),
-      getCompanies(),
-      getGender(),
-      getBank(),
-      getVehicleOwnership(),
-      getVehicleSticker(),
-      getVehicleUsage(),
-      getColor(),
-    ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
-      console.log('axios spread', province, companies)
-      await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
-      await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
-      await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
-      await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
-      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
-      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
-      await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
-      await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
-      doneLoading()
-    })).catch(err => {
+  const loadAllData = async () => {
+    try {
+      var province = await getProvince()
+      var companies = await getCompanies()
+      var gender = await getGender()
+      var bank = await getBank()
+      var ownership = await getVehicleOwnership()
+      var sticker = await getVehicleSticker()
+      var usage = await getVehicleUsage()
+      var color = await getColor()
+      if (province && companies && gender && bank && ownership && sticker && usage && color) {
+        await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
+        await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
+        await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
+        await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
+        await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
+        await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
+        print("saving done loading")
+        doneLoading()
+      }
+    } catch (error) {
       showDialog(err.message)
-    })
+    }
+
+    // axios.all([
+    //   getProvince(),
+    //   getCompanies(),
+    //   getGender(),
+    //   getBank(),
+    //   getVehicleOwnership(),
+    //   getVehicleSticker(),
+    //   getVehicleUsage(),
+    //   getColor(),
+    // ]).then(axios.spread(async (province, companies, gender, bank, ownership, sticker, usage, color) => {
+    //   console.log('axios spread', province, companies)
+    //   await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
+    //   await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))
+    //   await AsyncStorage.setItem(StorageKey.KEY_GENDER, JSON.stringify(gender))
+    //   await AsyncStorage.setItem(StorageKey.KEY_BANK, JSON.stringify(bank))
+    //   await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_OWNERSHIP, JSON.stringify(ownership))
+    //   await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
+    //   await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
+    //   await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
+    //   doneLoading()
+    // })).catch(err => {
+    //   showDialog(err.message)
+    // })
   }
 
   useEffect(() => {
-    // checkVersion();
     if (isFocus) {
-      // getProvinceApi();
       checkVersion()
-      // initFreshchat();
       AsyncStorage.setItem(StorageKey.KEY_BACKGROUND_ACTIVE, JSON.stringify(false))
     }
 
-    // AppState.addEventListener('change', handleAppStateChange);
     console.log('state', 'add listener');
-    // getCalendarWeek();
-    // const willFocusSub = props.navigation.addListener('willFocus', () => {
-    //   checkVersion()
-    // });
 
     const subscription = AppState.addEventListener("change", nextAppState => {
       if (

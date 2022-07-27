@@ -17,5 +17,7 @@ export default {
     KEY_DO_JOB: 'do_job',
     KEY_ACTIVE_CONTRACT: 'active_contract',
     KEY_BACKGROUND_ACTIVE: 'background_active',
-    KEY_START_TIME: 'start_time'
+    KEY_START_TIME: 'start_time',
+    KEY_START_DATE: 'start_date',
+    KEY_ELAPSED_TIME: 'elapsed_time'
 }

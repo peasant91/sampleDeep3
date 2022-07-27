@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import fr.snapp.imagebase64.RNImgToBase64Package;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -53,7 +54,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
-    initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    // initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
 
   /**

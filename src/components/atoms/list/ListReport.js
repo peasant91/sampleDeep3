@@ -8,6 +8,7 @@ import Colors from '../../../constants/Colors'
 
 import IconNoReport from '../../../assets/images/ic_no_report'
 import IconEmptyReport from '../../../assets/images/ic_empty_report'
+import { addDate, isBeforeDate } from '../../../actions/helper'
 
 const ListReport = ({data, onPress}) => {
 
@@ -35,14 +36,26 @@ const ListReport = ({data, onPress}) => {
         </View>
     }
 
+    const isStillAbleAdd = () => {
+        //forigiven date is masa tenggang you still able to create/update report
+        //and then check if today's date is before or in same day with forgivenDate
+        var forgivenDate = moment(data.start_date).add(9,'days')
+        const today = moment(Date()).startOf('day')
+        return isBeforeDate(today,forgivenDate)
+    }
+
     return <View style={{paddingTop: 16, paddingHorizontal: 16}}>
         <Divider/>
         <View style={{flexDirection: 'row', marginTop: 16, justifyContent: 'space-between'}}>
             <LatoBold>{moment(data.start_date).format('DD MMM YYYY')}</LatoBold>
-            {data.is_driver && data.desc && <TouchableOpacity onPress={() => onPress(false, data.id)}><LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold></TouchableOpacity>}
+            {data.is_driver && data.desc && <TouchableOpacity onPress={() => onPress(false, data.id,false)}><LatoBold style={{textDecorationLine: 'underline', color: Colors.primarySecondary}}>{translate('see_report')}</LatoBold></TouchableOpacity>}
         </View>
         {
-            !data.desc ? <EmptyReport/> : (data.is_driver ? <Report/> : <NoReport/>)
+            data.is_driver ?
+            <Report/> : (
+                isStillAbleAdd() ? <EmptyReport/> : <NoReport/>
+            )
+
         }
     </View>
 }

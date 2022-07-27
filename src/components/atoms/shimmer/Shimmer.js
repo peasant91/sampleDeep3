@@ -82,6 +82,26 @@ export const ShimmerIncome = ({containerStyle}) => {
   </View>
 }
 
+const ShimmerInnerNotif = () => {
+  return <View style={{flexDirection: 'row', marginTop: 16}}>
+    <ShimmerPlaceholder style={{width: 20, height: 20, marginTop: 0}}/>
+    <View style={{marginLeft: 10}}>
+    <ShimmerPlaceholder style={{width: 250, height: 20, marginTop: 0}}/>
+    <ShimmerPlaceholder style={{width: 290, height: 15, marginTop: 10}}/>
+    </View>
+  </View>
+}
+
+export const ShimmerNotifContainer = ({containerStyle}) => {
+  return <View style={containerStyle}>
+    {
+      [...Array(10)].map((index, value) => {
+        return ShimmerInnerNotif()
+      })
+    }
+  </View>
+}
+
 export const ShimmerOfferDetail = ({containerStyle}) => {
   return <View style={containerStyle}>
     <View style={{flexDirection: 'row'}}>

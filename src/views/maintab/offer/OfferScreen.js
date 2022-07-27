@@ -1,10 +1,12 @@
-import { FlatList, RefreshControl, SafeAreaView, StyleSheet, View } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, KeyboardAvoidingView, RefreshControl, SafeAreaView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import CardContract from '../../../components/atoms/list/CardContract';
 import { Input } from 'react-native-elements';
 
 import IconSearch from '../../../assets/images/ic_search_offer.svg';
 import IconFilter from '../../../assets/images/ic_filter.svg';
+import IconEmpty from '../../../assets/images/ic_empty_offer.svg';
+
 import { getCampaignList } from '../../../services/campaign';
 import ErrorNotRegisterVehicle from '../../../components/atoms/ErrorNotRegisterVehicle';
 import { showDialog } from '../../../actions/commonActions';
@@ -13,6 +15,11 @@ import { ShimmerCardContract } from '../../../components/atoms/shimmer/Shimmer';
 import { Shadow } from 'react-native-shadow-2';
 import { useIsFocused } from '@react-navigation/native';
 import Colors from '../../../constants/Colors';
+import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText';
+
+import debounce from 'lodash.debounce';
+import EmptySearch from '../../../components/atoms/EmptySearch';
+
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -39,6 +46,8 @@ const OfferScreen = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(true)
   const [search, setsearch] = useState('')
   const isFocused = useIsFocused();
+  const searchText = useRef(null)
+  const timeout = useRef(null);
 
   const goToDetail = (item) => {
     navigation.navigate('OfferDetail', { id: item.id })
@@ -50,22 +59,24 @@ const OfferScreen = ({ navigation, route }) => {
       setisLoading(true)
     }
 
-    if (canLoadData.current) {
+    if (!canLoadData.current){
+      return
+    }
     getCampaignList({
       page: page.current,
-      search: search
+      search: searchText.current
     }).then(response => {
+      setisNotRegisterVehicle(false)
       setisLoading(false)
-      if (response.length > 0) {
-        if (page.current == 1) {
-          setdata(response)
-        } else {
-          setdata([...data, ...response])
-        }
-        page.current += 1
+      if (page.current == 1) {
+        setdata(response.data)
       } else {
+        setdata([...data, ...response.data])
+      }
+      if (page.current === response.meta.last_page){
         canLoadData.current = false
       }
+      page.current += 1
     }).catch(err => {
       setisLoading(false)
       if (err.message.includes('verifikasi')) {
@@ -77,26 +88,50 @@ const OfferScreen = ({ navigation, route }) => {
         showDialog(err.message)
       }
     })
-    }
   }
 
   const onRefresh = () => {
+    console.log("search text",searchText.current);
     canLoadData.current = true
     page.current = 1
     getCampaignListApi()
   }
 
-  useEffect(() => {
-    if (isFocused) {
-      onRefresh()
-    } else {
-      setisLoading(true)
-    }
-  }, [search, isFocused])
+  // const debounceSearch = useCallback(
+  //  debounce(onRefresh, 1000),
+  //   [],
+  // )
+
+  // useEffect(() => {
+  //   if (isFocused) {
+  //     searchText.current = search
+  //     debounceSearch()
+  //   } else {
+  //     setisLoading(true)
+  //     console.log("is note focused");
+  //   }
+  // }, [search, isFocused])
+
+    useEffect(()=>{
+      if (timeout.current !== null) {          // IF THERE'S A RUNNING TIMEOUT
+        clearTimeout(timeout.current);         // THEN, CANCEL IT
+      }
+      timeout.current = setTimeout(() => {
+          timeout.current=null
+          searchText.current = search
+          onRefresh()
+      }, 500);
+    },[search])
 
   return (
     <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
-      <View style={{ backgroundColor: '#FAFAFA', flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={100}
+          contentContainerStyle={{flexGrow: 1}}
+          style={{flexGrow: 1}}>
+
+      <View style={{ flex: 1 }}>
         <Shadow viewStyle={{width: '100%'}} offset={[0, 10]} distance={10} startColor={Colors.divider}>
 
         <View style={styles.topHeader}>
@@ -107,6 +142,7 @@ const OfferScreen = ({ navigation, route }) => {
             placeholder={translate('find_offer_here')}
             multiline={false}
             onChangeText={(text) => {
+              clearTimeout(timeout.current)
               page.current = 1
               setsearch(text)
             }}
@@ -120,15 +156,16 @@ const OfferScreen = ({ navigation, route }) => {
                 return <ShimmerCardContract
                   containerStyle={{ marginHorizontal: 16, marginTop: 16 }}
                 />
-          }) :
+          }) : (data.length == 0 ? <EmptySearch title={translate('work')}/> : 
           <FlatList
             refreshControl={<RefreshControl
               refreshing={isLoading}
               onRefresh={onRefresh}
             />}
+            style={{backgroundColor: '#FAFAFA'}}
             data={data}
             contentContainerStyle={{ paddingBottom: 16, overflow: 'visible' }}
-            keyExtractor={item => item.id}
+            keyExtractor={(item,index) => `key ${index}-${item.id}`}
             onEndReachedThreshold={0.2}
             onEndReached={getCampaignListApi}
             renderItem={({ item, index }) => {
@@ -141,8 +178,10 @@ const OfferScreen = ({ navigation, route }) => {
               )
             }}
           />)
+          )
         }
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

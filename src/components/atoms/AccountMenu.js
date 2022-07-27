@@ -6,15 +6,13 @@ import {LatoBold} from '../atoms/CustomText';
 
 const AccountMenu = ({Icon, text, onPress, containerStyle, tintColor}) => {
   return (
-    <View style={containerStyle}>
-      <Shadow viewStyle={{width: '100%'}} radius={8} distance={5} offset={[0,3]} startColor={Colors.divider}  >
+    <Shadow containerViewStyle={containerStyle} viewStyle={{width: '100%'}} startColor={Colors.divider} distance={4}>
+    <View style={styles.container}>
     <TouchableOpacity onPress={onPress} >
-      <View style={styles.container}>
         <LatoBold Icon={Icon} style={{color: tintColor ?? Colors.primary}} iconTint={tintColor}>{text}</LatoBold>
-      </View>
     </TouchableOpacity>
-      </Shadow>
-    </View>
+      </View>
+    </Shadow>
   );
 };
 
@@ -23,7 +21,6 @@ export default AccountMenu;
 const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
-    shadowColor: 'black',
     backgroundColor: 'white',
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -33,6 +30,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    elevation: 10
+    elevation: 5
   },
 });

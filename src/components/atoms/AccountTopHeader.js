@@ -5,6 +5,8 @@ import { LatoRegular } from './CustomText';
 
 import IconVerified from '../../assets/images/ic_home_verified.svg';
 import IconLock from '../../assets/images/ic_lock.svg';
+import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.svg';
+
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
 import { getFullLink, isEmpty } from '../../actions/helper';
@@ -15,19 +17,35 @@ const AccountTopHeader = ({ data, isLoading }) => {
 
   useEffect(() => {
     console.log(data)
-  
+
   }, [])
-  
+
+  const checkStatus = () => {
+    switch (data.status) {
+      case 'verified':
+        return 'verified'
+      case 'unverified':
+        return 'on_verifying'
+      case 'declined':
+        return 'rejected'
+      case 'disabled':
+        return 'blocked'
+    }
+  }
+
 
   return (
-          <Shadow viewStyle={{width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 999, elevation: 10}} distance={2} offset={[0,2]}>
+    <Shadow viewStyle={{ width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 999, elevation: 10 }} distance={2} offset={[0, 2]}>
 
       {!isLoading ?
-        <View style={{flexDirection: 'row', zIndex: 999, elevation: 10}}>
-          <Avatar 
-            rounded
-            size={'medium'}
-            source={{ uri: getFullLink(data.profile_image) }} />
+        <View style={{ flexDirection: 'row', zIndex: 999, elevation: 10 }}>
+          {
+            data.profile_image ? <Avatar
+              rounded
+              size={'medium'}
+              source={{ uri: getFullLink(data.profile_image) }} /> :
+              <IconProfilePlaceholder height={50} width={50} />
+          }
           <View
             style={{
               marginLeft: 10,
@@ -44,13 +62,13 @@ const AccountTopHeader = ({ data, isLoading }) => {
                   color: data.status == 'verified' ? Colors.secondary : Colors.grey,
                   marginLeft: 5,
                 }}>
-                {translate(data.status == 'verified' ? 'verified' : 'on_verifying')}
+                {translate(checkStatus())}
               </LatoRegular>
             </View>
           </View>
-          </View>
+        </View>
         : <ShimmerAccoutTopHeader />}
-          </Shadow>
+    </Shadow>
   );
 };
 

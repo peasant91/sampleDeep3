@@ -18,7 +18,7 @@ const IncomeProfile = ({data, onPress}) => {
                 </View>
                 <View style={{backgroundColor: 'white'}}>
                 {
-                    data.incomes.map((value, index) => {
+                    data.transaction.map((value, index) => {
                         if (index < 2) {
                         return <View style={{padding: 5}}>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>

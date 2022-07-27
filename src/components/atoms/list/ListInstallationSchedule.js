@@ -23,8 +23,9 @@ const ListInstallationSchedule = ({data, onPressMap}) => {
     }
 
     const getTime = () => {
-        const startTime = moment(data.start_date, ).format('HH:mm')
+        const startTime = moment(data.start_date).format('HH:mm')
         const endTime = moment(data.end_date).format('HH:mm')
+        console.log(`tanggalnya nih ${getDate() + ', ' + startTime + ' - '  +endTime + ' WIB'}`);
         return getDate() + ', ' + startTime + ' - '  +endTime + ' WIB'
     }
 
@@ -49,7 +50,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
         marginBottom: 16,
         padding: 16, 
-        height: 90
+        height: 90,
+        backgroundColor: 'white'
     }
 })
 

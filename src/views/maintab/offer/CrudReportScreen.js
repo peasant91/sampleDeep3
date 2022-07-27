@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useState, useRef } from 'react'
 import { FlatList, ScrollView, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { showDialog, showLoadingDialog } from '../../../actions/commonActions'
+import { dismissDialog, showDialog, showLoadingDialog, showUploadDialog } from '../../../actions/commonActions'
 import { mapReportImages, mapStickerArea } from '../../../actions/helper'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomInput from '../../../components/atoms/CustomInput'
@@ -18,6 +18,7 @@ import IconGallery from '../../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../../assets/images/ic_camera_picker.svg';
 import IconDelete from '../../../assets/images/ic_trash_black.svg';
 import Colors from '../../../constants/Colors'
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
 const CrudReportScreen = ({ navigation, route }) => {
 
@@ -30,6 +31,8 @@ const CrudReportScreen = ({ navigation, route }) => {
     const [imageQueue, setimageQueue] = useState([])
     const [isloading, setisloading] = useState(false)
     const reportId = useRef(0)
+    const totalImageUpload = useRef(0)
+    const [currentUploadTask,setCurrentUploadTask] = useState()
 
 
 
@@ -47,21 +50,23 @@ const CrudReportScreen = ({ navigation, route }) => {
 
     const getStickers = () => {
         mapStickerArea(stickerArea).then(response => {
-            console.log('map sticker', response)
             setStickerLayoutData(response)
         })
     }
 
     const makeImageQueue = () => {
-        // var queue = []
-        // for (index in stickerLayoutData) {
-        //     for (childIndex in stickerLayoutData[index].images)[
-        //         queue.push(stickerLayoutData[index].images[childIndex] + '_!_' + stickerLayoutData[index].value)
-        //     ]
-        // }
-        // setimageQueue(queue)
-        setimageQueue(stickerLayoutData)
-        // showLoadingDialog(`mengeirim ${imageIndicator.current}/ ${queue.length}`)
+        var array = []
+        for (index in stickerLayoutData) {
+            const data = {
+                sticker_area: stickerLayoutData[index].value,
+                images: [...stickerLayoutData[index].images]
+            }
+            totalImageUpload.current += stickerLayoutData[index].images.length
+            array.push(data)
+        }
+        console.log("total image upload",totalImageUpload.current);
+        console.log("image queue",array);
+        setimageQueue([...array])
     }
 
     const openImagePicker = async (id, location, index) => {
@@ -79,23 +84,26 @@ const CrudReportScreen = ({ navigation, route }) => {
             type: 'check'
         })
 
-        console.log(formState)
+        //console.log(formState)
         let imageIsValid = true
 
-        for(item in stickerLayoutData) {
-            const item = stickerLayoutData[item]
-            imageIsValid = item.images.includes()
+        for (index in stickerLayoutData) {
+            const item = stickerLayoutData[index]
+            imageIsValid = !item.images.includes(" ")
         }
 
-        if (formState.formIsValid) {
-        setisloading(true)
-        postReport(formState.inputValues).then(response => {
-            setisloading(false)
-            reportId.current = response.report_id
-            makeImageQueue()
-        }).catch(err => {
-            // showDialog(err.message)
-        })
+        if (formState.formIsValid && imageIsValid) {
+            showUploadDialog("Mengunggah",totalImageUpload.current,0)
+            setisloading(true)
+            postReport(reportId.current,formState.inputValues).then(response => {
+                // reportId.current = response.report_id
+                setCurrentUploadTask(0)
+                makeImageQueue()
+            }).catch(err => {
+                setisloading(false)
+                dismissDialog()
+                showDialog(err.message)
+            })
         }
     }
 
@@ -105,8 +113,9 @@ const CrudReportScreen = ({ navigation, route }) => {
             if (image.images.length > 0) {
                 postReportImage(reportId.current, {
                     image: image.images[0],
-                    sticker_area: image.value
+                    sticker_area: image.sticker_area
                 }).then(response => {
+                    setCurrentUploadTask(prev=>prev+1)
                     image.images.shift()
                     setimageQueue([...imageQueue])
                 }).catch(err => {
@@ -116,7 +125,8 @@ const CrudReportScreen = ({ navigation, route }) => {
                 if (imageQueue.length <= 1) {
                     setimageQueue([])
                 } else {
-                    setimageQueue([...imageQueue.shift()])
+                    imageQueue.shift()
+                    setimageQueue([...imageQueue])
                 }
             }
         } else {
@@ -155,6 +165,23 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const openGalleryPicker = async selectedPicker => {
+        if (Platform.OS == 'android') {
+            const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+            console.log(permission)
+            if (permission == RESULTS.BLOCKED) {
+                showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+                return
+            }
+
+            if (permission == RESULTS.DENIED) {
+                const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+                console.log(result)
+                if (result != RESULTS.GRANTED) {
+                    showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+                    return
+                }
+            }
+        }
         const result = await launchImageLibrary({
             quality: 0.5,
             includeBase64: true,
@@ -164,22 +191,24 @@ const CrudReportScreen = ({ navigation, route }) => {
     };
 
     const processResult = (result) => {
-        if (result) {
-            if (selectedPicker.location != 'odometer') {
-                const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
-                if (data.length == 1) {
-                    data[0].images[selectedPicker.index] = 'data:image/jpg;base64,' + result.assets[0].base64
-                    console.log('data', data)
-                    setStickerLayoutData([...stickerLayoutData])
-                }
-            } else {
-                dispatch({
-                    type: 'input',
-                    id: selectedPicker.id,
-                    input: 'data:image/jpg;base64,' + result.assets[0].base64,
-                    isValid: true,
-                });
+        if (result == null || result == undefined || result.assets == undefined) {
+            return
+        }
+        console.log("get data");
+        if (selectedPicker.location != 'odometer') {
+            const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
+            if (data.length == 1) {
+                data[0].images[selectedPicker.index] = 'data:image/jpg;base64,' + result.assets[0].base64
+                //console.log('data', data)
+                setStickerLayoutData([...stickerLayoutData])
             }
+        } else {
+            dispatch({
+                type: 'input',
+                id: selectedPicker.id,
+                input: 'data:image/jpg;base64,' + result.assets[0].base64,
+                isValid: true,
+            });
         }
     }
 
@@ -204,10 +233,23 @@ const CrudReportScreen = ({ navigation, route }) => {
             postReportImageAPI()
         } else {
             if (isloading) {
-                showDialog(translate('report_send_success'))
+                showDialog(translate('report_send_success'), false, () => navigation.pop())
             }
         }
     }, [imageQueue])
+
+
+    useEffect(()=>{
+        if(!currentUploadTask){
+            return
+        }
+        console.log("current upload task",currentUploadTask)
+        console.log("current total task",totalImageUpload.current)
+        showUploadDialog("Mengunggah",totalImageUpload.current,currentUploadTask)
+        if(currentUploadTask == totalImageUpload.current-1){
+            dismissDialog()
+        }
+    },[currentUploadTask])
 
 
     useEffect(() => {
@@ -221,6 +263,10 @@ const CrudReportScreen = ({ navigation, route }) => {
                                 desc: response.desc,
                                 odometer: response.odometer
                             },
+                            inputValidities: {
+                                desc: true,
+                                odometer: true
+                            }
 
                         }
                     })
@@ -232,30 +278,32 @@ const CrudReportScreen = ({ navigation, route }) => {
                     showDialog(err.message)
                 })
         } else {
+            reportId.current = id
             getStickers()
         }
     }, [])
 
     return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-        <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} />
-        <ScrollView style={{ padding: 16 }}>
+        <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} shadowEnabled />
+        <ScrollView style={{ padding: 16, flex: 1 }}>
             <CustomInput
                 id={'desc'}
                 title={translate('report_detail')}
                 placeholder={translate('report_detail_placeholder')}
                 dispatcher={dispatch}
                 value={formState.inputValues.desc}
-                containerStyle={{paddingBottom: 16}}
+                containerStyle={{ paddingBottom: 16 }}
                 disabled={!isAdd}
                 required
                 isCheck={formState.isChecked}
             />
             {
                 stickerLayoutData?.map((value, index) => {
-                    console.log(value)
+                    // console.log(value)
                     return <View style={{ marginBottom: 16 }}>
                         <LatoBold>{translate('report_string', { body: value.name })}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
                         <FlatList
+                            style={{ zIndex: -99 }}
                             scrollEnabled={false}
                             columnWrapperStyle={{ justifyContent: 'space-between' }}
                             data={value.images}
@@ -263,23 +311,30 @@ const CrudReportScreen = ({ navigation, route }) => {
                             renderItem={({ item, index }) => {
                                 return <ReportImage imageUri={item} navigation={navigation} title={value.name} onPress={() => openImagePicker(value.value, value.value, index)} />
                             }} />
-            {
-                 stickerLayoutData.filter(item =>  item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_image', {string: value.name})}</LatoBold>
-            }
+                        {
+                            stickerLayoutData.filter(item => item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ marginTop: 10 }}>{translate('error_image', { string: value.name })}</LatoBold>
+                        }
                     </View>
                 })
             }
 
             <LatoBold>{translate('odometer_photo')}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
 
-            <ReportImage imageUri={formState.inputValues.odometer} onPress={() => openImagePicker('odometer', 'odometer')} navigation={navigation} title={translate('odometer')} />
+            <View style={{ paddingBottom: 24 }}>
 
+                <ReportImage
+                    imageUri={formState.inputValues.odometer}
+                    onPress={() => openImagePicker('odometer', 'odometer')}
+                    navigation={navigation}
+                    title={translate('odometer')} />
+
+            </View>
             {
-                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{color: 'red'}} containerStyle={{marginTop: 10}}>{translate('error_odometer')}</LatoBold>
+                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ paddingBottom: 10 }}>{translate('error_odometer')}</LatoBold>
             }
 
             {
-                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginVertical: 24 }} />
+                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginBottom: 24 }} isLoading={isloading} />
             }
 
 
@@ -288,22 +343,7 @@ const CrudReportScreen = ({ navigation, route }) => {
 
         <CustomSheet ref={pickerSheet}>
             <View style={{ padding: 16 }}>
-                <LatoBold>{translate('pick_photo')}</LatoBold>
-                <TouchableOpacity
-                    onPress={() => setimagePickerId(1)}
-                    style={{ marginVertical: 10 }}>
-                    <LatoRegular Icon={IconGallery}>
-                        {translate('pick_gallery')}
-                    </LatoRegular>
-                </TouchableOpacity>
-                <View
-                    style={{
-                        height: 1,
-                        backgroundColor: Colors.divider,
-                        marginBottom: 10,
-                        marginLeft: 28,
-                    }}
-                />
+                <LatoBold style={{ marginBottom: 10 }}>{translate('pick_photo')}</LatoBold>
                 <TouchableOpacity onPress={() => setimagePickerId(0)}>
                     <LatoRegular Icon={IconCamera}>
                         {translate('pick_camera')}

@@ -7,17 +7,21 @@ import translate from '../locales/translate';
 import ListCompany from '../components/atoms/list/ListCompany';
 
 import IconBack from '../assets/images/ic_arrow_back.svg';
+import IconCheckmark from '../assets/images/ic_checkmark.svg'
+
 import { Input } from 'react-native-elements';
 import ListArea from '../components/atoms/list/ListArea';
 import { LatoRegular } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
 import { Shadow } from 'react-native-shadow-2';
+import EmptySearch from '../components/atoms/EmptySearch';
 
 const PickerScreen = ({ navigation, route }) => {
 
   const { pickerId, title, data, selectedId, isEdit, dispatch, isRegister } = route.params;
 
-  const [filteredData, setfilteredData] = useState(data)
+  const [filteredData, setfilteredData] = useState(data ? data : [])
+  const manualInputId = -99
 
   const onPressList = (id, name) => {
     console.log(isEdit)
@@ -31,7 +35,7 @@ const PickerScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={style.container}>
-      <Shadow viewStyle={{width: '100%'}}>
+      <Shadow viewStyle={{width: '100%'}} offset={[0,5]} distance={5} startColor={Colors.divider}>
 
       <View style={style.header}>
         
@@ -50,6 +54,7 @@ const PickerScreen = ({ navigation, route }) => {
       <View style={{flex: 1}}>
 
 
+      {filteredData.length <= 0 ? <EmptySearch title={translate(title)}/> : 
       <FlatList
         contentContainerStyle={{ paddingTop: 16 }}
         style={{flex: 0, flexShrink: 1}}
@@ -61,15 +66,23 @@ const PickerScreen = ({ navigation, route }) => {
           else
             return <ListArea data={item} onPress={onPressList} selectedId={selectedId} />
         }}
-      />
+      />}
 
-      {pickerId == 'village_id' && 
-      <TouchableOpacity 
-        onPress={() => onPressList(null, translate('manual_input') )}
-        style={{flex: 0 , flexGrow: 100, padding: 16, }}>
-        <LatoRegular style={{color: Colors.primary}}>{translate('add_manual_input')}</LatoRegular>
-        </TouchableOpacity>}
+      {pickerId == 'village_id' && filteredData.length > 0 &&
+      <View
+        style={{flex: 0 , flexGrow: 100,}}>
+          <View style={{flexDirection: 'row', backgroundColor: selectedId == manualInputId ? '#EEEEFF' : 'white', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={() => onPressList(manualInputId, translate('manual_input') )}
+              style={{ padding: 16, }}
+            >
+        <LatoRegular style={{color: Colors.primary, width: '90%'}}>{translate('add_manual_input')}</LatoRegular>
+            </TouchableOpacity>
+        {selectedId == manualInputId && <IconCheckmark/>} 
+          </View>
+        </View>}
       </View>
+
     </SafeAreaView>
   );
 };

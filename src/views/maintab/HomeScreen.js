@@ -28,8 +28,7 @@ import IconVerified from '../../assets/images/ic_home_verified.svg';
 import IconCar from '../../assets/images/ic_home_car.svg';
 import IconArrow from '../../assets/images/ic_arrow_right_white.svg';
 import IconActiveContract from '../../assets/images/ic_home_active_contract.svg';
-import IconReport from '../../assets/images/ic_home_report.svg';
-import IconCarEmpty from '../../assets/images/ic_car_empty.svg';
+import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.svg';
 
 
 
@@ -42,7 +41,7 @@ import InfoMenu from '../../components/atoms/InfoMenu';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CardContract from '../../components/atoms/list/CardContract';
 import { getHome } from '../../services/home';
-import { showDialog } from '../../actions/commonActions';
+import { dismissDialog, showDialog, showUploadDialog } from '../../actions/commonActions';
 import { getProfile, updateFcmToken } from '../../services/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
@@ -52,6 +51,10 @@ import axios from 'axios';
 import ErrorNotRegisterVehicle from '../../components/atoms/ErrorNotRegisterVehicle';
 import { getChartData } from '../../services/report';
 import { getNotification } from '../../services/notification';
+import { useToast } from "react-native-toast-notifications";
+import { getContract } from '../../services/contract';
+import { SpeedSchema,DistanceSchema } from '../../data/realm/speed';
+import RNLocalize from 'react-native-localize';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
@@ -61,6 +64,9 @@ const dummyContractData = {
   date: '31 Nov 2022',
 }
 
+const validCampaignStatus = ["Sedang Berjalan"] //status campaign => in_period
+const validContractStatus = ["Ready Mulai Job Masa Tayang"] //status driver terhadap contract => ready
+
 const HomeScreen = ({ navigation, route }) => {
 
   const [backPressedCount, setBackPressedCount] = useState(0);
@@ -69,7 +75,9 @@ const HomeScreen = ({ navigation, route }) => {
   const [homeData, sethomeData] = useState({})
   const [profileData, setprofileData] = useState({})
   const [chartData, setChartData] = useState([])
+  const [contractData,setContractData] = useState({})
 
+  const toast = useToast();
 
   const data = {
     imageUrl:
@@ -102,14 +110,15 @@ const HomeScreen = ({ navigation, route }) => {
     axios.all([
       getHome(),
       getProfile(),
-      getNotification(),
-    ]).then(axios.spread(async (home, profile, notification, refreshToken) => {
+      getNotification()
+    ]).then(axios.spread(async (home, profile, notification, contract) => {
       setisLoading(false)
       sethomeData(home)
+      setContractData(contract)
       AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
       setprofileData(profile)
       getChartDataAPI(home)
-
+      getContractData(home)
       if (notification.length > 0 && notification.filter(item => !item.read_at).length > 0) {
         setisNotifVisible(true)
       } else {
@@ -143,6 +152,21 @@ const HomeScreen = ({ navigation, route }) => {
         showDialog(err.message)
       })
     }
+  }
+
+  const getContractData = (home) => {
+    if (home.active_contract){
+      getContract(home.active_contract.contract_id).then(response =>{
+        setContractData(response)
+      }).catch(err =>{
+        showDialog(err.message)
+      })
+    }
+  }
+  
+  const goToAddVehicle = () => {
+    console.log("clicked");
+    navigation.navigate('RegisterVehicleMain', {isRegister: false, isEdit: false})
   }
 
   useEffect(() => {
@@ -211,7 +235,11 @@ const HomeScreen = ({ navigation, route }) => {
 
               <View style={{ flexDirection: 'row' }}>
 
-                <Image source={{ uri: getFullLink(profileData.profile_image) }} style={styles.topImage} />
+                {
+                  profileData.profile_image ?
+                  <Image source={{ uri: getFullLink(profileData.profile_image) }} style={styles.topImage} /> :
+                  <IconProfilePlaceholder width={50} height={50}/>
+                }
 
                 <View style={{ marginLeft: 16, justifyContent: 'space-between', paddingVertical: 4 }}>
 
@@ -223,8 +251,14 @@ const HomeScreen = ({ navigation, route }) => {
 
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <IconCar />
-                    <LatoRegular style={{ marginHorizontal: 5 }}>{homeData.vehicle ? homeData.vehicle?.brand + ' -   ' + homeData.vehicle?.vehicle_plate : translate('vehicle_not_registered')}</LatoRegular>
-                    <IconVerified style={{ color: homeData.vehicle_status == 'verified' ? Colors.primarySecondary : Colors.grey }} />
+                    {homeData.vehicle ? 
+                    <LatoRegular style={{ marginHorizontal: 5, }}>{homeData.vehicle?.brand + ' -   ' + homeData.vehicle?.vehicle_plate}</LatoRegular>
+                     :
+                    <TouchableOpacity onPress={goToAddVehicle}>
+                      <LatoRegular style={{ marginHorizontal: 5, textDecorationLine: 'underline', color: Colors.primarySecondary }}>{translate('add_vehicle')}</LatoRegular>
+                    </TouchableOpacity>
+                    }
+                    {homeData.vehicle && <IconVerified style={{ color: homeData.vehicle_status == 'verified' ? Colors.primarySecondary : Colors.grey }} />}
                   </View>
 
                 </View>
@@ -239,14 +273,21 @@ const HomeScreen = ({ navigation, route }) => {
 
             <View>
 
-              {homeData.active_contract &&
+              {
+              homeData.active_contract &&
                 <CustomButton
                   containerStyle={{ marginHorizontal: 16, marginBottom: 16 }}
                   types={'primary'}
                   title={translate('do_job')}
                   iconRight={true}
                   icon={IconArrow}
-                  onPress={() => navigation.navigate('Job', {id: homeData.active_contract.id})}
+                  onPress={() => {
+                    if (validContractStatus.includes(contractData.status) && validCampaignStatus.includes(contractData.campaign.status)){
+                      navigation.navigate('Job', {id: homeData.active_contract.contract_id})
+                    }else{
+                      showDialog("Kontrak Belum Aktif",false,null,null,null,null,null,"Pekerjaan baru dapat dilakukan ketika kontrak dalam masa penayangan.")
+                    }
+                  }}
                 />
               }
 
@@ -266,8 +307,8 @@ const HomeScreen = ({ navigation, route }) => {
                         <View style={{ padding: 16 }}>
                           <CardContract data={homeData.active_contract} onPress={goToContractDetail} />
                           <LatoBold Icon={IconActiveContract} style={{ color: Colors.primary }} containerStyle={{ paddingVertical: 16 }}>{translate('travel_report')}</LatoBold>
-                          <DistanceChart data={chartData} />
                         </View>
+                          <DistanceChart data={chartData} />
                       </View>
                       :
                       //registered but no offer

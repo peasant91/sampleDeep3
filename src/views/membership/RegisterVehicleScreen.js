@@ -7,7 +7,6 @@ import CustomInput, { PickerInput } from '../../components/atoms/CustomInput'
 
 import IconGallery from '../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../assets/images/ic_camera_picker.svg';
-import IconDelete from '../../assets/images/ic_trash_black.svg';
 
 import translate from '../../locales/translate'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -22,8 +21,12 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import CustomButton from '../../components/atoms/CustomButton'
 import { getCity, getDistrict, getVehicleBrand, getVehicleModel, getVehicleType, getVillage } from '../../services/utilities'
 import { getVehicle, registerVehicle, updateVehicle } from '../../services/user'
-import { showDialog } from '../../actions/commonActions'
-
+import { dismissDialog, showDialog } from '../../actions/commonActions'
+import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions'
+import axios from 'axios'
+import { getFullLink, getImageBase64FromUrl } from '../../actions/helper'
+import ImageResizer from 'react-native-image-resizer';
+import ImgToBase64 from 'react-native-image-base64';
 
 
 const RegisterVehicleScreen = ({ navigation, route }) => {
@@ -56,6 +59,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   const [cityData, setcityData] = useState([])
   const [districtData, setdistrictData] = useState([])
   const [villageData, setvillageData] = useState([])
+  const [isPreloading, setisPreloading] = useState(true)
 
   const [images, setimages] = useState([' ', ' ', ' ', ' '])
   const [selectedPickerIndex, setselectedPickerIndex] = useState(0)
@@ -69,9 +73,11 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   const [stickerAreaData, setstickerAreaData] = useState([])
   const [stickerArea, setstickerArea] = useState([])
   const [colorData, setcolorData] = useState([])
+
   // const [isRegister, setisRegister] = useState(route.params.isRegister)
 
   const [isLoading, setisLoading] = useState(false)
+  const [isEdited, setisEdited] = useState(false)
 
 
   const pickerSheet = useRef()
@@ -91,6 +97,21 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     inputValidities: {},
     formIsValid: false,
   })
+
+  const checkIsEdited = () => {
+    if (isEdit && !isEdited && !isPreloading) {
+      setisEdited(true)
+    }
+  }
+
+  const showBackPrompt = () => {
+    if (isEdited) {
+      showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
+      return
+    }
+
+    navigation.pop()
+  }
 
   const goToRegisterVehicleSuccess = () => {
     navigation.navigate(isRegister ? 'RegisterVehicleSuccess' : 'RegisterVehicleSuccessMain', { isRegister: isRegister })
@@ -132,21 +153,21 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     setisLoading(true)
 
     if (!isEdit) {
-    registerVehicle(form).then(response => {
-      setisLoading(false)
-      goToRegisterVehicleSuccess()
-    }).catch(error => {
-      setisLoading(false)
-      showDialog(error.message)
-    })
+      registerVehicle(form).then(response => {
+        setisLoading(false)
+        goToRegisterVehicleSuccess()
+      }).catch(error => {
+        setisLoading(false)
+        showDialog(error.message)
+      })
     } else {
-    updateVehicle(form).then(response => {
-      setisLoading(false)
-      goToRegisterVehicleSuccess()
-    }).catch(error => {
-      setisLoading(false)
-      showDialog(error.message)
-    })
+      updateVehicle(form).then(response => {
+        setisLoading(false)
+        goToRegisterVehicleSuccess()
+      }).catch(error => {
+        setisLoading(false)
+        showDialog(error.message)
+      })
     }
   }
 
@@ -156,28 +177,57 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       includeBase64: true,
       mediaType: 'photo',
     });
-    if (result) {
-      setImage(result)
-    }
+    setImage(result)
 
   };
 
   const openGalleryPicker = async () => {
+    if (Platform.OS == 'android') {
+      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+      console.log(permission)
+      if (permission == RESULTS.BLOCKED) {
+        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+
+      if (permission == RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        console.log(result)
+        if (result != RESULTS.GRANTED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+          return
+        }
+      }
+    }
     const result = await launchImageLibrary({
       quality: 0.5,
+      maxWidth: 1024,
+      maxHeight: 768,
       includeBase64: true,
       mediaType: 'photo',
     });
-    if (result) {
-      setImage(result)
-    }
+
+    setImage(result)
   };
 
-  const setImage = (result) => {
+  const setImage = async (result) => {
+    if (result == null || result == undefined || result.assets == undefined) {
+      return
+    }
+
     const image = images
-    const base64 = `data:image/png;base64,${result.assets[0].base64}`
-    image[selectedPickerIndex] = base64
-    setimages([...image])
+    const uri = result.assets[0].uri
+    const resizeImage = await ImageResizer.createResizedImage(uri, 1024, 768, 'JPEG', 30, undefined, undefined, false, {
+      onlyScaleDown: true
+    })
+    if (resizeImage) {
+      const base64String = await ImgToBase64.getBase64String(resizeImage.uri)
+      image[selectedPickerIndex] = `data:image/png;base64,${base64String}`
+      setimages([...image])
+    }
+    // const base64 = `data:image/png;base64,${result.assets[0].base64}`
+    // image[selectedPickerIndex] = base64
+    // setimages([...image])
   }
 
 
@@ -189,7 +239,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       title: title,
       data: data,
       selectedId: selectedId,
-      previousRoute: 'RegisterVehicle',
+      previousRoute: isRegister ? 'RegisterVehicle' : 'RegisterVehicleMain',
       dispatch: dispatch,
       isRegister: isRegister,
       isEdit: isEdit
@@ -235,25 +285,25 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     }
   }
 
-  const translateEditForm = (form) => {
+  const translateEditForm = async (form) => {
     console.log('stickerArea', form.detail.sticker_area)
 
     const isFullBody = form.detail.sticker_area.includes(StickerType[0].id)
 
     const formStateDetail = {
       inputValues: {
-      color_id: form.detail.color.id,
-      color_id_value: form.detail.color.name,
-      images: form.images,
-      model_vehicle_id: form.detail.vehicle_model.id,
-      model_vehicle_id_value: form.detail.vehicle_model.name,
-      vehicle_brand_id: form.detail.vehicle_brand.id,
-      vehicle_brand_id_value: form.detail.vehicle_brand.name,
-      plate_number: form.detail.plate_number,
-      sticker_area: form.detail.stickerArea,
-      year: form.detail.year,
-      sticker_area_id: isFullBody ? StickerType[0].id : StickerType[1].id,
-      sticker_area_id_value: isFullBody ? StickerType[0].name : StickerType[1].name
+        color_id: form.detail.color.id,
+        color_id_value: form.detail.color.name,
+        images: form.images,
+        model_vehicle_id: form.detail.vehicle_model.id,
+        model_vehicle_id_value: form.detail.vehicle_model.name,
+        vehicle_brand_id: form.detail.vehicle_brand.id,
+        vehicle_brand_id_value: form.detail.vehicle_brand.name,
+        plate_number: form.detail.plate_number,
+        sticker_area: form.detail.stickerArea,
+        year: form.detail.year,
+        sticker_area_id: isFullBody ? StickerType[0].id : StickerType[1].id,
+        sticker_area_id_value: isFullBody ? StickerType[0].name : StickerType[1].name
       },
       inputValidities: {},
       formIsValid: true,
@@ -300,6 +350,17 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       state: formState
     })
 
+    var image = images
+
+    for (index in form.images) {
+      setisPreloading(true)
+      const imageUrl = form.images[index]
+      const base64 = await getImageBase64FromUrl(getFullLink(imageUrl))
+      image[index] = base64
+      setimages([...image])
+    }
+
+    setisPreloading(false)
     // if (!isFullBody) {
     //   setstickerArea(form.detail.sticker_area)
     // }
@@ -318,36 +379,61 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     }, 500);
   }, [imagePickerId]);
 
-  //reset if parent changed
   useEffect(() => {
-    dispatch({
-      type: 'picker',
-      id: 'city_id',
-      input: null,
-      desc: null,
-      isValid: false,
-    });
+    if (isEdit && isPreloading) {
+      axios.all([
+        getCity(formState.inputValues.province_id),
+        getDistrict(formState.inputValues.city_id),
+        getVillage(formState.inputValues.district_id)
+      ]).then(axios.spread((city, district, village) => {
+        setcityData(city)
+        setdistrictData(district)
+        setvillageData(village)
+        setTimeout(() => {
+          setisPreloading(false)
+        }, 1500);
+      }))
+    }
+  }, [formState])
+
+  //reset if region changed
+  useEffect(() => {
+    if (!isEdit || !isPreloading) {
+      dispatch({
+        type: 'picker',
+        id: 'city_id',
+        input: null,
+        desc: null,
+        isValid: false,
+      });
+    }
   }, [cityData]);
 
   useEffect(() => {
-    dispatch({
-      type: 'picker',
-      id: 'district_id',
-      input: null,
-      desc: null,
-      isValid: false,
-    });
+    if (!isEdit || !isPreloading) {
+
+      dispatch({
+        type: 'picker',
+        id: 'district_id',
+        input: null,
+        desc: null,
+        isValid: false,
+      });
+    }
   }, [cityData, districtData]);
 
   useEffect(() => {
-    dispatch({
-      type: 'picker',
-      id: 'village_id',
-      input: null,
-      desc: null,
-      isValid: false,
-    });
+    if (!isEdit || !isPreloading) {
+      dispatch({
+        type: 'picker',
+        id: 'village_id',
+        input: null,
+        desc: null,
+        isValid: false,
+      });
+    }
   }, [cityData, districtData, villageData]);
+
 
   useEffect(() => {
     console.log(route.params);
@@ -413,13 +499,18 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     ).then(model => setmodelData(model))
   }, [formStateDetail.inputValues.vehicle_brand_id])
 
+  useEffect(() => {
+    checkIsEdited()
+  }, [formState, formStateDetail])
+
 
 
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-    <NavBar title={isEdit ? translate('edit_vehicle') : translate('register_vehicle')} navigation={navigation} />
+    <NavBar title={isEdit ? translate('edit_vehicle') : translate('register_vehicle')} navigation={navigation} onBackPress={showBackPrompt} />
     <ScrollView style={{ flex: 1, padding: 16 }}>
       <View style={{ paddingBottom: 16 }}>
+
         <PickerInput
           id={'vehicle_ownership'}
           title={translate('vehicle_owner_title')}
@@ -429,6 +520,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           isCheck={formState.isChecked}
           required
         />
+
         <PickerInput
           id={'vehicle_usage'}
           title={translate('vehicle_usage_title')}
@@ -439,6 +531,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           isCheck={formState.isChecked}
           required
         />
+
         <PickerInput
           id={'province_id'}
           title={translate('province_title')}
@@ -485,6 +578,19 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
             openPicker('village_id', 'village_title', villageData, formState, dispatch)
           }
         />
+        {formState.inputValues.village_id == -99 && formState.inputValues.village_id_value != null &&
+
+          <CustomInput
+            id={'village_name'}
+            title={translate('manual_input')}
+            containerStyle={{ paddingBottom: 16 }}
+            placeholder={translate('village_placeholder')}
+            value={formState.inputValues.village_name}
+            isCheck={formState.isChecked}
+            dispatcher={dispatch}
+            required
+          />
+        }
 
         <PickerInput
           id={'vehicle_type'}
@@ -528,6 +634,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           value={formStateDetail.inputValues.year}
           dispatcher={dispatchDetail}
           isCheck={formState.isChecked}
+          keyboardType={'number-pad'}
           required
         />
 
@@ -578,7 +685,12 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
                   isChecked={isChecked}
                   onPress={() => {
                     if (isChecked) {
-                      stickerArea.pop(item.value)
+                      const index = stickerArea.indexOf(item.value)
+                      if (index == 0) {
+                        stickerArea.shift()
+                      } else {
+                        stickerArea.splice(index, 1)
+                      }
                     } else {
                       stickerArea.push(item.value)
                     }

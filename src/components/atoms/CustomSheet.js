@@ -11,7 +11,7 @@ import Colors from '../../constants/Colors';
 const CustomSheet = React.forwardRef(({children, onChange, snapPoints}, ref) => {
   const {bottom: safeBottomArea} = useSafeAreaInsets();
 
-  const initialSnapPoints = useMemo(() => ['1%','1%','CONTENT_HEIGHT','CONTENT_HEIGHT'], []);
+  const initialSnapPoints = useMemo(() => ['CONTENT_HEIGHT'], []);
   const {
     animatedHandleHeight,
     animatedSnapPoints,
@@ -23,7 +23,7 @@ const CustomSheet = React.forwardRef(({children, onChange, snapPoints}, ref) => 
     props => (
       <BottomSheetBackdrop
         {...props}
-        disappearsOnIndex={0}
+        disappearsOnIndex={-1}
       />
     ),
     []

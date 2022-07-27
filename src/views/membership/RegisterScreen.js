@@ -27,12 +27,12 @@ import CustomInput, {
   PickerInput,
   PasswordInput,
 } from '../../components/atoms/CustomInput';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import formReducer from '../../reducers/formReducer.js';
-import {showDialog, dismissDialog} from '../../actions/commonActions';
-import {register, updateProfile} from '../../services/auth';
+import { showDialog, dismissDialog, showLocationAlwaysDialog } from '../../actions/commonActions';
+import { register, updateProfile, validateRegister } from '../../services/auth';
 import NavBar from '../../components/atoms/NavBar';
-import {Image} from 'react-native-elements';
+import { Image } from 'react-native-elements';
 import DatePicker from 'react-native-date-picker';
 import CustomSheet from '../../components/atoms/CustomSheet';
 
@@ -41,19 +41,25 @@ import IconProfileAddImage from '../../assets/images/ic_profile_add_image.svg';
 import IconGallery from '../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../assets/images/ic_camera_picker.svg';
 import IconDelete from '../../assets/images/ic_trash_black.svg';
+import IconCalendar from '../../assets/images/ic_calendar.svg';
+
 
 import GenderComponents from '../../components/molecules/GenderComponents';
 import IDCard from '../../components/atoms/IDCard';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
-import {getCity, getDistrict, getProvince, getVillage} from '../../services/utilities';
+import { getCity, getDistrict, getProvince, getVillage,getDriverRekanan } from '../../services/utilities';
 import moment from 'moment';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
-import { getFullLink } from '../../actions/helper';
+import { getFullLink, getImageBase64FromUrl } from '../../actions/helper';
 import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
+import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { useToast } from "react-native-toast-notifications";
+import ImageResizer from 'react-native-image-resizer';
+import ImgToBase64 from 'react-native-image-base64';
 
 const dummyDivision = [
   {
@@ -70,7 +76,7 @@ const dummyDivision = [
   },
 ];
 
-const RegisterScreen = ({navigation, route}) => {
+const RegisterScreen = ({ navigation, route }) => {
 
   const [companyData, setcompanyData] = useState();
   const [provinceData, setprovinceData] = useState();
@@ -78,14 +84,18 @@ const RegisterScreen = ({navigation, route}) => {
   const [districtData, setdistrictData] = useState();
   const [villageData, setvillageData] = useState();
   const [bankData, setbankData] = useState();
+  const [partnerData,setPartnerData] = useState()
   const [selectedPicker, setselectedPicker] = useState();
   const [imagePickerId, setimagePickerId] = useState(99);
   const [preloading, setpreloading] = useState(true)
 
   const [isLoading, setIsLoading] = useState(false);
   const [openDate, setopenDate] = useState(false);
+  const [isEdited, setisEdited] = useState(false)
 
-  const { isEdit, data} = route.params
+  const { isEdit, data, isVerified } = route.params
+  const toast = useToast();
+  const toastMessage = useRef(translate('please_select_province'))
 
   const pickerSheet = useRef();
 
@@ -103,7 +113,14 @@ const RegisterScreen = ({navigation, route}) => {
 
   const [formStateCard, dispatchCard] = useReducer(formReducer, {
     inputValues: {},
-    inputValidities: {},
+    inputValidities: {
+      ktp_image: isEdit,
+      ktp: isEdit,
+      sim_a: isEdit,
+      sim_a_image: isEdit,
+      sim_b: formStateCard?.inputValues?.sim_b_image?.length <= 0,
+      sim_b_image: formStateCard?.inputValues?.sim_b?.length == undefined || formStateCard?.inputValues?.sim_b?.length <= 0
+    },
     formIsValid: isEdit,
   });
 
@@ -121,45 +138,54 @@ const RegisterScreen = ({navigation, route}) => {
     inputValues: {
     },
     inputValidities: {},
-    formIsValid: isEdit, 
+    formIsValid: isEdit,
     isChecked: false,
   });
+
+
+  const showBackPrompt = () => {
+    if (isEdited) {
+      showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
+      return
+    }
+
+    navigation.pop()
+  }
+
+  const checkEdited = () => {
+    if (isEdit && !isEdited) {
+      setisEdited(true)
+    }
+  }
 
   const doRegister = () => {
     dispatch({
       type: 'check',
     });
 
-    console.log(formState.formIsValid ,formStateCard.formIsValid , formStateDetail.formIsValid , formStateAddress.formIsValid ,formStateBank.formIsValid);
-
-    if (formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null)) {
-      // setIsLoading(true);
-      // register(formState.inputValues)
-      //   .then(response => {
-      //     setIsLoading(false);
-      //     goToSuccess();
-      //   })
-      //   .catch(err => {
-      //     setIsLoading(false);
-      //     showDialog(err.message, false);
-      //   });
-
+    if (isAllFormValid()) {
       buildForm(formState)
     }
   };
 
+  const isAllFormValid = () => {
+    console.log("sim b input",formStateCard?.inputValues?.sim_b?.length);
+    console.log(formState.formIsValid, formStateCard.inputValidities, formStateCard?.inputValues?.sim_b?.length)
+    return formState.formIsValid && formStateCard.formIsValid && formStateDetail.formIsValid && formStateAddress.formIsValid && (formStateBank.formIsValid || formStateDetail.inputValues.driver_company_id != null)
+  }
+
   //translate form into input state if edit profile
-  const translateForm = () => {
+  const translateForm = async () => {
     console.log('translateForm', data.city.id)
     const state = {
       inputValues:
-    {
-      name: data.name,
-      email: data.email,
-      phone1: data.phone1,
-      phone2: data.phone2,
-    },
-    formIsValid: true 
+      {
+        name: data.name,
+        email: data.email,
+        phone1: data.phone1,
+        phone2: data.phone2,
+      },
+      formIsValid: true
     }
 
     const stateDetail = {
@@ -167,6 +193,9 @@ const RegisterScreen = ({navigation, route}) => {
         birth_date: data.birth_date,
         driver_company_id: data.driver_company?.id,
         driver_company_id_value: data.driver_company?.name,
+        driver_partner_id : data.driver_partner?.id,
+        driver_partner_id_value: data.driver_partner?.name,
+        profile_image: await getImageBase64FromUrl(getFullLink(data.profile_image)),
         profile_image_uri: data.profile_image,
         gender: data.gender
       },
@@ -194,15 +223,12 @@ const RegisterScreen = ({navigation, route}) => {
         ktp: data.ktp.number,
         ktp_image_uri: data.ktp.image,
         sim_a: data.sim_a.number,
-        sim_a_image_uri: data.sim_a.image
+        sim_a_image_uri: data.sim_a.image,
+        sim_b: data.sim_b?.number,
+        sim_b_image_uri: data.sim_b?.image
       },
       formIsValid: true
     }
-
-    // console.log('card', stateCard)
-    // console.log('address', stateAddress)
-
-
 
     dispatchDetail({
       type: 'update',
@@ -229,29 +255,47 @@ const RegisterScreen = ({navigation, route}) => {
     onPickDate(data.birth_date)
   }
 
-
-  const buildForm = (formState) => {
+  const buildCardForm = () => {
+    //console.log('cardform', formStateCard.inputValues)
     var card = []
     for (item in Config.cardList) {
-      if (formStateCard.inputValues[Config.cardList[item]]) {
+      if (formStateCard.inputValues[Config.cardList[item]] && formStateCard.inputValues[`${Config.cardList[item]}_image`]) {
         // console.log('push', Config.cardList[item])
-      card.push({
-        type: Config.cardList[item],
-        number: formStateCard.inputValues[Config.cardList[item]],
-        image: formStateCard.inputValues[`${Config.cardList[item]}_image`]
-      })
+        card.push({
+          type: Config.cardList[item],
+          number: formStateCard.inputValues[Config.cardList[item]] ?? null,
+          image: formStateCard.inputValues[`${Config.cardList[item]}_image`] ?? null
+        })
       }
     }
+
+    return card
+
+  }
+
+  //delete village_id if manual input
+  const getFormAddress = () => {
+    if (formStateAddress.inputValues.village_name) {
+      const { village_id, ...object } = formStateAddress.inputValues
+      return object
+    } else {
+      return formStateAddress.inputValues
+    }
+  }
+
+
+  const buildForm = (formState) => {
 
     const detail = {
       ...formStateDetail.inputValues,
       bank: formStateDetail.inputValues.driver_company_id ? null : formStateBank.inputValues,
-      address: formStateAddress.inputValues,
-      card: card
+      address: getFormAddress(),
+      card: buildCardForm()
     }
 
     const data = {
       ...formState.inputValues,
+      password: 'thisisdummypassword',
       detail: detail
     }
 
@@ -259,13 +303,26 @@ const RegisterScreen = ({navigation, route}) => {
       setIsLoading(true)
       updateProfile(data).then(() => {
         setIsLoading(false)
-        navigation.navigate('Account', { isChangeProfile: true} , true)
+        navigation.navigate('Account', { isChangeProfile: true }, true)
       }).catch(err => {
+        setIsLoading(false)
         showDialog(err.message)
       })
     } else {
-      navigation.navigate('RegisterPassword', {data: data});
+      validate(data)
     }
+  }
+
+  const validate = (data) => {
+    setIsLoading(true)
+    validateRegister(data).then(response => {
+      setIsLoading(false)
+      data.password = ""
+      navigation.navigate('RegisterPassword', { data: data });
+    }).catch(error => {
+      setIsLoading(false)
+      showDialog(error.message)
+    })
   }
 
   const onGenderPicked = value => {
@@ -296,7 +353,7 @@ const RegisterScreen = ({navigation, route}) => {
         openCameraPicker(selectedPicker);
       } else if (imagePickerId == 1) {
         openGalleryPicker(selectedPicker);
-      } else if (imagePickerId == 2){
+      } else if (imagePickerId == 2) {
         deleteImage(selectedPicker);
       }
 
@@ -305,119 +362,86 @@ const RegisterScreen = ({navigation, route}) => {
   }, [imagePickerId]);
 
   const deleteImage = selectedPicker => {
-      if (selectedPicker.location == 'card') {
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id,
-          input: undefined,
-          isValid: false,
-        });
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: undefined,
-          isValid: false,
-        });
-      } else {
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id,
-          input: undefined,
-          isValid: false,
-        });
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: undefined,
-          isValid: false,
-        });
+    console.log(selectedPicker.id)
+    selectedPicker.dispatch({
+      type: 'image',
+      id: selectedPicker.id,
+      input: null,
+      uri: undefined,
+      isValid: selectedPicker.id == 'profile_image' || selectedPicker.id == 'sim_b_image' ? true : false,
+    })
   }
-}
 
-  const openCameraPicker = async selectedPicker => {
-    const result = await launchCamera({
+  const openCameraPicker = async () => {
+    launchCamera({
       quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
-    });
-    if (result) {
-      if (selectedPicker.location == 'card') {
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      } else {
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      }
-    }
+    }, (result) => {
+      processResult(result)
+    })
 
-    // console.log(result);
-    // console.log(formStateBank);
   };
 
-  const openGalleryPicker = async selectedPicker => {
+  const openGalleryPicker = async () => {
+    if (Platform.OS == 'android') {
+      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+      console.log(permission)
+      if (permission == RESULTS.BLOCKED) {
+        showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+
+      if (permission == RESULTS.DENIED) {
+        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        console.log(result)
+        if (result != RESULTS.GRANTED) {
+          showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+          return
+        }
+      }
+    }
     const result = await launchImageLibrary({
       quality: 0.5,
       includeBase64: true,
       mediaType: 'photo',
     });
-    if (result) {
-      if (selectedPicker.location == 'card') {
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchCard({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      } else {
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id,
-          input: result.assets[0].base64,
-          isValid: true,
-        });
-        dispatchDetail({
-          type: 'input',
-          id: selectedPicker.id + '_uri',
-          input: result.assets[0].uri,
-          isValid: true,
-        });
-      }
-    }
-
-    // console.log(result);
-    // console.log(formStateBank);
+    processResult(result)
   };
 
-  const openImagePicker = async (id, location) => {
+  const processResult = async (result) => {
+    if (result == null || result == undefined || result.assets == undefined) {
+      return
+    }
+    const uri = result.assets[0].uri
+    const resizeImage = await ImageResizer.createResizedImage(uri, 1024, 720, 'JPEG', 30, undefined, undefined, false, {
+      onlyScaleDown: true
+    })
+    if (resizeImage) {
+      const base64String = await ImgToBase64.getBase64String(resizeImage.uri)
+
+      if (base64String) {
+        selectedPicker.dispatch({
+          type: 'input',
+          id: selectedPicker.id,
+          input: 'data:image/png;base64,' + base64String,
+          isValid: true,
+        })
+        selectedPicker.dispatch({
+          type: 'input',
+          id: selectedPicker.id + '_uri',
+          input: resizeImage.uri,
+          isValid: true,
+        })
+      }
+    }
+  }
+
+  const openImagePicker = async (id, location, dispatch) => {
     setselectedPicker({
       id,
       location,
+      dispatch
     });
     setTimeout(() => {
       pickerSheet.current.expand();
@@ -428,13 +452,13 @@ const RegisterScreen = ({navigation, route}) => {
     if (selectedPicker) {
       if (selectedPicker.location == 'card') {
         return (
-          formStateCard.inputValues[selectedPicker.id] == '' ||
-          formStateCard.inputValues[selectedPicker.id] == undefined
+          formStateCard.inputValues[selectedPicker.id + '_uri'] == '' ||
+          formStateCard.inputValues[selectedPicker.id + '_uri'] == undefined
         );
       } else {
         return (
-          formStateDetail.inputValues[selectedPicker.id] == '' ||
-          formStateDetail.inputValues[selectedPicker.id] == undefined
+          formStateDetail.inputValues[selectedPicker.id + '_uri'] == '' ||
+          formStateDetail.inputValues[selectedPicker.id + '_uri'] == undefined
         );
       }
     } else {
@@ -444,9 +468,9 @@ const RegisterScreen = ({navigation, route}) => {
 
 
 
-  const openPicker = (id, title, data) => {
+  const openPicker = (id, title, data, dispatch) => {
     var selectedId;
-    if (id == 'driver_company_id') {
+    if (id == 'driver_company_id' || id == 'driver_partner_id') {
       selectedId = formStateDetail.inputValues[id];
     } else if (id == 'bank_id') {
       selectedId = formStateBank.inputValues[id];
@@ -460,7 +484,8 @@ const RegisterScreen = ({navigation, route}) => {
       data: data,
       selectedId: selectedId,
       isEdit: isEdit,
-      previousRoute: 'Register'
+      previousRoute: !isEdit ? 'Register' : 'EditProfile',
+      dispatch: dispatch
     });
   };
 
@@ -479,21 +504,32 @@ const RegisterScreen = ({navigation, route}) => {
 
   }, []);
 
+  useEffect(()=>{
+    const getDriverPartner = async() =>{
+      const partner = await getDriverRekanan()
+      setPartnerData(partner)
+    }
+    getDriverPartner()
+  },[])
+
   useEffect(() => {
     console.log(route.params);
 
     if (route.params?.pickerId) {
       const id = route.params.pickerId;
+      const dispatch = route.params.dispatch;
+      console.log(id);
+      dispatch({
+        type: 'picker',
+        id: id,
+        input: route.params.id,
+        desc: route.params.name,
+        isValid: true,
+      })
+
       if (id == 'driver_company_id') {
-        dispatchDetail({
-          type: 'picker',
-          id: id,
-          input: route.params.id,
-          desc: route.params.name,
-          isValid: true,
-        });
         //make bank null if company is picked
-        dispatchDetail({
+        dispatch({
           type: 'input',
           id: 'bank',
           input: null,
@@ -502,9 +538,9 @@ const RegisterScreen = ({navigation, route}) => {
         getUserBank(route.params.id).then(response => {
           const state = {
             inputValues: {
-            bank_id: response.id,
-            bank_id_value: response.bank_name,
-            ...response
+              bank_id: response.id,
+              bank_id_value: response.bank_name,
+              ...response
 
             },
             formIsValid: true
@@ -514,33 +550,58 @@ const RegisterScreen = ({navigation, route}) => {
             state: state
           })
         })
-      } else if (id == 'bank_id') {
-        dispatchBank({
-          type: 'picker',
-          id: id,
-          input: route.params.id,
-          desc: route.params.name,
-          isValid: true,
-        });
+      } else if (id == 'driver_partner_id'){
+
+      }else if (id == 'bank_id') {
+        return
       } else {
-        dispatchAddress({
-          type: 'picker',
-          id: id,
-          input: route.params.id,
-          desc: route.params.name,
-          isValid: true,
-        });
         if (id == 'province_id') {
+          toastMessage.current = translate('please_wait')
+          setcityData()
+          setdistrictData()
+          setvillageData()
           getCity(route.params.id).then(cityData => {
             setcityData(cityData);
+          }).catch(err => {
+            toastMessage.current = translate('reselect_province')
+            toast.show(toastMessage.current, {
+              type: 'custom',
+              placement: 'bottom',
+              duration: 5000,
+              offset: 30,
+              animationType: 'slide-in',
+            });
           });
         } else if (id == 'city_id') {
+          toastMessage.current = translate('please_wait')
+          setdistrictData()
+          setvillageData()
           getDistrict(route.params.id).then(districtData => {
             setdistrictData(districtData);
+          }).catch(err => {
+            toastMessage.current = translate('reselect_city')
+            toast.show(toastMessage.current, {
+              type: 'custom',
+              placement: 'bottom',
+              duration: 5000,
+              offset: 30,
+              animationType: 'slide-in',
+            });
           });
         } else if (id == 'district_id') {
+          toastMessage.current = translate('please_wait')
+          setvillageData()
           getVillage(route.params.id).then(villageData => {
             setvillageData(villageData);
+          }).catch(err => {
+            toastMessage.current = translate('reselect_district')
+            toast.show(toastMessage.current, {
+              type: 'custom',
+              placement: 'bottom',
+              duration: 5000,
+              offset: 30,
+              animationType: 'slide-in',
+            });
           });
         }
       }
@@ -550,9 +611,10 @@ const RegisterScreen = ({navigation, route}) => {
   //preload region
   useEffect(() => {
     if (isEdit) {
+      console.log("data", data);
       getCity(data.province.id).then(response => setcityData(response))
       getDistrict(data.city.id).then(response => setdistrictData(response))
-      getVillage(data.district.id).then(response => { 
+      getVillage(data.district.id).then(response => {
         setvillageData(response)
         setTimeout(() => {
           setpreloading(false)
@@ -566,81 +628,91 @@ const RegisterScreen = ({navigation, route}) => {
   //reset if region changed
   useEffect(() => {
     if (!isEdit || !preloading) {
-    dispatchAddress({
-      type: 'picker',
-      id: 'city_id',
-      input: null,
-      desc: null,
-      isValid: false,
-    });
+      dispatchAddress({
+        type: 'picker',
+        id: 'city_id',
+        input: null,
+        desc: null,
+        isValid: false,
+      });
     }
   }, [cityData]);
 
   useEffect(() => {
     if (!isEdit || !preloading) {
 
-    dispatchAddress({
-      type: 'picker',
-      id: 'district_id',
-      input: null,
-      desc: null,
-      isValid: false,
-    });
+      dispatchAddress({
+        type: 'picker',
+        id: 'district_id',
+        input: null,
+        desc: null,
+        isValid: false,
+      });
     }
   }, [cityData, districtData]);
 
   useEffect(() => {
     if (!isEdit || !preloading) {
-    dispatchAddress({
-      type: 'picker',
-      id: 'village_id',
-      input: null,
-      desc: null,
-      isValid: false,
-    });
+      dispatchAddress({
+        type: 'picker',
+        id: 'village_id',
+        input: null,
+        desc: null,
+        isValid: false,
+      });
     }
   }, [cityData, districtData, villageData]);
 
+  useEffect(() => {
+    if (isEdit && !preloading)
+      checkEdited()
+  }, [formState, formStateDetail, formStateAddress, formStateCard, formStateBank])
+
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
       <NavBar
         navigation={navigation}
         title={isEdit ? translate('edit_profile') : translate('register_form')}
         shadowEnabled={true}
+        onBackPress={showBackPrompt}
       />
       <KeyboardAvoidingView
-        style={{flex: 1, zIndex: -1}}
+        style={{ flex: 1, zIndex: -1 }}
         behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
         <ScrollView style={styles.container}>
-          <View style={{paddingBottom: 40}}>
-            {!isEdit && 
-            <View>
-            <LatoBold>{translate('register_form_title')}</LatoBold>
-            <LatoRegular containerStyle={{marginTop: 5}}>
-              {translate('register_form_desc')}
-            </LatoRegular>
-            </View>
-        }
+          <View style={{ paddingBottom: 40 }}>
+            {!isEdit &&
+              <View>
+                <LatoBold>{translate('register_form_title')}</LatoBold>
+                <LatoRegular containerStyle={{ marginTop: 5 }}>
+                  {translate('register_form_desc')}
+                </LatoRegular>
+              </View>
+            }
 
             <TouchableOpacity
-              style={{alignItems: 'center', margin: 16}}
-              onPress={() => openImagePicker('profile_image', 'Detail')}>
+              style={{ alignItems: 'center', margin: 16 }}
+              onPress={() => { !isVerified ? openImagePicker('profile_image', 'Detail', dispatchDetail) : null }}>
               <View>
                 {formStateDetail.inputValues.profile_image_uri ? (
                   <Image
                     source={{
-                      uri: formStateDetail.inputValues.profile_image ? formStateDetail.inputValues.profile_image_uri : getFullLink(formStateDetail.inputValues.profile_image_uri),
+                      uri: formStateDetail.inputValues.profile_image ? formStateDetail.inputValues.profile_image : getFullLink(formStateDetail.inputValues.profile_image_uri),
                     }}
-                    style={{width: 80, height: 80, borderRadius: 50, resizeMode: 'cover'}}
+                    style={{ width: 80, height: 80, borderRadius: 50, resizeMode: 'cover' }}
                   />
                 ) : (
                   <IconProfilePlaceholder />
                 )}
-                <IconProfileAddImage
-                  style={{position: 'absolute', bottom: 0, right: 0}}
-                />
+                {
+                  !isVerified &&
+                  <IconProfileAddImage
+                    style={{ position: 'absolute', bottom: 0, right: 0 }}
+                  />
+                }
+
               </View>
             </TouchableOpacity>
 
@@ -652,6 +724,7 @@ const RegisterScreen = ({navigation, route}) => {
               dispatcher={dispatch}
               isCheck={formState.isChecked}
               required
+              viewOnly={isVerified}
             />
 
             <PhoneInput
@@ -659,9 +732,10 @@ const RegisterScreen = ({navigation, route}) => {
               title={translate('phone_title')}
               placeholder={translate('phone_placeholder')}
               dispatcher={dispatch}
-              containerStyle={{marginVertical: 16}}
+              containerStyle={{ marginVertical: 16 }}
               value={formState.inputValues.phone1}
               isCheck={formState.isChecked}
+              viewOnly={isVerified}
             />
 
             <PhoneInput
@@ -672,17 +746,21 @@ const RegisterScreen = ({navigation, route}) => {
               value={formState.inputValues.phone2}
               isCheck={formState.isChecked}
               optional
+              isUnique={true}
+              isUniqueWith={formState.inputValues.phone1}
+              viewOnly={isVerified}
             />
 
             <CustomInput
               id={'email'}
               title={translate('email_title')}
               placeholder={translate('email_placeholder')}
-              containerStyle={{marginVertical: 16}}
+              containerStyle={{ marginVertical: 16 }}
               dispatcher={dispatch}
               value={formState.inputValues.email}
               isCheck={formState.isChecked}
               required
+              viewOnly={isVerified}
             />
 
             <PickerInput
@@ -690,23 +768,40 @@ const RegisterScreen = ({navigation, route}) => {
               title={translate('company_title')}
               placeholder={translate('company_placeholder')}
               value={formStateDetail.inputValues.driver_company_id_value}
-              onPress={() =>
-                openPicker('driver_company_id', 'company_title', companyData)
-              }
+              viewOnly={isVerified}
+              disabled={isVerified}
+              onPress={() => {
+                openPicker('driver_company_id', 'company_title', companyData, dispatchDetail)
+              }}
               isCheck={formState.isChecked}
             />
 
-            <InfoMenu text={translate('company_bank_info')} containerStyle={{marginTop: 16}}/>
+            <InfoMenu text={translate('company_bank_info')} containerStyle={{ marginTop: 16 }} />
+
+            <PickerInput
+              id={'driver_partner_id'}
+              title={translate('partner_title')}
+              placeholder={translate('partner_placeholder')}
+              value={formStateDetail.inputValues.driver_partner_id_value}
+              viewOnly={isVerified}
+              containerStyle={{ marginTop: 16 }}
+              disabled={isVerified}
+              onPress={() => {
+                openPicker('driver_partner_id', 'partner_title', partnerData, dispatchDetail)
+              }}
+              isCheck={formState.isChecked}
+            />
 
             <CustomInput
               id={'address'}
               title={translate('address_title')}
               placeholder={translate('address_placeholder')}
               value={formStateAddress.inputValues.address}
-              containerStyle={{marginVertical: 16}}
+              containerStyle={{ marginVertical: 16 }}
               dispatcher={dispatchAddress}
               isCheck={formState.isChecked}
               required
+              viewOnly={isVerified}
             />
 
             <PickerInput
@@ -715,20 +810,34 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('province_placeholder')}
               value={formStateAddress.inputValues.province_id_value}
               isCheck={formState.isChecked}
+              viewOnly={isVerified}
+              disabled={isVerified}
               onPress={() =>
-                openPicker('province_id', 'province_title', provinceData)
+                openPicker('province_id', 'province_title', provinceData, dispatchAddress)
               }
+              required
             />
-            
+
             <PickerInput
               id={'city_id'}
               title={translate('city_title')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               placeholder={translate('city_placeholder')}
               value={formStateAddress.inputValues.city_id_value}
               isCheck={formState.isChecked}
-              disabled={formStateAddress.inputValues.province_id == null }
-              onPress={() => openPicker('city_id', 'city_title', cityData)}
+              viewOnly={isVerified}
+              disabled={isVerified}
+              //disabled={formStateAddress.inputValues.province_id == null && cityData == null}
+              onPress={() => cityData == null ?
+                toast.show(toastMessage.current, {
+                  type: 'custom',
+                  placement: 'bottom',
+                  duration: 2000,
+                  offset: 30,
+                  animationType: 'slide-in',
+                })
+                : openPicker('city_id', 'city_title', cityData, dispatchAddress)}
+              required
             />
 
             <PickerInput
@@ -737,38 +846,59 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('district_placeholder')}
               value={formStateAddress.inputValues.district_id_value}
               isCheck={formState.isChecked}
-              disabled={formStateAddress.inputValues.city_id == null }
-              onPress={() =>
-                openPicker('district_id', 'district_title', districtData)
+              viewOnly={isVerified}
+              disabled={isVerified}
+              //disabled={formStateAddress.inputValues.city_id == null }
+              onPress={() => districtData == null ?
+                toast.show(toastMessage.current, {
+                  type: 'custom',
+                  placement: 'bottom',
+                  duration: 2000,
+                  offset: 30,
+                  animationType: 'slide-in',
+                })
+                : openPicker('district_id', 'district_title', districtData, dispatchAddress)
               }
+              required
             />
 
             <PickerInput
               id={'village_id'}
               title={translate('village_title')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               placeholder={translate('village_placeholder')}
               value={formStateAddress.inputValues.village_id_value}
               isCheck={formState.isChecked}
-              disabled={formStateAddress.inputValues.district_id == null }
-              onPress={() =>
-                openPicker('village_id', 'village_title', villageData)
+              viewOnly={isVerified}
+              disabled={isVerified}
+              //disabled={formStateAddress.inputValues.district_id == null}
+              onPress={() => villageData == null ?
+                toast.show(toastMessage.current, {
+                  type: 'custom',
+                  placement: 'bottom',
+                  duration: 2000,
+                  offset: 30,
+                  animationType: 'slide-in',
+                })
+                : openPicker('village_id', 'village_title', villageData, dispatchAddress)
               }
-            />
-
-              {formStateAddress.inputValues.village_id == null && formStateAddress.inputValues.village_id_value != null &&
-
-            <CustomInput
-              id={'village_name'}
-              title={translate('manual_input')}
-              containerStyle={{paddingBottom: 16}}
-              placeholder={translate('village_placeholder')}
-              value={formStateAddress.inputValues.village_name}
-              isCheck={formState.isChecked}
-              dispatcher={dispatchAddress}
               required
             />
-              }
+
+            {formStateAddress.inputValues.village_id == -99 && formStateAddress.inputValues.village_id_value != null &&
+
+              <CustomInput
+                id={'village_name'}
+                title={translate('manual_input')}
+                containerStyle={{ paddingBottom: 16 }}
+                placeholder={translate('village_placeholder')}
+                value={formStateAddress.inputValues.village_name}
+                isCheck={formState.isChecked}
+                viewOnly={isVerified}
+                dispatcher={dispatchAddress}
+                required
+              />
+            }
 
             <CustomInput
               id={'postal_code'}
@@ -777,13 +907,16 @@ const RegisterScreen = ({navigation, route}) => {
               value={formStateAddress.inputValues.postal_code}
               dispatcher={dispatchAddress}
               isCheck={formState.isChecked}
+              viewOnly={isVerified}
+              keyboardType={'number-pad'}
               required
             />
 
             <GenderComponents
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               selectedId={formStateDetail.inputValues.gender}
               isCheck={formState.isChecked}
+              disabled={isVerified}
               onPress={onGenderPicked}
             />
 
@@ -793,22 +926,25 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('birthdate_placeholder')}
               value={formStateDetail.inputValues.birth_date_value}
               isCheck={formState.isChecked}
+              Icon={IconCalendar}
+              viewOnly={isVerified}
+              disabled={isVerified}
               required
               onPress={() => setopenDate(true)}
             />
-              { !isEdit && 
+            {!isEdit &&
               <View>
 
                 <PickerInput
                   id={'bank_id'}
                   title={translate('bank_title')}
                   placeholder={translate('bank_placeholder')}
-                  containerStyle={{paddingVertical: 16}}
+                  containerStyle={{ paddingVertical: 16 }}
                   value={formStateBank.inputValues.bank_id_value}
                   isCheck={formState.isChecked}
                   required
-                  disabled={formStateDetail.inputValues.driver_company_id }
-                  onPress={() => openPicker('bank_id', 'bank_title', bankData)}
+                  disabled={formStateDetail.inputValues.driver_company_id}
+                  onPress={() => openPicker('bank_id', 'bank_title', bankData, dispatchBank)}
                 />
 
                 <CustomInput
@@ -819,6 +955,7 @@ const RegisterScreen = ({navigation, route}) => {
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
                   disabled={formStateDetail.inputValues.driver_company_id}
+                  keyboardType={'number-pad'}
                   required
                 />
 
@@ -826,7 +963,7 @@ const RegisterScreen = ({navigation, route}) => {
                   id={'branch'}
                   title={translate('branch_title')}
                   placeholder={translate('branch_placeholder')}
-                  containerStyle={{paddingVertical: 16}}
+                  containerStyle={{ paddingVertical: 16 }}
                   value={formStateBank.inputValues.branch}
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
@@ -848,19 +985,21 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomInput
               id={'ktp'}
-              title={translate('number', {string: translate('ktp')})}
+              title={translate('number', { string: translate('ktp') })}
               placeholder={translate('ktp_placeholder')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               value={formStateCard.inputValues.ktp}
               dispatcher={dispatchCard}
+              viewOnly={isVerified}
               isCheck={formState.isChecked}
+              keyboardType={'number-pad'}
               required
             />
 
             <IDCard
               title={translate('ktp')}
               navigation={navigation}
-              onPress={() => openImagePicker('ktp_image', 'card')}
+              onPress={() => { !isVerified ? openImagePicker('ktp_image', 'card', dispatchCard) : null }}
               imageUri={formStateCard.inputValues.ktp_image_uri}
               isCheck={formState.isChecked}
               required
@@ -868,20 +1007,21 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomInput
               id={'sim_a'}
-              title={translate('number', {string: translate('sim_a')})}
+              title={translate('number', { string: translate('sim_a') })}
               placeholder={translate('sim_placeholder')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               value={formStateCard.inputValues.sim_a}
               dispatcher={dispatchCard}
+              viewOnly={isVerified}
               isCheck={formState.isChecked}
+              keyboardType={'number-pad'}
               required
             />
 
-              
             <IDCard
               title={translate('sim_a')}
               navigation={navigation}
-              onPress={() => openImagePicker('sim_a_image', 'card')}
+              onPress={() => { !isVerified ? openImagePicker('sim_a_image', 'card', dispatchCard) : null }}
               imageUri={formStateCard.inputValues.sim_a_image_uri}
               isCheck={formState.isChecked}
               required
@@ -889,28 +1029,37 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomInput
               id={'sim_b'}
-              title={translate('number', {string: translate('sim_b')})}
+              title={translate('number', { string: translate('sim_b') })}
               placeholder={translate('sim_placeholder')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               value={formStateCard.inputValues.sim_b}
               dispatcher={dispatchCard}
+              viewOnly={isVerified}
+              keyboardType={'number-pad'}
               isCheck={formState.isChecked}
+              required={formStateCard.inputValues.sim_b_image?.length > 0}
             />
 
             <IDCard
               navigation={navigation}
               title={translate('sim_b')}
-              onPress={() => openImagePicker('sim_b_image', 'card')}
+              onPress={() => { !isVerified ? openImagePicker('sim_b_image', 'card', dispatchCard) : null }}
               imageUri={formStateCard.inputValues.sim_b_image_uri}
+              isCheck={formState.isChecked}
+              required={formStateCard.inputValues.sim_b?.length > 0}
             />
+            {
+              (!isVerified) && (
+                <CustomButton
+                  types="primary"
+                  title={translate('next')}
+                  containerStyle={{ marginTop: 16 }}
+                  onPress={doRegister}
+                  isLoading={isLoading}
+                />
+              )
+            }
 
-            <CustomButton
-              types="primary"
-              title={translate('next')}
-              containerStyle={{marginTop: 16}}
-              onPress={doRegister}
-              isLoading={isLoading}
-            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -927,11 +1076,11 @@ const RegisterScreen = ({navigation, route}) => {
       />
 
       <CustomSheet ref={pickerSheet}>
-        <View style={{padding: 16}}>
+        <View style={{ padding: 16 }}>
           <LatoBold>{translate('pick_photo')}</LatoBold>
           <TouchableOpacity
             onPress={() => setimagePickerId(1)}
-            style={{marginVertical: 10}}>
+            style={{ marginVertical: 10 }}>
             <LatoRegular Icon={IconGallery}>
               {translate('pick_gallery')}
             </LatoRegular>
@@ -949,7 +1098,7 @@ const RegisterScreen = ({navigation, route}) => {
               {translate('pick_camera')}
             </LatoRegular>
           </TouchableOpacity>
-          
+
           {!isPickedImageEmpty() && (
             <View>
               <View

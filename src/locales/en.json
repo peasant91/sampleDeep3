@@ -4,6 +4,7 @@
     "ok": "Ok",
     "yes": "Ya",
     "no": "Tidak",
+    "false": "Tidak",
     "login": "Masuk",
     "back": "Kembali",
     "sign_out": "Sign Out",
@@ -19,7 +20,7 @@
     "notification": "Notifikasi",
     "change_password_success": "Ganti Kata Sandi Berhasil.",
     "see_report": "Lihat Report",
-    
+    "empty_trip": "Anda belum pernah melakukan perjalanan.",
     "network_error": "Tidak dapat terhubung, Mohon periksa Koneksi",
     "fullname_placeholder": "cth: Sri Sedana",
     "email_title": "Email",
@@ -88,7 +89,7 @@
     "register_form_desc" : "Silahkan Isi Data diri Anda dengan lengkap.",
 
     "back_to_login": "Kembali ke Login",
-    "back_to_home": "Kembali ke Beranda",
+    "back_to_home": "Kembali ke Beranda",   
 
     "my_profile": "Profilku",
     "change_password": "Ganti Kata Sandi",
@@ -97,7 +98,9 @@
     "must_not_empty": "%{s} tidak boleh kosong.",
     "retry": "Coba Lagi",
     "cancel": "Batalkan",
+    "cancel_short": "Batal",
     "invalid_phone": "Nomor telepon tidak valid",
+    "invalid_phone_unique": "Nomor telepon tidak unik",
     "invalid_email": "Email tidak valid",
     "password_not_match": "Kata Sandi tidak sama",
     "enable_push_notif": "Mohon ijinkan pemberitahuan untuk mendapatkan berita terbaru.",
@@ -114,7 +117,7 @@
     "home_info": "Selalu nyalakan GPS ketika berkendara agar jarak tempuh tercatat disistem",
     "do_job": "Melakukan Pekerjaan",
     "active_contract": "Kontrak Aktif",
-    "see_contract": "Lihat Kontrak",
+    "see_contract": "Lihat Penawaran Ini",
     "no_active_contract": "Belum ada kontrak aktif. \nSilahkan cari penawaran yang terbaik untuk Anda.",
     "no_history_contract": "Belum ada riwayat kontrak. \nSilahkan cari penawaran yang terbaik untuk Anda.",
     "see_offer": "Lihat Penawaran",
@@ -130,6 +133,7 @@
     "vehicle_can_be_change": "Kendaraan tidak bisa diubah ketika sudah diverifikasi hubungin admin untuk melakukan perubahan.",
     "info_not_verified": "Tambahkan kendaraan agar mendapatkan penawaran pekerjaan dari Kami.",
     "see_this_offer": "Lihat Penawaran Ini",
+    "add_vehicle": "Tambahkan Kendaraan",
 
     "my_contract": "Kontrak Saya",
     "change_profile": "Ubah Profil",
@@ -195,7 +199,7 @@
     "manual_input" : "Input Manual",
     "add_manual_input": "+Input Manual",
     "sticker_area_placeholder": "cth: Full Body",
-
+    "press_again": "Tekan sekali lagi untuk keluar",
     "contract_end":"Selesai Kontrak",
     "installation_time_title": "Lokasi & Waktu Pemasangan",
     "company_detail": "Detail Perusahaan",
@@ -264,11 +268,43 @@
     "error_odometer": "Mohon tambahkan gambar odometer",
     "error_image": "Mohon tambahkan gambar %{string}",
     "find_picker": "Cari %{title}",
-    "company_bank_info": "Jika memilih perusahaan maka rekening yang digunakan adalah rekening perusahaan."
+    "company_bank_info": "Jika memilih perusahaan maka rekening yang digunakan adalah rekening perusahaan.",
+    "report_send_success": "Berhasil mengirim Laporan",
+    "please_allow_camera": "Mohon ijinkan akses kamera untuk mengambil gambar",
+    "please_allow_storage": "Mohon ijinkan akses media penyimpanan untuk mengambil gambar",
+    "error_agree_to_terms": "Anda harus menyetujui Syarat & Ketentuan untuk melakukan pendaftaran",
+
+    "empty_offer_title": "%{title} tidak ditemukan",
+    "empty_offer_desc": "Tidak ada %{title} sesuai kata kunci, Coba \ngunakan kata kunci lainnya ya.",
+
+    "empty_notif_title": "Tidak ada notifikasi",
+    "empty_notif_desc": "Notifikasi terkait pekerjaan dan lainnya akan \nditampilkan disini.",
+
+    "password_min": "Kata Sandi tidak boleh kurang dari %{min} karakter",
+    "password_max": "Kata Sandi tidak boleh lebih dari %{max} karakter",
+    "work": "Pekerjaan",
+
+    "edit_confirm_title": "Yakin ingin kembali?",
+    "edit_confirm_desc": "Data Anda tidak akan tersimpan jika Anda kembali ke halaman sebelumnya.",
+    "reselect_province": "Gagal mengambil data, silahkan pilih ulang provinsi",
+    "reselect_city": "Gagal mengambil data, silahkan pilih ulang kabupaten/kota",
+    "reselect_district": "Gagal mengambil data, silahkan pilih ulang Kecamatan",
+    "reselect_sub_district": "Gagal mengambil data, silahkan pilih ulang Kelurahan",
+    "please_wait": "Mohon tunggu sebentar, data belum siap",
+    "please_select_province": "Mohon pilih provinsi terlebih dahulu",
+    "withdraw": "TARIK DANA",
+    "withdraw_confirmation_title": "Yakin tarik dana?",
+    "withdraw_confirmation_desc": "Dana yang ditarik merupakan akumulasi pendapatan dari pekerjaan yang selesai.",
+    "reset_job_warning":"Waktu dan jarak akan diakumulasi setiap hari setiap\n jam 00:00",
+    "reset_dialog_title": "Mulai Pekerjaan?",
+    "reset_dialog_desc": "Waktu dan jarak akan direset dari awal, namun data hari sebelumnya sudah diakumulasi pada laporan perjalanan.",
+    "report_warning_title": "Report minggu ini sudah dibuat",
+    "report_warning_desc": "Anda hanya dapat membuat report 1x seminggu di setiap jobnya.",
+    "partner_title" : "Rekanan",
+    "partner_placeholder": "Pilih Rekanan",
+    "report_invalid_title": "Campaign Belum Dimulai",
+    "report_invalid_desc": "Anda bisa membuat laporan jika campaign sudah dimulai.",
+    "rejected": "Verifikasi ditolak",
+    "blocked": "Akun di nonaktifkan"
     
-
-
-
-
-
 }

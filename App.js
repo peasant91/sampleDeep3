@@ -14,6 +14,7 @@ import {
   View,
   Text,
   StatusBar,
+  Alert,
 } from 'react-native';
 
 import { ThemeProvider, Icon } from 'react-native-elements';
@@ -42,7 +43,6 @@ import RegisterScreen from './src/views/membership/RegisterScreen';
 import RegisterPasswordScreen from './src/views/membership/RegisterPasswordScreen';
 import ForgotPasswordScreen from './src/views/membership/ForgotPasswordScreen';
 import SuccessScreen from './src/views/SuccessScreen';
-import MyProfileScreen from './src/views/MyProfileScreen';
 import ChangePasswordScreen from './src/views/membership/ChangePasswordScreen';
 import SingleWebScreen from './src/views/SingleWebScreen';
 import PickerScreen from './src/views/PickerScreen';
@@ -66,13 +66,13 @@ import IncomeDetailScreen from './src/views/maintab/account/IncomeDetailScreen';
 
 import Colors from './src/constants/Colors';
 import messaging from '@react-native-firebase/messaging';
-import { Freshchat } from 'react-native-freshchat-sdk';
 import CustomisableAlert from 'react-native-customisable-alert';
 import Config from './src/constants/Config';
 import MainTabScreen from './src/views/maintab/MainTabScreen';
 import { logout } from './src/services/user';
 import { showDialog } from './src/actions/commonActions';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import notifee from '@notifee/react-native';
 
 //realm
 
@@ -153,6 +153,7 @@ const App = ({ navigation, route }) => {
       signIn: async data => {
         console.log('dispatch login');
         try {
+          console.log('uid', uid)
           const uid = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
           if (Config.isMockDesign) {
             dispatch({ type: 'SIGN_IN', token: "mock" });
@@ -169,9 +170,13 @@ const App = ({ navigation, route }) => {
           AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
             dispatch({ type: 'SIGN_OUT' });
           })
-          
+
         }).catch(err => {
-          showDialog(err.message)
+          BackgroundGeolocation.stop()
+          AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
+            dispatch({ type: 'SIGN_OUT' });
+          })
+          // showDialog(err.message)
         })
       },
       doneLoading: async data => {
@@ -184,7 +189,6 @@ const App = ({ navigation, route }) => {
   const saveFirebaseToken = token => {
     AsyncStorage.setItem(StorageKey.KEY_FIREBASE_TOKEN, token);
 
-    Freshchat.setPushRegistrationToken(token);
   };
 
   useEffect(() => {
@@ -207,20 +211,48 @@ const App = ({ navigation, route }) => {
     bootstrapAsync();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Freshchat.isFreshchatNotification(
-        remoteMessage.data,
-        freshchatNotification => {
-          if (freshchatNotification) {
-            Freshchat.handlePushNotification(remoteMessage.data);
-          } else {
-            console.log(`forground notification ${remoteMessage}`);
-          }
-        },
-      );
-    });
+  const requestNotifPermission = async () => {
+    try {
+      await notifee.requestPermission()
+      const status = await messaging().requestPermission();
+      if (status === messaging.AuthorizationStatus.AUTHORIZED || status === messaging.AuthorizationStatus.PROVISIONAL) {
+        messaging().onNotificationOpenedApp(remoteMessage => {
+          console.log("MESSAGE - ON NOTIFICATION OPEN APP", remoteMessage);
+        });
+        messaging().getInitialNotification().then(remoteMessage => {
+          console.log("MESSAGE - INITIAL FUNCTION");
+          console.log(remoteMessage);
+        });
+        return
+      } else {
+        requestNotifPermission()
+      }
+    } catch (err) {
+      console.log("request notif permission error", err);
+    }
+  }
 
+  useEffect(() => {
+    requestNotifPermission()
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log("remove messaging", remoteMessage);
+      // Create a channel (required for Android)
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
+      const data = remoteMessage.data
+      if(data){
+        await notifee.displayNotification({
+          title: data.title,
+          body: data.body,
+          data: data,
+          android: {
+            channelId
+          }
+        })
+      }
+    })
     return unsubscribe;
   }, []);
 
@@ -250,7 +282,7 @@ const App = ({ navigation, route }) => {
         'Notification caused app to open from background state:',
         remoteMessage.notification,
       );
-      RootNavigation.navigate('NewsDetail', {
+      RootNavigation.navigate('Home', {
         data: { id: remoteMessage.data.news_id },
       });
 
@@ -261,6 +293,7 @@ const App = ({ navigation, route }) => {
     messaging()
       .getInitialNotification()
       .then(remoteMessage => {
+        console.log("initial noti");
         if (remoteMessage) {
           console.log(
             'Notification caused app to open from quit state:',
@@ -313,7 +346,6 @@ const App = ({ navigation, route }) => {
                   />
                 ) : !state.userToken ? (
                   <>
-                    
                     <Stack.Screen
                       name="Login"
                       component={LoginScreen}
@@ -321,10 +353,34 @@ const App = ({ navigation, route }) => {
                     />
 
                     <Stack.Screen
+                      name="Register"
+                      component={RegisterScreen}
+                      options={{ headerShown: false }}
+                      initialParams={{ isEdit: false }}
+                    />
+
+                    <Stack.Screen
+                      name="RegisterPassword"
+                      component={RegisterPasswordScreen}
+                      initialParams={{ data: {} }}
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
                       name="RegisterVehicle"
                       component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
+                      initialParams={{ isEdit: false }}
                     />
+
+
+                    <Stack.Screen
+                      name="ResetPassword"
+                      component={ResetPasswordScreen}
+                      options={{ headerShown: false }}
+                    />
+
+
 
                     <Stack.Screen
                       name="RegisterSuccess"
@@ -346,24 +402,6 @@ const App = ({ navigation, route }) => {
 
 
                     <Stack.Screen
-                      name="ResetPassword"
-                      component={ResetPasswordScreen}
-                      options={{ headerShown: false }}
-                    />
-
-                    <Stack.Screen
-                      name="Register"
-                      component={RegisterScreen}
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="RegisterPassword"
-                      component={RegisterPasswordScreen}
-                      options={{ headerShown: false }}
-                    />
-
-
-                    <Stack.Screen
                       name="RegisterVehicleSuccess"
                       component={RegisterVehicleSuccessScreen}
                       options={{ headerShown: false }}
@@ -374,7 +412,7 @@ const App = ({ navigation, route }) => {
                       component={OtpScreen}
                       options={{ headerShown: false }}
                     />
-                    
+
                     <Stack.Screen
                       name="ImageViewer"
                       component={ImageViewerScreen}
@@ -407,7 +445,7 @@ const App = ({ navigation, route }) => {
                     />
 
                     <Stack.Screen
-                      name="RegisterVehicle"
+                      name="RegisterVehicleMain"
                       component={RegisterVehicleScreen}
                       options={{ headerShown: false }}
                     />
@@ -460,18 +498,13 @@ const App = ({ navigation, route }) => {
                       options={{ headerShown: false }}
                     />
 
-                    <Stack.Screen
-                      name="MyProfile"
-                      component={MyProfileScreen}
-                      options={{ headerShown: false, animationEnabled: enableAnimation }}
-                    />
 
                     <Stack.Screen
                       name="OfferDetail"
                       component={OfferDetailScreen}
                       options={{ headerShown: false, animationEnabled: enableAnimation }}
                     />
-                    
+
                     <Stack.Screen
                       name="Picker"
                       component={PickerScreen}

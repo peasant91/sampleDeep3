@@ -18,7 +18,9 @@ import CustomButton from '../components/atoms/CustomButton';
 import {getErrorMessage} from '../services/baseApi';
 import {ModalPortal} from 'react-native-modals';
 import moment from 'moment';
+
 import {showAlert, closeAlert} from 'react-native-customisable-alert';
+import CustomUploadAlertComponent from '../components/molecules/CustomUploadAlertComponent';
 
 let id = 0;
 
@@ -29,28 +31,10 @@ export const showDialog = (
   negativeAction,
   positiveTitle,
   negativeTitle,
-  isReversed
+  isReversed,
+  desc
 ) => {
   console.log('alert dialog show');
-  // DialogManager.show({
-  //     animationDuration: 0,
-  //     ScaleAnimation: new ScaleAnimation(),
-  //     width: '80%',
-  //     dialogStyle: { borderRadius: 16, width: '80%' },
-  //     dismissOnTouchOutside: false,
-  //     children: (
-
-  //         <GenericCustomAlert
-  //             dialogTitle={message}
-  //             isDoubleButton={isDoubleButton}
-  //             onPositivePress={positiveAction ? positiveAction : () => dismissDialog()}
-  //             onNegativePress={negativeAction ? negativeAction : () => dismissDialog()}
-  //             positiveTitle={positiveTitle}
-  //             negativeTitle={negativeTitle} />
-  //     ),
-  // }, () => {
-  //     console.log('callback - show');
-  // });
     showAlert({
       alertType: 'custom',
       animationIn: 'fadeIn',
@@ -58,6 +42,7 @@ export const showDialog = (
       customAlert: (
         <GenericCustomAlert
           dialogTitle={message}
+          desc={desc}
           isDoubleButton={isDoubleButton}
           onPositivePress={() => {
             if (positiveAction) {
@@ -78,8 +63,22 @@ export const showDialog = (
         />
       ),
     });
-  
 };
+
+export const showUploadDialog = (message,totalData,currentPosition) => {
+  showAlert({
+    alertType: 'custom',
+    animationIn: 'fadeIn',
+    animationOut: 'fadeOut',
+    customAlert: (
+      <CustomUploadAlertComponent
+      dialogTitle={message}
+      totalData={totalData}
+      currentState={currentPosition}
+      />
+    ),
+  });
+}
 
 export const showLoadingDialog = message => {
   console.log('alert dialog show');
@@ -132,7 +131,7 @@ export const showLocationAlwaysDialog = (onConfirm) => {
             style={{width: 200, height: 100, alignSelf: 'center'}}
             source={require('../assets/lottie/location.json')}
           />
-          <LatoBold>{translate('always_location_title')}</LatoBold>
+          <LatoBold style={{textAlign: 'center', alignSelf: 'center'}}>{translate('always_location_title')}</LatoBold>
           <LatoRegular
             containerStyle={{marginVertical: 16}}
             style={{

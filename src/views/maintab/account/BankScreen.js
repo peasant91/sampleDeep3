@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useReducer, useState, useEffect } from 'react'
 import { SafeAreaView, ScrollView } from 'react-native'
-import { showDialog } from '../../../actions/commonActions'
+import { showDialog,dismissDialog } from '../../../actions/commonActions'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomInput, { PickerInput } from '../../../components/atoms/CustomInput'
 import NavBar from '../../../components/atoms/NavBar'
@@ -15,6 +15,8 @@ const BankScreen = ({ navigation, route }) => {
 
     const { isReadOnly, prevData } = route.params
     const [bankData, setbankData] = useState()
+    const [isEdited, setisEdited] = useState(false)
+    const [preloading, setpreloading] = useState(true)
 
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {
@@ -26,8 +28,31 @@ const BankScreen = ({ navigation, route }) => {
         isChecked: false
     })
 
+    const showBackPrompt = () => {
+        if (isEdited) {
+            showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
+            return
+        } 
+
+        navigation.pop()
+    }
+
+    const checkEdited = () => {
+        if (!isEdited) {
+            setisEdited(true)
+        }
+    }
+
+    useEffect(()=>{
+        if (!preloading){
+            checkEdited()
+        }
+    },[formState])
+
     const updateBankAPI = () => {
-        dispatch('check')
+        dispatch({
+            type: 'check'
+        })
 
         if (formState.formIsValid) {
             updateBank(formState.inputValues)
@@ -62,6 +87,7 @@ const BankScreen = ({ navigation, route }) => {
                 input: JSON.parse(data).filter(item => item.short_name == prevData?.bank_name)[0].id,
                 isValid: true
             })
+            setpreloading(false)
         }).catch(err => {
             showDialog(err.message)
         })
@@ -77,13 +103,14 @@ const BankScreen = ({ navigation, route }) => {
           desc: route.params.name,
           isValid: true,
             })
+            setpreloading(false)
         }
     }, [route.params])
     
 
     return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
 
-        <NavBar title={translate('bank_account')} navigation={navigation} />
+        <NavBar title={translate('bank_account')} navigation={navigation} onBackPress={showBackPrompt} />
 
         <ScrollView style={{ padding: 16 }}>
 
@@ -92,9 +119,11 @@ const BankScreen = ({ navigation, route }) => {
                 title={translate('bank_title')}
                 placeholder={translate('bank_placeholder')}
                 viewOnly={isReadOnly}
+                disabled={isReadOnly}
                 value={formState.inputValues.bank_id_value}
                 isCheck={formState.isChecked}
                 onPress={() => openPicker('bank_id', 'bank_account', bankData)}
+                required
             />
 
             <CustomInput
@@ -106,6 +135,8 @@ const BankScreen = ({ navigation, route }) => {
                 viewOnly={isReadOnly}
                 value={formState.inputValues.number}
                 isCheck={formState.isChecked}
+                keyboardType={'number-pad'}
+                required
             />
 
             <CustomInput
@@ -116,6 +147,7 @@ const BankScreen = ({ navigation, route }) => {
                 viewOnly={isReadOnly}
                 value={formState.inputValues.branch}
                 isCheck={formState.isChecked}
+                required
             />
 
             <CustomInput
@@ -127,6 +159,7 @@ const BankScreen = ({ navigation, route }) => {
                 dispatcher={dispatch}
                 value={formState.inputValues.name}
                 isCheck={formState.isChecked}
+                required
             />
 
         </ScrollView>

@@ -16,6 +16,9 @@ const RegisterVehiclePicture = ({imageUrl, onDelete, index, navigation, onAdd}) 
         <View>
             <TouchableOpacity onPress={() => navigation.navigate('ImageViewer', {imageUrl: imageUrl, title: ''})}>
                 <Image source={{uri: imageUrl}} style={{aspectRatio: 1.5}}/>
+            <View style={{position: 'absolute', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
+            <IconView/>
+            </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onDelete(index)}>
                 <IconDelete style={{position: 'absolute', right: 0, bottom: 0}}/>

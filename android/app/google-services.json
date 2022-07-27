@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "623422295303",
-    "project_id": "schott-pbi",
-    "storage_bucket": "schott-pbi.appspot.com"
+    "project_number": "246471571560",
+    "project_id": "otomedia-2e945",
+    "storage_bucket": "otomedia-2e945.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:623422295303:android:87a9d261c9afa67f3e09a2",
+        "mobilesdk_app_id": "1:246471571560:android:2a12cd5ab3cd0fd6c5a3dd",
         "android_client_info": {
           "package_name": "id.otomedia.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "623422295303-id0flpkjcait5om0r7a6l3m9qgi3veql.apps.googleusercontent.com",
+          "client_id": "246471571560-llkg46eu7e83bevmihs6er6iq8munjnd.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBsGj96xD9qRqnUnampDHBDJDXEKYkNGjs"
+          "current_key": "AIzaSyAA3nRYUAfLapv7pmAu8pc4pZlT_fuFIvQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "623422295303-id0flpkjcait5om0r7a6l3m9qgi3veql.apps.googleusercontent.com",
+              "client_id": "246471571560-llkg46eu7e83bevmihs6er6iq8munjnd.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

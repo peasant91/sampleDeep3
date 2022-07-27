@@ -22,7 +22,7 @@ import { AuthContext } from '../../../../App';
 import { showDialog } from '../../../actions/commonActions';
 import { getProfile } from '../../../services/user';
 import { getDriverVehicle, getVehicleRoute } from '../../../services/utilities';
-import { isEmpty } from '../../../actions/helper';
+import { isEmpty, openWhatsapp } from '../../../actions/helper';
 import axios from 'axios';
 import { ShimmerPlaceholder } from '../../../components/atoms/shimmer/Shimmer';
 import { getHome } from '../../../services/home';
@@ -58,26 +58,59 @@ const AccountScreen = ({navigation, route}) => {
 
   const getProfileApi = () => {
     setisLoading(true)
-    axios.all([
-      getProfile(),
-      getVehicleRoute(),
-      getHome(),
-      getIncomeList({
-        year: moment(Date()).format('yyyy')
-      })
-    ]).then(axios.spread((profile, vehicleRoute, contract, income) => {
-      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
-      setprofileData(profile)
-      setvehicleRute(vehicleRoute)
-      setContractData(contract)
-      setincomeData(income)
+    getProfile().then(Response=> {
+      AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(Response))
+      setprofileData(Response)
+    }).catch(err=>{
       setrefreshing(false)
       setisLoading(false)
-    })).catch(err => {
+      showDialog(err.message)
+    })
+    getVehicleRoute().then(Response=> {
+      setvehicleRute(Response)
+    }).catch(err=>{
+      setrefreshing(false)
+      setisLoading(false)
+      showDialog(err.message)
+    })
+    getHome().then(Response=> {
+      setContractData(Response)
+    }).catch(err=>{
+      setrefreshing(false)
+      setisLoading(false)
+      showDialog(err.message)
+    })
+    getIncomeList({
+      year: moment(Date()).format('yyyy')
+  }).then(Response=> {
+      setincomeData(Response)
+      setrefreshing(false)
+      setisLoading(false)
+    }).catch(err=>{
       setrefreshing(false)
       setisLoading(false)
       showDialog(error.message)
     })
+    // axios.all([
+    //   getProfile(),
+    //   getVehicleRoute(),
+    //   getHome(),
+    //   getIncomeList({
+    //     year: moment(Date()).format('yyyy')
+    //   })
+    // ]).then(axios.spread((profile, vehicleRoute, contract, income) => {
+    //   AsyncStorage.setItem(StorageKey.KEY_USER_PROFILE, JSON.stringify(profile))
+    //   setprofileData(profile)
+    //   setvehicleRute(vehicleRoute)
+    //   setContractData(contract)
+    //   setincomeData(income)
+    //   setrefreshing(false)
+    //   setisLoading(false)
+    // })).catch(err => {
+    //   setrefreshing(false)
+    //   setisLoading(false)
+    //   showDialog(error.message)
+    // })
   }
 
   useEffect( () => {
@@ -87,15 +120,18 @@ const AccountScreen = ({navigation, route}) => {
   }, [route.params])
 
   const goToEdit = () => {
-    navigation.navigate('EditProfile', { isEdit: true, data: profileData})
+    console.log("data",profileData);
+    if (profileData) {
+      navigation.navigate('EditProfile', { isEdit: true, data: profileData,isVerified: profileData.status == 'verified' ? true : false})
+    }
   }
 
   const goToEditVehicle = () => {
-    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: true})
+    navigation.navigate('RegisterVehicleMain', {isRegister: false, isEdit: true})
   }
 
   const goToAddVehicle = () => {
-    navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})
+    navigation.navigate('RegisterVehicleMain', {isRegister: false, isEdit: false})
   }
 
   const goToContract = () => {
@@ -103,7 +139,7 @@ const AccountScreen = ({navigation, route}) => {
   }
 
   const goToBank = () => {
-    navigation.navigate('Bank', {isReadOnly: profileData.account_bank ? false : true, prevData: profileData.account_bank ? profileData.account_bank : profileData.driver_company.account_bank})
+    navigation.navigate('Bank', {isReadOnly: profileData.account_bank ? profileData.status === 'verified' ? true : false : true, prevData: profileData.account_bank ? profileData.account_bank : profileData.driver_company.account_bank})
   }
 
   const logout = () => {
@@ -145,7 +181,7 @@ const AccountScreen = ({navigation, route}) => {
                 Icon={IconCar}
                 text={translate('vehicle')}
                 containerStyle={{margin: 16}}
-                onPress={() => navigation.navigate('RegisterVehicle', {isRegister: false, isEdit: false})}
+                onPress={goToAddVehicle}
               />
 
               <InfoMenu
@@ -160,7 +196,7 @@ const AccountScreen = ({navigation, route}) => {
 
             <View style={{margin: 12}}>
 
-              {!isEmpty(incomeData) && <IncomeProfile data={incomeData} onPress={() => navigation.navigate('IncomeDetail')}/>}
+              {!isEmpty(incomeData) && <IncomeProfile data={incomeData} onPress={() => navigation.navigate('IncomeDetail')} />}
 
             <ShimmerPlaceholder
             isLoading={isLoading}
@@ -204,6 +240,7 @@ const AccountScreen = ({navigation, route}) => {
               Icon={IconContactUs}
               text={translate('contact_us')}
               containerStyle={{marginTop: 16}}
+              onPress={openWhatsapp}
             />
 
           </View>

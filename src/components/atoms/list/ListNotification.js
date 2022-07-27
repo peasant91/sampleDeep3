@@ -2,19 +2,21 @@ import moment from 'moment'
 import React from 'react'
 import { View } from 'react-native'
 import { Image } from 'react-native-elements'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 import { getFullLink } from '../../../actions/helper'
 import Colors from '../../../constants/Colors'
 import { LatoBold, LatoRegular } from '../CustomText'
 import Divider from '../Divider'
 
 
-const ListNotification = ({data}) => {
-    return <View style={{backgroundColor: data.read_at ? 'white' : '#F4F5FF'}}>
+const ListNotification = ({data, onPress}) => {
+    
+    return <TouchableOpacity style={{backgroundColor: data.read_at ? 'white' : '#F4F5FF'}} onPress={onPress}>
 
     <View style={{flexDirection: 'row', padding: 16, flex: 1, alignItems: 'flex-start'}}>
         <Image
-            source={{uri: getFullLink(data.imageUrl)}}
-            style={{width: 24, height: 24, borderRadius: 24, resizeMode: 'center'}}
+            source={{uri: getFullLink(data.icon)}}
+            style={{width: 24, height: 24, borderRadius: 24, resizeMode: 'cover'}}
         />
 
         <View style={{flex: 1, marginLeft: 10}}>
@@ -28,7 +30,7 @@ const ListNotification = ({data}) => {
 
     </View>
     <Divider/>
-    </View>
+    </TouchableOpacity>
 
 }
 

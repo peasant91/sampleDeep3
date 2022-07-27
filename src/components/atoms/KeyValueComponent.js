@@ -7,7 +7,7 @@ const KeyValueComponent = ({ title, value, isBold, style, containerStyle }) => {
 
     return <View style={containerStyle}>
         {
-            !isBold ? <View style={{ flexDirection: 'row', marginTop: 10 }}>
+            !isBold ? <View style={{ flexDirection: 'row', marginTop: 10,alignItems:'flex-start' }}>
 
                 <LatoRegular containerStyle={{ flex: 3 }} style={style}>{title}</LatoRegular>
                 <LatoRegular style={style}>:</LatoRegular>

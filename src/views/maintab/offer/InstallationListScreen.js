@@ -11,8 +11,8 @@ const InstallationListScreen = ({navigation, route}) => {
     const {data} = route.params
 
     return <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>   
-        <NavBar title={translate('installation_location')} navigation={navigation} shadowEnabled={true}/>
-        <View>
+        <NavBar title={translate('installation_location')} navigation={navigation} shadowEnabled />
+        <View style={{backgroundColor: '#FAFAFA', flex: 1}}>
             <FlatList
                 contentContainerStyle={{paddingVertical: 16}}
                 data={data}
