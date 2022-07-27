@@ -71,6 +71,7 @@ const MainTabScreen = ({navigation, route}) => {
   });
   const lastSentTime = useRef();
   const sumDistance = useRef(0);
+  const lastLocation = null;
 
   // useEffect(()=>{
   //   const test = async()=>{
@@ -125,6 +126,7 @@ const MainTabScreen = ({navigation, route}) => {
   }, []);
 
   const onLocationChange = async location => {
+    console.log('onLocationChange location data ', location);
     const distance =
       currentPosition?.current.latitude == 0
         ? 0
@@ -162,6 +164,43 @@ const MainTabScreen = ({navigation, route}) => {
       latitude: location.latitude,
       longitude: location.longitude,
     };
+    console.log('--------------------masuk last location---------------------');
+
+    AsyncStorage.getItem(StorageKey.KEY_LAST_LOCATION)
+      .then(res => {
+        lastLocation = res;
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    console.log('last location here ', lastLocation);
+    // check last location
+    if (lastLocation == null) {
+      console.log('last location data is empty -- saving location');
+      // if (location != null) {
+      //   AsyncStorage.setItem(
+      //     StorageKey.KEY_LAST_LOCATION,
+      //     JSON.stringify(location),
+      //   );
+      // }
+      AsyncStorage.setItem(
+        StorageKey.KEY_LAST_LOCATION,
+        JSON.stringify(location),
+      );
+    } else {
+      console.log('location != null here');
+      // check if distance > 1 KM ?
+
+      const checkDistance = calcDistance(
+        lastLocation.latitude,
+        lastLocation.longitude,
+        currentPosition?.current.latitude,
+        currentPosition?.current.longitude,
+      );
+      console.log('check distance here ', checkDistance);
+    }
+    console.log('--------------------end last location---------------------');
+
     sendLocation(location);
   };
 
