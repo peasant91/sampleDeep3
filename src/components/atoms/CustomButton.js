@@ -15,17 +15,18 @@ const CustomButton = ({
   onPress,
   style,
   isLoading = false,
+  disabled,
 }) => {
   return (
-    <View style={[containerStyle, {borderRadius: 24}]} >
-      <TouchableOpacity >
-        <View >
+    <View style={[containerStyle, {borderRadius: 24}]}>
+      <TouchableOpacity>
+        <View>
           <Button
             title={title.toUpperCase()}
             style={style}
             pointer
             onPress={onPress}
-            disabled={isLoading}
+            disabled={disabled}
             loading={isLoading}
             iconContainerStyle={{marginRight: 10, paddingRight: 10, width: 2}}
             icon={icon ? icon : null}
@@ -66,11 +67,10 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     borderRadius: 24,
-    borderWidth: 1,
     height: 50,
     left: 0,
     right: 0,
-    backgroundColor: Colors.primary,
+    backgroundColor: 'grey',
     paddingRight: 10,
   },
   titlePrimary: {
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   disbledTitle: {
     fontFamily: 'Lato-Bold',
-    fontSize: 14,
+    fontSize: 18,
     color: 'white',
   },
 });
