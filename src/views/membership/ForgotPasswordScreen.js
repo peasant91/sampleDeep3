@@ -1,13 +1,19 @@
 import React, {useReducer, useState} from 'react';
-import {SafeAreaView, StyleSheet, StatusBar, ScrollView, View} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  StatusBar,
+  ScrollView,
+  View,
+} from 'react-native';
 import formReducer from '../../reducers/formReducer';
 import {forgotPassword} from '../../services/auth';
 import {showDialog} from '../../actions/commonActions';
 import CustomButton from '../../components/atoms/CustomButton';
 import translate from '../../locales/translate';
 import NavBar from '../../components/atoms/NavBar';
-import { LatoRegular } from '../../components/atoms/CustomText';
-import { PhoneInput } from '../../components/atoms/CustomInput';
+import {LatoRegular} from '../../components/atoms/CustomText';
+import {PhoneInput} from '../../components/atoms/CustomInput';
 
 const ForgotPasswordScreen = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,36 +47,42 @@ const ForgotPasswordScreen = ({navigation, route}) => {
     }
   };
 
-  const goToOtp = (response) => {
+  const goToOtp = response => {
     navigation.navigate('OtpScreen', {
       data: {
         email: response.address,
         phone: formState.inputValues.address,
-        otpId: response.id
+        otpId: response.id,
       },
-      isRegister: false
+      isRegister: false,
     });
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
-      <NavBar title={translate('forgot_password')} navigation={navigation}/>
+      <NavBar title={translate('forgot_password')} navigation={navigation} />
       <ScrollView style={{flex: 1}}>
         <View style={{padding: 16}}>
           <LatoRegular>{translate('forgot_password_desc')}</LatoRegular>
-          <PhoneInput 
-          id={'address'}
-          containerStyle={{paddingTop: 16}}
-          title={translate('phone_title')}
-          dispatcher={dispatch}
-          value={formState.inputValues.address}
-          placeholder={translate('phone_placeholder')}
-          isCheck={formState.isChecked}
+          <PhoneInput
+            id={'address'}
+            containerStyle={{paddingTop: 16}}
+            title={translate('phone_title')}
+            dispatcher={dispatch}
+            value={formState.inputValues.address}
+            placeholder={translate('phone_placeholder')}
+            isCheck={formState.isChecked}
           />
         </View>
       </ScrollView>
-      <CustomButton containerStyle={{padding: 16}} types={'primary'} title={translate('next')} onPress={onOtpSend} isLoading={isLoading}/>
+      <CustomButton
+        containerStyle={{padding: 16}}
+        types={'primary'}
+        title={translate('next')}
+        onPress={onOtpSend}
+        isLoading={isLoading}
+      />
     </SafeAreaView>
   );
 };

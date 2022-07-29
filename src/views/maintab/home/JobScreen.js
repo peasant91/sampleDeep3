@@ -236,50 +236,51 @@ const JobScreen = ({navigation, route}) => {
     if (distances.length > 0) {
       const sumDistance = sum(distances.map(item => item.distance));
       setDistance(sumDistance.toFixed(2));
+
       // check if distance is >= 1
-      const currentDistance = sumDistance.toFixed(2);
-      console.log('===== currentDistance here =====', sumDistance.toFixed(2));
-      if (currentDistance >= 1) {
-        console.log(
-          '===== currenDistance >= 1 is true ===== ',
-          currentDistance,
-          currentDistance >= 1,
-        );
-        // check distance tidak boleh float
-        console.log(
-          '===== integer here =====',
-          Number.isInteger(currentDistance),
-        );
-        if (Number.isInteger(currentDistance)) {
-          // check distance multiple of 1
-          if (currentDistance % currentDistance == 0) {
-            AsyncStorage.getItem(StorageKey.KEY_LAST_LOCATION)
-              .then(res => {
-                const value = JSON.parse(res);
-                console.log('~~~~~ get traffic flow API here ~~~~~');
-                getTrafficFlow(
-                  value.latitude.toString(),
-                  value.longitude.toString(),
-                )
-                  .then(response => {
-                    console.log(
-                      'traffic tomtom data ',
-                      JSON.stringify(response.data, null, 2),
-                    );
-                  })
-                  .catch(err => {
-                    console.log('error here ', err);
-                  });
-              })
-              .catch(err => {
-                console.log(err);
-              });
-          }
-        }
-      } else {
-        console.log('currentDistance smaller than 1 ', currentDistance);
-      }
-      console.log('========= currenDistance end =======');
+      // const currentDistance = sumDistance.toFixed(2);
+      // console.log('===== currentDistance here =====', sumDistance.toFixed(2));
+      // if (currentDistance >= 1) {
+      //   console.log(
+      //     '===== currenDistance >= 1 is true ===== ',
+      //     currentDistance,
+      //     currentDistance >= 1,
+      //   );
+      //   // check distance tidak boleh float
+      //   console.log(
+      //     '===== integer here =====',
+      //     Number.isInteger(currentDistance),
+      //   );
+      //   if (Number.isInteger(currentDistance)) {
+      //     // check distance multiple of 1
+      //     if (currentDistance % currentDistance == 0) {
+      //       AsyncStorage.getItem(StorageKey.KEY_LAST_LOCATION)
+      //         .then(res => {
+      //           const value = JSON.parse(res);
+      //           console.log('~~~~~ get traffic flow API here ~~~~~');
+      //           getTrafficFlow(
+      //             value.latitude.toString(),
+      //             value.longitude.toString(),
+      //           )
+      //             .then(response => {
+      //               console.log(
+      //                 'traffic tomtom data ',
+      //                 JSON.stringify(response.data, null, 2),
+      //               );
+      //             })
+      //             .catch(err => {
+      //               console.log('error here ', err);
+      //             });
+      //         })
+      //         .catch(err => {
+      //           console.log(err);
+      //         });
+      //     }
+      //   }
+      // } else {
+      //   console.log('currentDistance smaller than 1 ', currentDistance);
+      // }
+      // console.log('========= currenDistance end =======');
     }
     // check distance >= 1
     // console.log(
@@ -460,11 +461,12 @@ const JobScreen = ({navigation, route}) => {
 
       BackgroundGeolocation.on('location', location => {
         // start background task here
-        BackgroundGeolocation.startTask(taskKey => {
-          console.log('~~~~~ Background task in JobScreen on ~~~~~');
-          onLocationChange();
-          BackgroundGeolocation.endTask(taskKey);
-        });
+        onLocationChange();
+        // BackgroundGeolocation.startTask(taskKey => {
+        //   console.log('~~~~~ Background task in JobScreen on ~~~~~');
+        //   onLocationChange();
+        //   BackgroundGeolocation.endTask(taskKey);
+        // });
       });
 
       return () => {

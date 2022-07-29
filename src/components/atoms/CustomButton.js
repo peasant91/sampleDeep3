@@ -30,7 +30,6 @@ const CustomButton = ({
             loading={isLoading}
             iconContainerStyle={{marginRight: 10, paddingRight: 10, width: 2}}
             icon={icon ? icon : null}
-            iconContainerStyle={{marginLeft: 10, paddingLeft: 10}}
             iconRight={iconRight}
             disabledTitleStyle={{...styles.disbledTitle}}
             disabledStyle={{...styles.buttonDisabled}}

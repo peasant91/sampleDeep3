@@ -42,7 +42,7 @@ const ContractHistoryScreen = ({ navigation, route }) => {
     }
 
     const goToDetail = (item) => {
-        navigation.push('CurrentContract', {id: item.id, isEmpty: false, isCurrent: false})
+        navigation.push('CurrentContract', {id: item.contract_id, isEmpty: false, isCurrent: false})
     }
 
   const onRefresh = () => {

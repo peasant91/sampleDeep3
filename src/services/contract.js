@@ -19,22 +19,8 @@ export const sendDistance = data => {
 };
 
 export const getTrafficFlow = (lat, lng) => {
-  const slat = '-8.672767';
-  const slong = '115.225246';
-  const sample = `${(slat, slong)}`;
-  const loc = `${(lat, lng)}`;
-  //   console.log('tomtom latlng ', loc);
-  //   try {
-  //     const data = await axios.get(
-  //       `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key=8JY6MkByK0sBGwhG2w4VVaPYCAHGLjx0&point=-8.672767,115.225246`,
-  //     );
-  //     console.log('tomtom data here ', data);
-  //     return data;
-  //   } catch (error) {
-  //     console.log('tomtom error ', error);
-  //   }
   return axios.get(
-    `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key=8JY6MkByK0sBGwhG2w4VVaPYCAHGLjx0&point=${lat},${lng}`,
+    `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/5/json?key=8JY6MkByK0sBGwhG2w4VVaPYCAHGLjx0&point=${lat},${lng}`,
     {
       headers: {
         'Content-Type': 'application/json',
