@@ -36,6 +36,7 @@ const CustomButton = ({
             buttonStyle={[
               types == 'primary' ? styles.primary : styles.secondary,
               style,
+              {borderWidth: disabled == true ? 0 : 1},
             ]}
             titleStyle={
               types == 'primary' ? styles.titlePrimary : styles.titleSecondary

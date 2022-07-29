@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Avatar, Image } from 'react-native-elements';
-import { LatoRegular } from './CustomText';
+import React, {useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {Avatar, Image} from 'react-native-elements';
+import {LatoRegular} from './CustomText';
 
 import IconVerified from '../../assets/images/ic_home_verified.svg';
 import IconLock from '../../assets/images/ic_lock.svg';
@@ -9,43 +9,51 @@ import IconProfilePlaceholder from '../../assets/images/ic_profile_placeholder.s
 
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
-import { getFullLink, isEmpty } from '../../actions/helper';
-import { ShimmerAccoutTopHeader } from './shimmer/Shimmer';
-import { Shadow } from 'react-native-shadow-2';
+import {getFullLink, isEmpty} from '../../actions/helper';
+import {ShimmerAccoutTopHeader} from './shimmer/Shimmer';
+import {Shadow} from 'react-native-shadow-2';
 
-const AccountTopHeader = ({ data, isLoading }) => {
-
+const AccountTopHeader = ({data, isLoading}) => {
   useEffect(() => {
-    console.log(data)
-
-  }, [])
+    console.log(data);
+  }, []);
 
   const checkStatus = () => {
     switch (data.status) {
       case 'verified':
-        return 'verified'
+        return 'verified';
       case 'unverified':
-        return 'on_verifying'
+        return 'on_verifying';
       case 'declined':
-        return 'rejected'
+        return 'rejected';
       case 'disabled':
-        return 'blocked'
+        return 'blocked';
     }
-  }
-
+  };
 
   return (
-    <Shadow viewStyle={{ width: '100%', padding: 10, backgroundColor: 'white', height: 70, zIndex: 999, elevation: 10 }} distance={2} offset={[0, 2]}>
-
-      {!isLoading ?
-        <View style={{ flexDirection: 'row', zIndex: 999, elevation: 10 }}>
-          {
-            data.profile_image ? <Avatar
+    <Shadow
+      viewStyle={{
+        width: '100%',
+        padding: 10,
+        backgroundColor: 'white',
+        height: 70,
+        zIndex: 999,
+        elevation: 10,
+      }}
+      distance={2}
+      offset={[0, 2]}>
+      {!isLoading ? (
+        <View style={{flexDirection: 'row', zIndex: 999, elevation: 10}}>
+          {data.profile_image ? (
+            <Avatar
               rounded
               size={'medium'}
-              source={{ uri: getFullLink(data.profile_image) }} /> :
-              <IconProfilePlaceholder height={50} width={50} />
-          }
+              source={{uri: data.profile_image}}
+            />
+          ) : (
+            <IconProfilePlaceholder height={50} width={50} />
+          )}
           <View
             style={{
               marginLeft: 10,
@@ -53,13 +61,16 @@ const AccountTopHeader = ({ data, isLoading }) => {
               justifyContent: 'space-around',
             }}>
             <LatoRegular Icon={IconLock}>{data.name}</LatoRegular>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <IconVerified
-                color={data.status == 'verified' ? Colors.secondary : Colors.grey}
+                color={
+                  data.status == 'verified' ? Colors.secondary : Colors.grey
+                }
               />
               <LatoRegular
                 style={{
-                  color: data.status == 'verified' ? Colors.secondary : Colors.grey,
+                  color:
+                    data.status == 'verified' ? Colors.secondary : Colors.grey,
                   marginLeft: 5,
                 }}>
                 {translate(checkStatus())}
@@ -67,7 +78,9 @@ const AccountTopHeader = ({ data, isLoading }) => {
             </View>
           </View>
         </View>
-        : <ShimmerAccoutTopHeader />}
+      ) : (
+        <ShimmerAccoutTopHeader />
+      )}
     </Shadow>
   );
 };

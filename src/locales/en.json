@@ -130,7 +130,7 @@
     "change_vehicle": "Ubah Kendaraan",
     "vehicle": "Kendaraan",
     "verification_success": "Lulus Verifikasi",
-    "vehicle_can_be_change": "Kendaraan tidak bisa diubah ketika sudah diverifikasi hubungin admin untuk melakukan perubahan.",
+    "vehicle_can_be_change": "Data kendaraan tidak bisa diubah ketika sudah diverifikasi oleh admin. Hubungi admin untuk melakukan perubahan.",
     "info_not_verified": "Tambahkan kendaraan agar mendapatkan penawaran pekerjaan dari Kami.",
     "see_this_offer": "Lihat Penawaran Ini",
     "add_vehicle": "Tambahkan Kendaraan",

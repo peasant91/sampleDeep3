@@ -152,10 +152,14 @@ const OfferDetailScreen = ({navigation, route}) => {
             </View>
 
             <Divider />
-            <InfoMenu
-              containerStyle={{marginHorizontal: 16, marginTop: 16}}
-              text={translate('vehicle_can_be_change')}
-            />
+            {data.is_available == false && (
+              <InfoMenu
+                containerStyle={{marginHorizontal: 16, marginTop: 16}}
+                text={
+                  'Kuota untuk kontrak ini sudah penuh. Coba mengajukan kontrak pada pekerjaan lain.'
+                }
+              />
+            )}
 
             <View style={{padding: 16}}>
               <LatoBold style={styles.primaryHead}>

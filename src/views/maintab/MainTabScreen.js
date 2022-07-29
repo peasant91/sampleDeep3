@@ -223,7 +223,6 @@ const MainTabScreen = ({navigation, route}) => {
         }
       }
     } else {
-      Alert.alert('Traffic data not sent.');
       console.log('currentDistance smaller than 1 ', currentDistance);
     }
     console.log('========= currenDistance end =======');
