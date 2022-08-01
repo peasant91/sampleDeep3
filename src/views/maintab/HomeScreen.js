@@ -117,9 +117,9 @@ const HomeScreen = ({navigation, route}) => {
       .all([getHome(), getProfile(), getNotification()])
       .then(
         axios.spread(async (home, profile, notification, contract) => {
-          setisLoading(false);
+          
           sethomeData(home);
-          setContractData(contract);
+          //setContractData(contract);
           AsyncStorage.setItem(
             StorageKey.KEY_USER_PROFILE,
             JSON.stringify(profile),
@@ -173,6 +173,7 @@ const HomeScreen = ({navigation, route}) => {
       getContract(home.active_contract.contract_id)
         .then(response => {
           setContractData(response);
+          setisLoading(false);
         })
         .catch(err => {
           showDialog(err.message);
@@ -332,6 +333,9 @@ const HomeScreen = ({navigation, route}) => {
                   iconRight={true}
                   icon={IconArrow}
                   onPress={() => {
+                    if (!contractData && Object.keys(contractData).length == 0){
+                      return
+                    }
                     if (
                       validContractStatus.includes(contractData.status) &&
                       validCampaignStatus.includes(contractData.campaign.status)

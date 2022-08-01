@@ -268,7 +268,7 @@ const SplashScreen = ({ navigation, route }) => {
         print("saving done loading")
         doneLoading()
       }
-    } catch (error) {
+    } catch (err) {
       showDialog(err.message)
     }
 

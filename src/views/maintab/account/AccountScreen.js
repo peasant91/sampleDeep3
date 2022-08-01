@@ -132,8 +132,8 @@ const AccountScreen = ({navigation, route}) => {
   }, [route.params]);
 
   const goToEdit = () => {
-    console.log('data', profileData);
-    if (profileData) {
+    console.log('profile data', profileData);
+    if (profileData && (Object.keys(profileData).length != 0)) {
       navigation.navigate('EditProfile', {
         isEdit: true,
         data: profileData,
@@ -165,6 +165,9 @@ const AccountScreen = ({navigation, route}) => {
   };
 
   const goToBank = () => {
+    if (!profileData.account_bank && (Object.keys(profileData).length == 0)){
+      return
+    }
     navigation.navigate('Bank', {
       isReadOnly: profileData.account_bank
         ? profileData.status === 'verified'

@@ -35,6 +35,10 @@ export const openMaps = (lat, lng) => {
   });
 };
 
+export const momentx = (date) => {
+  return moment(date).utc()
+}
+
 export const getPostTime = date => {
   const utc = moment.utc('2022-04-19T02:20:33.000Z');
   const now = moment(Date());

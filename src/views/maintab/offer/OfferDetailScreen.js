@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   ScrollView,
@@ -6,21 +6,22 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Image} from 'react-native-elements';
+import { Image } from 'react-native-elements';
 import CustomButton from '../../../components/atoms/CustomButton';
-import {LatoBold, LatoRegular} from '../../../components/atoms/CustomText';
+import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText';
 import NavBar from '../../../components/atoms/NavBar';
 import Colors from '../../../constants/Colors';
 import translate from '../../../locales/translate';
 import DeviceInfo from 'react-native-device-info';
 import RNLocalize from 'react-native-localize';
 import moment from 'moment';
+import { momentx } from '../../../actions/helper';
 
 import IconLocation from '../../../assets/images/ic_home_location.svg';
 import Divider from '../../../components/atoms/Divider';
 import ListInstallationSchedule from '../../../components/atoms/list/ListInstallationSchedule';
-import {getCampaignDetail} from '../../../services/campaign';
-import {showDialog} from '../../../actions/commonActions';
+import { getCampaignDetail } from '../../../services/campaign';
+import { showDialog } from '../../../actions/commonActions';
 import {
   displayProvince,
   getFullLink,
@@ -28,10 +29,11 @@ import {
   toCurrency,
 } from '../../../actions/helper';
 import ListTag from '../../../components/atoms/list/ListTag';
-import {ShimmerOfferDetail} from '../../../components/atoms/shimmer/Shimmer';
-import {applyContract} from '../../../services/contract';
+import { ShimmerOfferDetail } from '../../../components/atoms/shimmer/Shimmer';
+import { applyContract } from '../../../services/contract';
 import SafeAreaView from 'react-native-safe-area-view';
 import InfoMenu from '../../../components/atoms/InfoMenu';
+import KeyValueComponent from '../../../components/atoms/KeyValueComponent';
 
 const data = {
   imageUrl: 'https://picsum.photos/200/300',
@@ -53,8 +55,8 @@ const dummyData = [
   },
 ];
 
-const OfferDetailScreen = ({navigation, route}) => {
-  const {id} = route.params;
+const OfferDetailScreen = ({ navigation, route }) => {
+  const { id } = route.params;
 
   const [isLoading, setisLoading] = useState(true);
   const [isProcessing, setisProcessing] = useState(false);
@@ -75,8 +77,8 @@ const OfferDetailScreen = ({navigation, route}) => {
   };
 
   const getAdsDate = () => {
-    const start = moment(data.start_date);
-    const end = moment(data.end_date);
+    const start = momentx(data.start_date);
+    const end = momentx(data.end_date);
     if (start.format('YYYY') != end.format('YYYY')) {
       return start.format('DD MMMM YYYY') + ' - ' + end.format('DD MMMM YYYY');
     } else if (start.format('MM') != end.format('MM')) {
@@ -91,7 +93,7 @@ const OfferDetailScreen = ({navigation, route}) => {
     applyContract(id)
       .then(response => {
         setisProcessing(false);
-        navigation.navigate('Home', {isReload: true}, true);
+        navigation.navigate('Home', { isReload: true }, true);
       })
       .catch(err => {
         showDialog(err.message);
@@ -113,25 +115,25 @@ const OfferDetailScreen = ({navigation, route}) => {
   }, []);
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <NavBar
         title={translate('offer_detail')}
         navigation={navigation}
         shadowEnabled
       />
-      <ScrollView style={{flex: 1}}>
+      <ScrollView style={{ flex: 1 }}>
         {isLoading ? (
-          <ShimmerOfferDetail containerStyle={{padding: 16}} />
+          <ShimmerOfferDetail containerStyle={{ padding: 16 }} />
         ) : (
           <View>
-            <View style={{flexDirection: 'row', padding: 16}}>
+            <View style={{ flexDirection: 'row', padding: 16 }}>
               <Image
-                source={{uri: getFullLink(data?.company_image)}}
-                style={{height: 64, width: 'auto', aspectRatio: 1}}
+                source={{ uri: getFullLink(data?.company_image) }}
+                style={{ height: 64, width: 'auto', aspectRatio: 1 }}
               />
 
-              <View style={{paddingLeft: 16}}>
-                <LatoBold style={{color: '#6D6D6D'}}>
+              <View style={{ paddingLeft: 16 }}>
+                <LatoBold style={{ color: '#6D6D6D' }}>
                   {data.company_name}
                 </LatoBold>
                 <LatoRegular
@@ -143,9 +145,9 @@ const OfferDetailScreen = ({navigation, route}) => {
                   Icon={IconLocation}>
                   {displayProvince(data.contract_area)}
                 </LatoRegular>
-                <LatoRegular style={{fontSize: 10, color: '#A7A7A7'}}>
+                <LatoRegular style={{ fontSize: 10, color: '#A7A7A7' }}>
                   {translate('created_at', {
-                    date: moment(data.created_at).format('DD MMMM YYYY'),
+                    date: momentx(data.created_at).format('DD MMMM YYYY'),
                   })}
                 </LatoRegular>
               </View>
@@ -154,19 +156,36 @@ const OfferDetailScreen = ({navigation, route}) => {
             <Divider />
             {data.is_available == false && (
               <InfoMenu
-                containerStyle={{marginHorizontal: 16, marginTop: 16}}
+                containerStyle={{ marginHorizontal: 16, marginTop: 16 }}
                 text={
                   'Kuota untuk kontrak ini sudah penuh. Coba mengajukan kontrak pada pekerjaan lain.'
                 }
               />
             )}
 
-            <View style={{padding: 16}}>
+            <View style={{ padding: 16 }}>
               <LatoBold style={styles.primaryHead}>
                 {translate('offer_info')}
               </LatoBold>
-              <View style={{flexDirection: 'row', height: 80, marginTop: 16}}>
-                <View style={{flex: 3, justifyContent: 'space-around'}}>
+              <View style={{ flexDirection: 'column', marginTop: 16,marginBottom: 16 }}>
+                <KeyValueComponent
+                  title={translate('offer_type')}
+                  value={data.sticker_area?.length > 1
+                    ? data.sticker_area.join(', ')
+                    : data.sticker_area}
+                  style={styles.subHeading}
+                />
+                <KeyValueComponent
+                  title={translate('ad_duration')}
+                  value={getAdsDate()}
+                  style={styles.subHeading}
+                />
+                <KeyValueComponent
+                  title={translate('price_per_kilos')}
+                  value={toCurrency(data.price_km)}
+                  style={styles.subHeading}
+                />
+                {/* <View style={{flex: 3, justifyContent: 'space-around'}}>
                   <LatoRegular style={styles.primarySub}>
                     {translate('offer_type')}
                   </LatoRegular>
@@ -181,8 +200,8 @@ const OfferDetailScreen = ({navigation, route}) => {
                   <LatoRegular style={styles.primarySub}>:</LatoRegular>
                   <LatoRegular style={styles.primarySub}>:</LatoRegular>
                   <LatoRegular style={styles.primarySub}>:</LatoRegular>
-                </View>
-                <View
+                </View> */}
+                {/* <View
                   style={{
                     flex: 5,
                     marginLeft: 10,
@@ -199,33 +218,33 @@ const OfferDetailScreen = ({navigation, route}) => {
                   <LatoRegular style={styles.primarySub}>
                     {toCurrency(data.price_km)}
                   </LatoRegular>
-                </View>
+                </View> */}
               </View>
               <LatoRegular
                 style={styles.primarySub}
-                containerStyle={{marginTop: 8}}>
+                containerStyle={{ marginTop: 8 }}>
                 {translate('operational_province')}
               </LatoRegular>
               <FlatList
                 scrollEnabled={false}
-                contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap'}}
+                contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
                 data={data.contract_area}
                 keyExtractor={item => item}
-                renderItem={({item, index}) => {
+                renderItem={({ item, index }) => {
                   return <ListTag title={item} />;
                 }}
               />
               <LatoRegular
                 style={styles.primarySub}
-                containerStyle={{marginTop: 8}}>
+                containerStyle={{ marginTop: 8 }}>
                 {translate('operational_city')}
               </LatoRegular>
               <FlatList
                 scrollEnabled={false}
-                contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap'}}
+                contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
                 data={data.contract_area_city}
                 keyExtractor={item => item}
-                renderItem={({item, index}) => {
+                renderItem={({ item, index }) => {
                   return <ListTag title={item} />;
                 }}
               />
@@ -233,20 +252,20 @@ const OfferDetailScreen = ({navigation, route}) => {
 
             <Divider />
 
-            <View style={{padding: 16}}>
+            <View style={{ padding: 16 }}>
               <LatoBold style={styles.primaryHead}>
                 {translate('vehicle_purpose')}
               </LatoBold>
-              <View style={{flexDirection: 'row', marginTop: 16}}>
+              <View style={{ flexDirection: 'row', marginTop: 16 }}>
                 <LatoRegular
                   style={styles.primarySub}
-                  containerStyle={{flex: 3}}>
+                  containerStyle={{ flex: 3 }}>
                   {translate('vehicle_type')}
                 </LatoRegular>
                 <LatoRegular>:</LatoRegular>
                 <LatoRegular
                   style={styles.primarySub}
-                  containerStyle={{flex: 5, marginLeft: 10}}>
+                  containerStyle={{ flex: 5, marginLeft: 10 }}>
                   {data?.vehicle_type?.length > 1
                     ? data.vehicle_type.join(' & ')
                     : data.vehicle_type}
@@ -254,15 +273,15 @@ const OfferDetailScreen = ({navigation, route}) => {
               </View>
               <LatoRegular
                 style={styles.primarySub}
-                containerStyle={{marginTop: 8}}>
+                containerStyle={{ marginTop: 8 }}>
                 {translate('vehicle_brand')}
               </LatoRegular>
               <FlatList
                 scrollEnabled={false}
-                contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap'}}
+                contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
                 data={data.vehicles}
                 keyExtractor={item => item}
-                renderItem={({item, index}) => {
+                renderItem={({ item, index }) => {
                   return <ListTag title={item} />;
                 }}
               />
@@ -275,7 +294,7 @@ const OfferDetailScreen = ({navigation, route}) => {
                 justifyContent: 'space-between',
                 flexDirection: 'row',
               }}>
-              <LatoBold style={{color: Colors.primary}}>
+              <LatoBold style={{ color: Colors.primary }}>
                 {translate('installation_time_title')}
               </LatoBold>
               <TouchableOpacity
@@ -306,11 +325,11 @@ const OfferDetailScreen = ({navigation, route}) => {
                 );
               })}
 
-            <LatoBold containerStyle={{paddingHorizontal: 16}}>
+            <LatoBold containerStyle={{ paddingHorizontal: 16 }}>
               {translate('company_detail')}
             </LatoBold>
             <LatoRegular
-              containerStyle={{paddingHorizontal: 16, paddingVertical: 10}}>
+              containerStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}>
               {data.description}
             </LatoRegular>
           </View>
@@ -319,7 +338,7 @@ const OfferDetailScreen = ({navigation, route}) => {
 
       {!isLoading && (
         <CustomButton
-          containerStyle={{padding: 16}}
+          containerStyle={{ padding: 16 }}
           types={'primary'}
           onPress={showConfirmationDialog}
           isLoading={isProcessing}
@@ -339,6 +358,10 @@ const styles = StyleSheet.create({
   primaryHead: {
     color: Colors.primary,
     fontSize: 14,
+  },
+  subHeading: {
+    color: Colors.primary,
+    fontSize: 12,
   },
 });
 

@@ -227,7 +227,7 @@ const RegisterScreen = ({navigation, route}) => {
         driver_partner_id: data.driver_partner?.id,
         driver_partner_id_value: data.driver_partner?.name,
         profile_image: await getImageBase64FromUrl(
-          getFullLink(data.profile_image),
+          data.profile_image,
         ),
         profile_image_uri: data.profile_image,
         gender: data.gender,
@@ -254,8 +254,14 @@ const RegisterScreen = ({navigation, route}) => {
     const stateCard = {
       inputValues: {
         ktp: data.ktp.number,
+        ktp_image : await getImageBase64FromUrl(
+          data.ktp.image,
+        ),
         ktp_image_uri: data.ktp.image,
         sim_a: data.sim_a.number,
+        sim_a_image: await getImageBase64FromUrl(
+          data.sim_a.image,
+        ),
         sim_a_image_uri: data.sim_a.image,
         sim_b: data.sim_b?.number,
         sim_b_image_uri: data.sim_b?.image,
