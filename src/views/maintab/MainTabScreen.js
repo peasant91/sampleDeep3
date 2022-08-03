@@ -237,7 +237,7 @@ const MainTabScreen = ({navigation, route}) => {
     } else {
       const duration = moment
         .duration(lastSentTime.current.diff(moment(Date())))
-        .asMinutes();
+        .asSeconds();
 
       console.log('momentDuration', duration);
       console.log('lastsenttime', lastSentTime);

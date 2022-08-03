@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>623422295303-42fa6lookroeeji4mpmn6nqedc46j2jb.apps.googleusercontent.com</string>
+	<string>246471571560-93orqj0o6tmtdtir05dvgive5kjolnni.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.623422295303-42fa6lookroeeji4mpmn6nqedc46j2jb</string>
+	<string>com.googleusercontent.apps.246471571560-93orqj0o6tmtdtir05dvgive5kjolnni</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDwzWRsWUh614flvJxklzB_87Pz8j_PkNo</string>
+	<string>AIzaSyD-jtDG9yH6rPjYnAJZI98UNE4sKaXOX-Y</string>
 	<key>GCM_SENDER_ID</key>
-	<string>623422295303</string>
+	<string>246471571560</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>id.otomedia.ios</string>
 	<key>PROJECT_ID</key>
-	<string>schott-pbi</string>
+	<string>otomedia-2e945</string>
 	<key>STORAGE_BUCKET</key>
-	<string>schott-pbi.appspot.com</string>
+	<string>otomedia-2e945.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:623422295303:ios:2f69c9ced12e39cb3e09a2</string>
+	<string>1:246471571560:ios:74706c3922530e2fc5a3dd</string>
 </dict>
 </plist>

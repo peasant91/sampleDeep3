@@ -104,6 +104,7 @@ const JobScreen = ({navigation, route}) => {
           }
         }
       } else {
+        console.log("previos null");
         AsyncStorage.setItem(StorageKey.KEY_DO_JOB, JSON.stringify(!isStart));
         AsyncStorage.setItem(
           StorageKey.KEY_ACTIVE_CONTRACT,
@@ -217,6 +218,7 @@ const JobScreen = ({navigation, route}) => {
     });
 
   const onLocationChange = async () => {
+    console.log("on location change in jobscreen");
     const schema = [SpeedSchema, DistanceSchema];
     const realm = await Realm.open({
       path: 'otomedia',
