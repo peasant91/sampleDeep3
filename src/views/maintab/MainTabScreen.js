@@ -69,27 +69,8 @@ const MainTabScreen = ({navigation, route}) => {
     latitude: 0,
     longitude: 0,
   });
-  const lastSentTime = useRef();
   const sumDistance = useRef(0);
-  const lastLocation = useRef(null);
-
-  // useEffect(()=>{
-  //   const test = async()=>{
-  //     const realm = await Realm.open(
-  //       {
-  //         path: 'otomedia',
-  //         schema: [SpeedSchema, DistanceSchema]
-  //       }
-  //     )
-  //     const distances = realm.objects('Distance')
-  //     if (distances.length > 0) {
-  //       const sums = sum(distances.map(item => item.distance))
-  //       sumDistance.current = sums
-  //       console.log("sums distance",sums);
-  //     }
-  //   }
-  //   test()
-  // },[])
+  const lastSendDistance = useRef(0);
 
   useEffect(() => {
     AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN).then(token => {
@@ -118,7 +99,7 @@ const MainTabScreen = ({navigation, route}) => {
     });
 
     AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(backround => {
-      console.log('background', backround);
+      console.log('background anjeng', backround);
       if (JSON.parse(backround)) {
         BackgroundGeolocation.start();
       }
@@ -126,19 +107,9 @@ const MainTabScreen = ({navigation, route}) => {
   }, []);
 
   const onLocationChange = async location => {
-    console.log('onLocationChange location data ', location);
-    const distance =
-      currentPosition?.current.latitude == 0
-        ? 0
-        : calcDistance(
-            location.latitude,
-            location.longitude,
-            currentPosition?.current.latitude,
-            currentPosition?.current.longitude,
-          );
+    const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude,location.longitude,currentPosition?.current.latitude,currentPosition?.current.longitude);
     sumDistance.current += distance;
-    const currentDistance = sumDistance.current.toFixed(2);
-    console.log('currentDistance in MainTabScreen here ', currentDistance);
+    
     const schema = [SpeedSchema, DistanceSchema];
 
     try {
@@ -165,89 +136,19 @@ const MainTabScreen = ({navigation, route}) => {
       latitude: location.latitude,
       longitude: location.longitude,
     };
-    AsyncStorage.setItem(
-      StorageKey.KEY_LAST_LOCATION,
-      JSON.stringify(location),
-    );
-    // bisa coba masukin logic hit traffic API di sini memakai sumDistance.current (pindahin dari JobScreen)
-    // open this line
-    if (currentDistance >= 1) {
-      console.log(
-        '===== currenDistance >= 1 is true ===== ',
-        currentDistance,
-        currentDistance >= 1,
-      );
-      // check distance tidak boleh float
-      console.log(
-        '===== integer here =====',
-        Number.isInteger(currentDistance),
-      );
-      if (Number.isInteger(currentDistance)) {
-        // check distance multiple of 1
-        if (currentDistance % currentDistance == 0) {
-          console.log('~~~~~ get traffic flow API here ~~~~~');
-          getTrafficFlow(location.latitude, location.longitude)
-            .then(response => {
-              console.log(
-                'traffic tomtom data ',
-                JSON.stringify(response.data, null, 2),
-              );
-              Alert.alert('Traffic data sent.');
-            })
-            .catch(err => {
-              console.log('error here ', err);
-            });
-          // AsyncStorage.getItem(StorageKey.KEY_LAST_LOCATION)
-          //   .then(res => {
-          //     const value = JSON.parse(res);
-          //     console.log('~~~~~ get traffic flow API here ~~~~~');
-          //     getTrafficFlow(
-          //       // value.latitude.toString(),
-          //       // value.longitude.toString(),
-          //       location.latitude,
-          //       location.longitude,
-          //     )
-          //       .then(response => {
-          //         console.log(
-          //           'traffic tomtom data ',
-          //           JSON.stringify(response.data, null, 2),
-          //         );
-          //       })
-          //       .catch(err => {
-          //         console.log('error here ', err);
-          //       });
-          //   })
-          //   .catch(err => {
-          //     console.log(err);
-          //   });
-        }
+    
+    if (sumDistance.current > 0){
+      const sumDistanceInMeters = (sumDistance.current * 1000)
+      const lastSendDistanceInMeters = (lastSendDistance.current * 1000)
+      console.log(`sum distance in meter ${sumDistanceInMeters}`);
+      console.log(`sum last send distance in meter ${lastSendDistanceInMeters}`);
+      if (sumDistanceInMeters - lastSendDistanceInMeters >= 100){
+        sendLocation(location);
       }
-    } else {
-      console.log('currentDistance smaller than 1 ', currentDistance);
     }
-    console.log('========= currenDistance end =======');
-
-    sendLocation(location);
   };
 
   const sendLocation = async location => {
-    if (!lastSentTime.current) {
-      lastSentTime.current = moment(Date());
-      return;
-    } else {
-      const duration = moment
-        .duration(lastSentTime.current.diff(moment(Date())))
-        .asSeconds();
-
-      console.log('momentDuration', duration);
-      console.log('lastsenttime', lastSentTime);
-      console.log('sumdistance', sumDistance.current);
-
-      if (duration > Config.minimumTimeToSend) {
-        return;
-      }
-    }
-
     Realm.open({
       path: 'otomedia',
       schema: [SpeedSchema, DistanceSchema],
@@ -255,38 +156,23 @@ const MainTabScreen = ({navigation, route}) => {
       const distances = realm.objects('Distance');
       if (distances.length > 0) {
         const sums = sum(distances.map(item => item.distance));
-        console.log('total distance sums', sums);
-
-        console.log('masuk traffic flow here ');
-        console.log('location here for tomtom ', location);
-        // getTrafficFlow(
-        //   location.latitude.toString(),
-        //   location.longitude.toString(),
-        // )
-        //   .then(response => {
-        //     console.log(
-        //       'traffic tomtom data ',
-        //       JSON.stringify(response.data, null, 2),
-        //     );
-        //   })
-        //   .catch(err => {
-        //     console.log('error here ', err);
-        //   });
+        
         AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
           sendDistance({
             lat: location.latitude,
             lng: location.longitude,
-            distance: (sums * 1000).toFixed(2), //in meter
+            distance: (sums*1000).toFixed(2), //in meter
             contract_id: id,
           })
             .then(response => {
+              lastSendDistance.current = sums
               //sumDistance.current = 0
             })
             .catch(err => {});
         });
       }
     });
-    lastSentTime.current = moment(Date());
+    //lastSentTime.current = moment(Date());
   };
 
   return (

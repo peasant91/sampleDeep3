@@ -1,3 +1,349 @@
+/*
+import React, {useContext, useState, useEffect, useRef} from 'react';
+import {View, Platform, Keyboard, Alert} from 'react-native';
+
+import {
+  createBottomTabNavigator,
+  BottomTabBar,
+} from '@react-navigation/bottom-tabs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import HomeScreen from './HomeScreen';
+import OfferScreen from './offer/OfferScreen';
+import AccountScreen from './account/AccountScreen';
+
+import IconHome from '../../assets/images/ic_home.svg';
+import IconOffer from '../../assets/images/ic_offer.svg';
+import IconAccount from '../../assets/images/ic_account.svg';
+import Colors from '../../constants/Colors';
+import {AuthContext} from '../../../App';
+import StorageKey from '../../constants/StorageKey';
+import {initBackground} from '../../services/background';
+import Realm from 'realm';
+import moment from 'moment';
+import {DistanceSchema, SpeedSchema} from '../../data/realm/speed';
+import {calcDistance} from '../../actions/helper';
+import {getTrafficFlow, sendDistance} from '../../services/contract';
+import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import Config from '../../constants/Config';
+import {useToast} from 'react-native-toast-notifications';
+import {sum} from '../../actions/helper';
+
+const CustomBottomTabBar = props => {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    let keyboardEventListeners;
+    if (Platform.OS === 'android') {
+      keyboardEventListeners = [
+        Keyboard.addListener('keyboardDidShow', () => setVisible(false)),
+        Keyboard.addListener('keyboardDidHide', () => setVisible(true)),
+      ];
+    }
+    return () => {
+      if (Platform.OS === 'android') {
+        keyboardEventListeners &&
+          keyboardEventListeners.forEach(eventListener =>
+            eventListener.remove(),
+          );
+      }
+    };
+  }, []);
+
+  const render = () => {
+    if (Platform.OS === 'ios') {
+      return <BottomTabBar {...props} />;
+    }
+    if (!visible) return null;
+    return <BottomTabBar {...props} />;
+  };
+
+  return render();
+};
+
+const Tab = createBottomTabNavigator();
+
+const MainTabScreen = ({navigation, route}) => {
+  const [isLogin, setisLogin] = useState(false);
+  const toast = useToast();
+  const currentPosition = useRef({
+    latitude: 0,
+    longitude: 0,
+  });
+  const lastSentTime = useRef();
+  const sumDistance = useRef(0);
+  const lastLocation = useRef(null);
+
+  // useEffect(()=>{
+  //   const test = async()=>{
+  //     const realm = await Realm.open(
+  //       {
+  //         path: 'otomedia',
+  //         schema: [SpeedSchema, DistanceSchema]
+  //       }
+  //     )
+  //     const distances = realm.objects('Distance')
+  //     if (distances.length > 0) {
+  //       const sums = sum(distances.map(item => item.distance))
+  //       sumDistance.current = sums
+  //       console.log("sums distance",sums);
+  //     }
+  //   }
+  //   test()
+  // },[])
+
+  useEffect(() => {
+    AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN).then(token => {
+      if (token) {
+        setisLogin(true);
+      } else {
+        setisLogin(false);
+      }
+    });
+
+    initBackground();
+
+    BackgroundGeolocation.on('location', location => {
+      // handle your locations here
+      // to perform long running operation on iOS
+      // you need to create background task
+
+      console.log('location', location);
+      BackgroundGeolocation.startTask(taskKey => {
+        // execute long running task
+        // eg. ajax post location
+        // IMPORTANT: task has to be ended by endTask
+        onLocationChange(location);
+        BackgroundGeolocation.endTask(taskKey);
+      });
+    });
+
+    AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(backround => {
+      console.log('background', backround);
+      if (JSON.parse(backround)) {
+        BackgroundGeolocation.start();
+      }
+    });
+  }, []);
+
+  const onLocationChange = async location => {
+    console.log('onLocationChange location data ', location);
+    const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude,location.longitude,currentPosition?.current.latitude,currentPosition?.current.longitude);
+    sumDistance.current += distance;
+    const currentDistance = sumDistance.current.toFixed(2);
+    console.log('currentDistance in MainTabScreen here ', currentDistance);
+    const schema = [SpeedSchema, DistanceSchema];
+
+    try {
+      const realm = await Realm.open({
+        path: 'otomedia',
+        schema: schema,
+      });
+      realm.write(() => {
+        realm.create('Speed', {
+          date: Date(),
+          speed: location.speed,
+        });
+        realm.create('Distance', {
+          date: Date(),
+          lat: location.latitude,
+          lng: location.longitude,
+          distance: distance,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    currentPosition.current = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    };
+    AsyncStorage.setItem(
+      StorageKey.KEY_LAST_LOCATION,
+      JSON.stringify(location),
+    );
+    // bisa coba masukin logic hit traffic API di sini memakai sumDistance.current (pindahin dari JobScreen)
+    // open this line
+    if (currentDistance >= 1) {
+      console.log(
+        '===== currenDistance >= 1 is true ===== ',
+        currentDistance,
+        currentDistance >= 1,
+      );
+      // check distance tidak boleh float
+      console.log(
+        '===== integer here =====',
+        Number.isInteger(currentDistance),
+      );
+      if (Number.isInteger(currentDistance)) {
+        // check distance multiple of 1
+        if (currentDistance % currentDistance == 0) {
+          console.log('~~~~~ get traffic flow API here ~~~~~');
+          getTrafficFlow(location.latitude, location.longitude)
+            .then(response => {
+              console.log(
+                'traffic tomtom data ',
+                JSON.stringify(response.data, null, 2),
+              );
+              Alert.alert('Traffic data sent.');
+            })
+            .catch(err => {
+              console.log('error here ', err);
+            });
+          // AsyncStorage.getItem(StorageKey.KEY_LAST_LOCATION)
+          //   .then(res => {
+          //     const value = JSON.parse(res);
+          //     console.log('~~~~~ get traffic flow API here ~~~~~');
+          //     getTrafficFlow(
+          //       // value.latitude.toString(),
+          //       // value.longitude.toString(),
+          //       location.latitude,
+          //       location.longitude,
+          //     )
+          //       .then(response => {
+          //         console.log(
+          //           'traffic tomtom data ',
+          //           JSON.stringify(response.data, null, 2),
+          //         );
+          //       })
+          //       .catch(err => {
+          //         console.log('error here ', err);
+          //       });
+          //   })
+          //   .catch(err => {
+          //     console.log(err);
+          //   });
+        }
+      }
+    } else {
+      console.log('currentDistance smaller than 1 ', currentDistance);
+    }
+    console.log('========= currenDistance end =======');
+
+    //send location only every 5 METERS!!!. 
+    //In order to achieve that, we can calculate the sums of the distance, if it's value modules to 5 we execute send location otherwise we skip it.
+    // const sumDistanceInMeters = (sumDistance.current * 1000)
+    // if (sumDistanceInMeters % 5 == 0){
+      
+    // }
+    sendLocation(location);
+  };
+
+  const sendLocation = async location => {
+    // if (!lastSentTime.current) {
+    //   lastSentTime.current = moment(Date());
+    //   return;
+    // } else {
+    //   const duration = moment
+    //     .duration(lastSentTime.current.diff(moment(Date())))
+    //     .asSeconds();
+
+    //   console.log('momentDuration', duration);
+    //   console.log('lastsenttime', lastSentTime);
+    //   console.log('sumdistance', sumDistance.current);
+
+    //   if (duration > Config.minimumTimeToSend) {
+    //     return;
+    //   }
+    // }
+
+    Realm.open({
+      path: 'otomedia',
+      schema: [SpeedSchema, DistanceSchema],
+    }).then(realm => {
+      const distances = realm.objects('Distance');
+      if (distances.length > 0) {
+        const sums = sum(distances.map(item => item.distance));
+        console.log('total distance sums', sums);
+
+        console.log('masuk traffic flow here ');
+        console.log('location here for tomtom ', location);
+        // getTrafficFlow(
+        //   location.latitude.toString(),
+        //   location.longitude.toString(),
+        // )
+        //   .then(response => {
+        //     console.log(
+        //       'traffic tomtom data ',
+        //       JSON.stringify(response.data, null, 2),
+        //     );
+        //   })
+        //   .catch(err => {
+        //     console.log('error here ', err);
+        //   });
+        AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
+          const sumDistanceInMeters = (sums * 1000)
+          if (sumDistanceInMeters % 5 != 0){
+            return
+          }
+          sendDistance({
+            lat: location.latitude,
+            lng: location.longitude,
+            distance: sumDistanceInMeters.toFixed(2), //in meter
+            contract_id: id,
+          })
+            .then(response => {
+              //sumDistance.current = 0
+            })
+            .catch(err => {});
+        });
+      }
+    });
+    //lastSentTime.current = moment(Date());
+  };
+
+  return (
+    <Tab.Navigator
+      tabBar={props => <CustomBottomTabBar {...props} />}
+      screenOptions={({route}) => ({
+        headerShown: false,
+        tabBarLabelStyle: {fontSize: 13, marginBottom: 10},
+        tabBarStyle: {height: Platform.OS == 'ios' ? 100 : 70},
+        tabBarIconStyle: {marginTop: 5},
+        tabBarIcon: ({focused, color, size}) => {
+          let Icon;
+
+          switch (route.name) {
+            case 'Home':
+              Icon = focused ? (
+                <IconHome color={Colors.primary} />
+              ) : (
+                <IconHome color={Colors.grey} />
+              );
+              break;
+            case 'Offer':
+              Icon = focused ? (
+                <IconOffer color={Colors.primary} />
+              ) : (
+                <IconOffer color={Colors.grey} />
+              );
+              break;
+            default:
+              Icon = focused ? (
+                <IconAccount color={Colors.primary} />
+              ) : (
+                <IconAccount color={Colors.grey} />
+              );
+          }
+
+          // You can return any component that you like here!
+          return Icon;
+        },
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: 'gray',
+      })}>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Offer" component={OfferScreen} />
+      <Tab.Screen name="Account" component={AccountScreen} />
+    </Tab.Navigator>
+  );
+};
+
+export default MainTabScreen;
+
+*/
+
+/*
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {Alert, Platform, StatusBar, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-elements';
@@ -37,6 +383,7 @@ import {showLocationAlwaysDialog} from '../../../actions/commonActions';
 const JobScreen = ({navigation, route}) => {
   const [time, settime] = useState(['00', '00', '00']);
   const [speed, setSpeed] = useState('00');
+  const [speedRaw, setSpeedRaw] = useState('00');
   const [distance, setDistance] = useState('00');
   const [isStart, setisStart] = useState();
   const loop = useRef();
@@ -200,6 +547,7 @@ const JobScreen = ({navigation, route}) => {
     new Promise(async (resolve, reject) => {
       settime(['00', '00', '00']);
       setSpeed('00');
+      setSpeedRaw('00');
       setDistance('00');
 
       const schema = [SpeedSchema, DistanceSchema];
@@ -214,6 +562,102 @@ const JobScreen = ({navigation, route}) => {
       await AsyncStorage.removeItem(StorageKey.KEY_ELAPSED_TIME);
       resolve(true);
     });
+
+  const onLocationChange = async () => {
+    console.log("on location change in jobscreen");
+    const schema = [SpeedSchema, DistanceSchema];
+    const realm = await Realm.open({
+      path: 'otomedia',
+      schema: schema,
+    });
+
+    const speeds = realm.objects('Speed');
+    print(`ini speed ${speeds}`);
+    if (speeds.length > 0) {
+      const averageSpeed = average(speeds.map(item => item.speed));
+      const kmh = averageSpeed * 3.6;
+      setSpeed(averageSpeed.toFixed(2));
+      setSpeedRaw(kmh.toFixed(2));
+    }
+
+    const distances = realm.objects('Distance');
+    if (distances.length > 0) {
+      const sumDistance = sum(distances.map(item => item.distance));
+      setDistance(sumDistance.toFixed(2));
+
+      // check if distance is >= 1
+      // const currentDistance = sumDistance.toFixed(2);
+      // console.log('===== currentDistance here =====', sumDistance.toFixed(2));
+      // if (currentDistance >= 1) {
+      //   console.log(
+      //     '===== currenDistance >= 1 is true ===== ',
+      //     currentDistance,
+      //     currentDistance >= 1,
+      //   );
+      //   // check distance tidak boleh float
+      //   console.log(
+      //     '===== integer here =====',
+      //     Number.isInteger(currentDistance),
+      //   );
+      //   if (Number.isInteger(currentDistance)) {
+      //     // check distance multiple of 1
+      //     if (currentDistance % currentDistance == 0) {
+      //       AsyncStorage.getItem(StorageKey.KEY_LAST_LOCATION)
+      //         .then(res => {
+      //           const value = JSON.parse(res);
+      //           console.log('~~~~~ get traffic flow API here ~~~~~');
+      //           getTrafficFlow(
+      //             value.latitude.toString(),
+      //             value.longitude.toString(),
+      //           )
+      //             .then(response => {
+      //               console.log(
+      //                 'traffic tomtom data ',
+      //                 JSON.stringify(response.data, null, 2),
+      //               );
+      //             })
+      //             .catch(err => {
+      //               console.log('error here ', err);
+      //             });
+      //         })
+      //         .catch(err => {
+      //           console.log(err);
+      //         });
+      //     }
+      //   }
+      // } else {
+      //   console.log('currentDistance smaller than 1 ', currentDistance);
+      // }
+      // console.log('========= currenDistance end =======');
+    }
+    // check distance >= 1
+    // console.log(
+    //   '====================== distance here =================== ',
+    //   distance,
+    // );
+    // if (distance >= 0.1) {
+    //   console.log(
+    //     '========================== masuk lebih dari 0.1 =============== ',
+    //     distance,
+    //     distance >= 0.1,
+    //   );
+    //   // check distance tidak boleh float
+    //   console.log(
+    //     '========================== integer here ===================',
+    //     Number.isInteger(distance),
+    //   );
+    //   if (Number.isInteger(distance)) {
+    //     // check distance multiple of 1
+    //     if (distance % distance == 0) {
+    //       console.log(
+    //         '=========================== per 1 km =============================',
+    //         distance,
+    //         distance % distance == 0,
+    //       );
+    //     }
+    //   }
+    // }
+  };
 
   const startTimer = async time => {
     const diff = await getElapsedSecond(time);
@@ -336,31 +780,6 @@ const JobScreen = ({navigation, route}) => {
     });
   };
 
-  const onLocationChange = async () => {
-
-    const schema = [SpeedSchema, DistanceSchema]
-    const realm = await Realm.open(
-      {
-        path: 'otomedia',
-        schema: schema,
-      }
-    )
-
-    const speeds = realm.objects('Speed')
-    if (speeds.length > 0) {
-      const averageSpeed = average(speeds.map(item => item.speed))
-      setSpeed(averageSpeed.toFixed(2))
-    }
-
-
-    const distances = realm.objects('Distance')
-    if (distances.length > 0) {
-      const sumDistance = sum(distances.map(item => item.distance))
-      setDistance(sumDistance.toFixed(2))
-    }
-
-  }
-
   const saveElapsedTime = async () => {
     var startTime = await AsyncStorage.getItem(StorageKey.KEY_START_TIME);
     getElapsedSecond(startTime).then(elapsedTime => {
@@ -389,7 +808,13 @@ const JobScreen = ({navigation, route}) => {
       onLocationChange();
 
       BackgroundGeolocation.on('location', location => {
+        // start background task here
         onLocationChange();
+        // BackgroundGeolocation.startTask(taskKey => {
+        //   console.log('~~~~~ Background task in JobScreen on ~~~~~');
+        //   onLocationChange();
+        //   BackgroundGeolocation.endTask(taskKey);
+        // });
       });
 
       return () => {
@@ -479,7 +904,7 @@ const JobScreen = ({navigation, route}) => {
           <LatoBold style={{fontSize: 18}}>
             {translate('average_speed')}
           </LatoBold>
-          <LatoBold style={{fontSize: 48, marginTop: 24}}>{speed}</LatoBold>
+          <LatoBold style={{fontSize: 48, marginTop: 24}}>{speedRaw}</LatoBold>
           <LatoBold style={{fontSize: 18}}>Km/h</LatoBold>
         </View>
 
@@ -529,3 +954,5 @@ const styles = StyleSheet.create({
 });
 
 export default JobScreen;
+
+*/

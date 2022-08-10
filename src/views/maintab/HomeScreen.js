@@ -178,6 +178,8 @@ const HomeScreen = ({navigation, route}) => {
         .catch(err => {
           showDialog(err.message);
         });
+    }else{
+      setisLoading(false);
     }
   };
 
