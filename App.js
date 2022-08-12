@@ -73,6 +73,7 @@ import { logout } from './src/services/user';
 import { showDialog } from './src/actions/commonActions';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import notifee from '@notifee/react-native';
+import {DistanceSchema, SpeedSchema} from './src/data/realm/speed';
 
 //realm
 
@@ -167,16 +168,30 @@ const App = ({ navigation, route }) => {
       signOut: async data => {
         logout().then(response => {
           BackgroundGeolocation.stop()
-          AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
-            dispatch({ type: 'SIGN_OUT' });
-          })
+          const schema = [SpeedSchema, DistanceSchema];
 
+          Realm.open({
+            path: 'otomedia',
+            schema: schema,
+          }).then(realm =>{
+            realm.write(() => realm.deleteAll());
+            AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
+              dispatch({ type: 'SIGN_OUT' });
+            })
+          })
         }).catch(err => {
           BackgroundGeolocation.stop()
-          AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
-            dispatch({ type: 'SIGN_OUT' });
+          const schema = [SpeedSchema, DistanceSchema];
+
+          Realm.open({
+            path: 'otomedia',
+            schema: schema,
+          }).then(realm=>{
+            realm.write(() => realm.deleteAll());
+            AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
+              dispatch({ type: 'SIGN_OUT' });
+            })
           })
-          // showDialog(err.message)
         })
       },
       doneLoading: async data => {
@@ -242,7 +257,7 @@ const App = ({ navigation, route }) => {
         name: 'Default Channel',
       });
       const data = remoteMessage.data
-      if(data){
+      if (data) {
         await notifee.displayNotification({
           title: data.title,
           body: data.body,

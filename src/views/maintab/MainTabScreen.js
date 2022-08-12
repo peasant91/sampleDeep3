@@ -1,5 +1,5 @@
-import React, {useContext, useState, useEffect, useRef} from 'react';
-import {View, Platform, Keyboard, Alert} from 'react-native';
+import React, { useContext, useState, useEffect, useRef } from 'react';
+import { View, Platform, Keyboard, Alert } from 'react-native';
 
 import {
   createBottomTabNavigator,
@@ -15,18 +15,18 @@ import IconHome from '../../assets/images/ic_home.svg';
 import IconOffer from '../../assets/images/ic_offer.svg';
 import IconAccount from '../../assets/images/ic_account.svg';
 import Colors from '../../constants/Colors';
-import {AuthContext} from '../../../App';
+import { AuthContext } from '../../../App';
 import StorageKey from '../../constants/StorageKey';
-import {initBackground} from '../../services/background';
+import { initBackground } from '../../services/background';
 import Realm from 'realm';
 import moment from 'moment';
-import {DistanceSchema, SpeedSchema} from '../../data/realm/speed';
-import {calcDistance} from '../../actions/helper';
-import {getTrafficFlow, sendDistance} from '../../services/contract';
+import { DistanceSchema, SpeedSchema } from '../../data/realm/speed';
+import { calcDistance } from '../../actions/helper';
+import { getTrafficFlow, sendDistance } from '../../services/contract';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import Config from '../../constants/Config';
-import {useToast} from 'react-native-toast-notifications';
-import {sum} from '../../actions/helper';
+import { useToast } from 'react-native-toast-notifications';
+import { sum } from '../../actions/helper';
 
 const CustomBottomTabBar = props => {
   const [visible, setVisible] = useState(true);
@@ -62,7 +62,7 @@ const CustomBottomTabBar = props => {
 
 const Tab = createBottomTabNavigator();
 
-const MainTabScreen = ({navigation, route}) => {
+const MainTabScreen = ({ navigation, route }) => {
   const [isLogin, setisLogin] = useState(false);
   const toast = useToast();
   const currentPosition = useRef({
@@ -107,9 +107,8 @@ const MainTabScreen = ({navigation, route}) => {
   }, []);
 
   const onLocationChange = async location => {
-    const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude,location.longitude,currentPosition?.current.latitude,currentPosition?.current.longitude);
-    sumDistance.current += distance;
-    
+    const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude);
+
     const schema = [SpeedSchema, DistanceSchema];
 
     try {
@@ -136,16 +135,8 @@ const MainTabScreen = ({navigation, route}) => {
       latitude: location.latitude,
       longitude: location.longitude,
     };
-    
-    if (sumDistance.current > 0){
-      const sumDistanceInMeters = (sumDistance.current * 1000)
-      const lastSendDistanceInMeters = (lastSendDistance.current * 1000)
-      console.log(`sum distance in meter ${sumDistanceInMeters}`);
-      console.log(`sum last send distance in meter ${lastSendDistanceInMeters}`);
-      if (sumDistanceInMeters - lastSendDistanceInMeters >= 100){
-        sendLocation(location);
-      }
-    }
+
+    sendLocation(location);
   };
 
   const sendLocation = async location => {
@@ -156,34 +147,45 @@ const MainTabScreen = ({navigation, route}) => {
       const distances = realm.objects('Distance');
       if (distances.length > 0) {
         const sums = sum(distances.map(item => item.distance));
-        
+        const sumsInMeters = (sums * 1000).toFixed(2)
+        console.log("sums in meters",sumsInMeters);
+        console.log("last send distance",lastSendDistance.current);
+        console.log("distance diff",sumsInMeters - lastSendDistance.current);
+        if (sumsInMeters - lastSendDistance.current < 100) {
+          return
+        }
+
         AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
           sendDistance({
             lat: location.latitude,
             lng: location.longitude,
-            distance: (sums*1000).toFixed(2), //in meter
+            distance: sumsInMeters, //in meter
             contract_id: id,
           })
             .then(response => {
-              lastSendDistance.current = sums
-              //sumDistance.current = 0
+              lastSendDistance.current = sumsInMeters
+              toast.show(`sending distance ${sumsInMeters}`), {
+                animationType: 'slide-in',
+                duration: 1000,
+                type: 'custom',
+                placement: 'bottom'
+              }
             })
-            .catch(err => {});
+            .catch(err => { });
         });
       }
     });
-    //lastSentTime.current = moment(Date());
   };
 
   return (
     <Tab.Navigator
       tabBar={props => <CustomBottomTabBar {...props} />}
-      screenOptions={({route}) => ({
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarLabelStyle: {fontSize: 13, marginBottom: 10},
-        tabBarStyle: {height: Platform.OS == 'ios' ? 100 : 70},
-        tabBarIconStyle: {marginTop: 5},
-        tabBarIcon: ({focused, color, size}) => {
+        tabBarLabelStyle: { fontSize: 13, marginBottom: 10 },
+        tabBarStyle: { height: Platform.OS == 'ios' ? 100 : 70 },
+        tabBarIconStyle: { marginTop: 5 },
+        tabBarIcon: ({ focused, color, size }) => {
           let Icon;
 
           switch (route.name) {
