@@ -411,6 +411,7 @@ const JobScreen = ({navigation, route}) => {
     });
 
   useFocusEffect(
+    
     useCallback(() => {
       if (isStart == undefined) {
         console.log('start is undefined');

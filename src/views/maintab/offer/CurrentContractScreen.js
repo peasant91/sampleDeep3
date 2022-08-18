@@ -286,9 +286,9 @@ const CurrentContractScreen = ({navigation, route}) => {
                   <View style={{padding: 16}}>
                     <KeyValueComponent
                       title={translate('transferred')}
-                      value={moment(contractData.date_transfer).format(
+                      value={ contractData.date_transfer != null ? moment(contractData.date_transfer).format(
                         'DD MMMM YYYY',
-                      )}
+                      ) : "-"}
                       isBold
                       style={styles.subHeading}
                     />

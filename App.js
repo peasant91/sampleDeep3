@@ -72,8 +72,8 @@ import MainTabScreen from './src/views/maintab/MainTabScreen';
 import { logout } from './src/services/user';
 import { showDialog } from './src/actions/commonActions';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
-import notifee from '@notifee/react-native';
-import {DistanceSchema, SpeedSchema} from './src/data/realm/speed';
+import notifee, { EventType } from '@notifee/react-native';
+import { DistanceSchema, SpeedSchema } from './src/data/realm/speed';
 
 //realm
 
@@ -173,7 +173,7 @@ const App = ({ navigation, route }) => {
           Realm.open({
             path: 'otomedia',
             schema: schema,
-          }).then(realm =>{
+          }).then(realm => {
             realm.write(() => realm.deleteAll());
             AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
               dispatch({ type: 'SIGN_OUT' });
@@ -186,7 +186,7 @@ const App = ({ navigation, route }) => {
           Realm.open({
             path: 'otomedia',
             schema: schema,
-          }).then(realm=>{
+          }).then(realm => {
             realm.write(() => realm.deleteAll());
             AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
               dispatch({ type: 'SIGN_OUT' });
@@ -295,13 +295,33 @@ const App = ({ navigation, route }) => {
     messaging().onNotificationOpenedApp(remoteMessage => {
       console.log(
         'Notification caused app to open from background state:',
-        remoteMessage.notification,
+        remoteMessage,
       );
-      RootNavigation.navigate('Home', {
-        data: { id: remoteMessage.data.news_id },
-      });
-
-      // navigation.navigate(remoteMessage.data.type);
+      const data = remoteMessage.data
+      switch (data.type.toLowerCase()) {
+        case 'account':
+          RootNavigation.navigate('Account');
+          break;
+        case 'contract_detail':
+          RootNavigation.navigate('CurrentContract', {
+            id: data.model_id,
+            isEmpty: false,
+            isCurrent: true,
+          })
+          break;
+        case 'contract_history':
+          RootNavigation.navigate('CurrentContract', {
+            id: data.model_id,
+            isEmpty: false,
+            isCurrent: false,
+          })
+          break;
+        case 'offer_list':
+          RootNavigation.navigate('Offer');
+          break;
+        default:
+          break;
+      }
     });
 
     // Check whether an initial notification is available
@@ -320,6 +340,44 @@ const App = ({ navigation, route }) => {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    //handle foreground events
+    notifee.onForegroundEvent(({ type, detail }) => {
+      if (type == EventType.PRESS) {
+        const data = detail.notification?.data
+        if (data) {
+          console.log('notif data foreground', data)
+          const id = data['model_id']
+          const type = data['type']
+          switch (type.toLowerCase()) {
+            case 'account':
+              RootNavigation.navigate('Account');
+              break;
+            case 'contract_detail':
+              RootNavigation.navigate('CurrentContract', {
+                id: id,
+                isEmpty: false,
+                isCurrent: true,
+              })
+              break;
+            case 'contract_history':
+              RootNavigation.navigate('CurrentContract', {
+                id: id,
+                isEmpty: false,
+                isCurrent: false,
+              })
+              break;
+            case 'offer_list':
+              RootNavigation.navigate('Offer');
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    })
+  }, [])
 
   if (loading) {
     return null;

@@ -25,15 +25,32 @@ const NotificationScreen = ({navigation, route}) => {
   const isFocus = useIsFocused();
 
   const navigateNotification = item => {
-    switch (item.notif_type) {
-      case 'App\\Models\\User\\Driver':
+    console.log("item",item.type);
+    switch (item.type) {
+      case 'account':
         navigation.navigate('Account');
         break;
-      case 'App\\Models\\Vehicle\\Vehicle':
+      case 'notification':
         navigation.navigate('Account');
         break;
-      case 'App\\Models\\User\\User':
-        navigation.navigate('Account');
+      case 'contract_detail':
+        navigation.navigate('CurrentContract', {
+          id: id,
+          isEmpty: false,
+          isCurrent: true,
+        })
+        break;
+      case 'contract_history':
+        navigation.navigate('CurrentContract', {
+          id: id,
+          isEmpty: false,
+          isCurrent: false,
+        })
+        break;
+      case 'offer_list':
+        navigation.navigate('Offer');
+        break;
+      default:
         break;
     }
   };

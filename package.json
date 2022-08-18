@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "ios:beta": "fastlane ios beta",
     "android:beta": "fastlane android beta",
-    "build-android-apk": "cd android && ./gradlew assembleRelease && cd .."
+    "build-android-apk": "cd android && ./gradlew assembleRelease && cd ..",
+    "release-build": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/ && rm -rf android/app/src/main/res/drawable-* && rm -rf android/app/src/main/res/raw/* && cd android && ./gradlew assembleRelease && cd app/build/outputs/apk && open ."
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4.1.5",

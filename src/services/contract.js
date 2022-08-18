@@ -20,7 +20,7 @@ export const sendDistance = data => {
 
 export const getTrafficFlow = (lat, lng) => {
   return axios.get(
-    `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/5/json?key=8JY6MkByK0sBGwhG2w4VVaPYCAHGLjx0&point=${lat},${lng}`,
+    `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/5/json?key=8JY6MkByK0sBGwhG2w4VVaPYCAHGLjx0&point=${lat},${lng}&unit=mph`,
     {
       headers: {
         'Content-Type': 'application/json',

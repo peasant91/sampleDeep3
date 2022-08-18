@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { View, Platform, Keyboard, Alert } from 'react-native';
 
 import {
@@ -69,7 +69,8 @@ const MainTabScreen = ({ navigation, route }) => {
     latitude: 0,
     longitude: 0,
   });
-  const sumDistance = useRef(0);
+  const lastSendTraffic = useRef(0);
+  const lastSendTrafficTime = useRef()
   const lastSendDistance = useRef(0);
 
   useEffect(() => {
@@ -106,11 +107,16 @@ const MainTabScreen = ({ navigation, route }) => {
     });
   }, []);
 
+  useLayoutEffect(()=>{
+    return () => {
+      BackgroundGeolocation.removeAllListeners
+    }
+  },[])
+
   const onLocationChange = async location => {
     const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude);
 
     const schema = [SpeedSchema, DistanceSchema];
-
     try {
       const realm = await Realm.open({
         path: 'otomedia',
@@ -143,33 +149,43 @@ const MainTabScreen = ({ navigation, route }) => {
     Realm.open({
       path: 'otomedia',
       schema: [SpeedSchema, DistanceSchema],
-    }).then(realm => {
+    }).then( async realm => {
       const distances = realm.objects('Distance');
       if (distances.length > 0) {
         const sums = sum(distances.map(item => item.distance));
         const sumsInMeters = (sums * 1000).toFixed(2)
+
         console.log("sums in meters",sumsInMeters);
         console.log("last send distance",lastSendDistance.current);
         console.log("distance diff",sumsInMeters - lastSendDistance.current);
-        if (sumsInMeters - lastSendDistance.current < 100) {
+
+        if ((sumsInMeters - lastSendDistance.current < 5 )) {
           return
         }
-
+        var isTraffic = false
+        if (sumsInMeters - lastSendTraffic.current >= 500){
+          isTraffic = true
+        }
+        console.log("last sent time",lastSendTrafficTime.current);
         AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
           sendDistance({
             lat: location.latitude,
             lng: location.longitude,
             distance: sumsInMeters, //in meter
             contract_id: id,
+            last_distance: isTraffic == false ? null : lastSendDistance.current,
+            last_date: isTraffic == false ? null : lastSendTrafficTime.current
           })
             .then(response => {
-              lastSendDistance.current = sumsInMeters
-              toast.show(`sending distance ${sumsInMeters}`), {
-                animationType: 'slide-in',
-                duration: 1000,
-                type: 'custom',
-                placement: 'bottom'
+              console.log("response send data",response);
+              if (!lastSendTrafficTime.current){
+                lastSendTrafficTime.current = response.date
               }
+              if (isTraffic == true){
+                lastSendTraffic.current = sumsInMeters
+                lastSendTrafficTime.current = response.date
+              }
+              lastSendDistance.current = sumsInMeters
             })
             .catch(err => { });
         });

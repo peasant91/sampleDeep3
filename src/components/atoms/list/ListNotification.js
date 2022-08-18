@@ -21,11 +21,11 @@ const ListNotification = ({data, onPress}) => {
           alignItems: 'flex-start',
         }}>
         <Image
-          source={{uri: getFullLink(data.icon)}}
+          source={{uri: data.icon}}
           style={{width: 24, height: 24, borderRadius: 24, resizeMode: 'cover'}}
         />
 
-        <View style={{flex: 1, paddingLeft: 10}}>
+        <View style={{flex: 1, paddingLeft: 10,paddingRight: 10}}>
           <View
             style={{
               flexDirection: 'row',

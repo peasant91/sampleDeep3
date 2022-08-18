@@ -65,7 +65,7 @@ export const initBackground = () => {
   BackgroundGeolocation.configure({
     desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
     stationaryRadius: 50,
-    distanceFilter: 100,
+    distanceFilter: 50,
     interval: 10000,
     fastestInterval: 10000,
     activitiesInterval: 10000,
