@@ -35,14 +35,14 @@ const NotificationScreen = ({navigation, route}) => {
         break;
       case 'contract_detail':
         navigation.navigate('CurrentContract', {
-          id: id,
+          id: item.model_id,
           isEmpty: false,
           isCurrent: true,
         })
         break;
       case 'contract_history':
         navigation.navigate('CurrentContract', {
-          id: id,
+          id: item.model_id,
           isEmpty: false,
           isCurrent: false,
         })
@@ -51,6 +51,7 @@ const NotificationScreen = ({navigation, route}) => {
         navigation.navigate('Offer');
         break;
       default:
+        navigation.navigate('IncomeDetail');
         break;
     }
   };

@@ -176,8 +176,11 @@ const App = ({ navigation, route }) => {
           }).then(realm => {
             realm.write(() => realm.deleteAll());
             AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
-              dispatch({ type: 'SIGN_OUT' });
+              AsyncStorage.removeItem(StorageKey.KEY_ELAPSED_TIME).then(_ =>{
+                dispatch({ type: 'SIGN_OUT' });
+              })
             })
+            
           })
         }).catch(err => {
           BackgroundGeolocation.stop()
@@ -189,7 +192,9 @@ const App = ({ navigation, route }) => {
           }).then(realm => {
             realm.write(() => realm.deleteAll());
             AsyncStorage.removeItem(StorageKey.KEY_ACCESS_TOKEN).then(_ => {
-              dispatch({ type: 'SIGN_OUT' });
+              AsyncStorage.removeItem(StorageKey.KEY_ELAPSED_TIME).then(_ =>{
+                dispatch({ type: 'SIGN_OUT' });
+              })
             })
           })
         })
@@ -320,6 +325,7 @@ const App = ({ navigation, route }) => {
           RootNavigation.navigate('Offer');
           break;
         default:
+          RootNavigation.navigate('IncomeDetail');
           break;
       }
     });
