@@ -107,11 +107,11 @@ const MainTabScreen = ({ navigation, route }) => {
     });
   }, []);
 
-  useLayoutEffect(()=>{
+  useLayoutEffect(() => {
     return () => {
       BackgroundGeolocation.removeAllListeners
     }
-  },[])
+  }, [])
 
   const onLocationChange = async location => {
     const distance = currentPosition?.current.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.current.latitude, currentPosition?.current.longitude);
@@ -149,24 +149,24 @@ const MainTabScreen = ({ navigation, route }) => {
     Realm.open({
       path: 'otomedia',
       schema: [SpeedSchema, DistanceSchema],
-    }).then( async realm => {
+    }).then(async realm => {
       const distances = realm.objects('Distance');
       if (distances.length > 0) {
         const sums = sum(distances.map(item => item.distance));
         const sumsInMeters = (sums * 1000).toFixed(2)
 
-        console.log("sums in meters",sumsInMeters);
-        console.log("last send distance",lastSendDistance.current);
-        console.log("distance diff",sumsInMeters - lastSendDistance.current);
+        console.log("sums in meters", sumsInMeters);
+        console.log("last send distance", lastSendDistance.current);
+        console.log("distance diff", sumsInMeters - lastSendDistance.current);
 
-        if ((sumsInMeters - lastSendDistance.current < 5 )) {
+        if ((sumsInMeters - lastSendDistance.current < 5)) {
           return
         }
         var isTraffic = false
-        if (sumsInMeters - lastSendTraffic.current >= 500){
+        if (sumsInMeters - lastSendTraffic.current >= 500) {
           isTraffic = true
         }
-        console.log("last sent time",lastSendTrafficTime.current);
+        console.log("last sent time", lastSendTrafficTime.current);
         AsyncStorage.getItem(StorageKey.KEY_ACTIVE_CONTRACT).then(id => {
           sendDistance({
             lat: location.latitude,
@@ -177,11 +177,11 @@ const MainTabScreen = ({ navigation, route }) => {
             last_date: isTraffic == false ? null : lastSendTrafficTime.current
           })
             .then(response => {
-              console.log("response send data",response);
-              if (!lastSendTrafficTime.current){
+              console.log("response send data", response);
+              if (!lastSendTrafficTime.current) {
                 lastSendTrafficTime.current = response.date
               }
-              if (isTraffic == true){
+              if (isTraffic == true) {
                 lastSendTraffic.current = sumsInMeters
                 lastSendTrafficTime.current = response.date
               }
@@ -233,9 +233,24 @@ const MainTabScreen = ({ navigation, route }) => {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: 'gray',
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Offer" component={OfferScreen} />
-      <Tab.Screen name="Account" component={AccountScreen} />
+      <Tab.Screen
+        options={{
+          tabBarLabel: "Beranda",
+        }}
+        name="Home"
+        component={HomeScreen} />
+      <Tab.Screen
+        options={{
+          tabBarLabel: "Penawaran",
+        }}
+        name="Offer"
+        component={OfferScreen} />
+      <Tab.Screen
+        options={{
+          tabBarLabel: "Beranda",
+        }}
+        name="Account" 
+        component={AccountScreen} />
     </Tab.Navigator>
   );
 };
