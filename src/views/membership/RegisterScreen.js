@@ -75,6 +75,7 @@ import {
 import {useToast} from 'react-native-toast-notifications';
 import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
+import ModalActivityIndicator from '../../components/molecules/ModalActivityIndicator';
 
 const dummyDivision = [
   {
@@ -289,7 +290,7 @@ const RegisterScreen = ({navigation, route}) => {
       state: state,
     });
 
-    console.log('detail form', stateDetail);
+    //console.log('detail form', stateDetail);
 
     onPickDate(data.birth_date);
   };
@@ -553,7 +554,7 @@ const RegisterScreen = ({navigation, route}) => {
     } else {
       selectedId = formStateAddress.inputValues[id];
     }
-    console.log(selectedId);
+    console.log("selected id",selectedId);
     navigation.navigate('Picker', {
       pickerId: id,
       title: title,
@@ -579,21 +580,29 @@ const RegisterScreen = ({navigation, route}) => {
     translateForm();
   }, []);
 
-  useEffect(() => {
-    const getDriverPartner = async () => {
+  const fetchPreloadData = async()=>{
+    try{
       const partner = await getDriverRekanan();
       setPartnerData(partner);
-    };
-    getDriverPartner();
-  }, []);
+      const city = await getCity(data.province.id)
+      setcityData(city)  
+      const district = await getDistrict(data.city.id)
+      setdistrictData(district)
+      const village = await getVillage(data.district.id)
+      setvillageData(village)
+      setpreloading(false);
+    }catch(e){
+      showDialog(e)
+    }
+  }
 
   useEffect(() => {
-    console.log(route.params);
+    console.log("parames",route.params);
 
     if (route.params?.pickerId) {
       const id = route.params.pickerId;
       const dispatch = route.params.dispatch;
-      console.log(id);
+      console.log("picker id",id);
       dispatch({
         type: 'picker',
         id: id,
@@ -691,14 +700,9 @@ const RegisterScreen = ({navigation, route}) => {
   useEffect(() => {
     if (isEdit) {
       console.log('data', data);
-      getCity(data.province.id).then(response => setcityData(response));
-      getDistrict(data.city.id).then(response => setdistrictData(response));
-      getVillage(data.district.id).then(response => {
-        setvillageData(response);
-        setTimeout(() => {
-          setpreloading(false);
-        }, 500);
-      });
+      fetchPreloadData()
+    }else{
+      setpreloading(false)
     }
   }, []);
 
@@ -1258,6 +1262,7 @@ const RegisterScreen = ({navigation, route}) => {
           )}
         </View>
       </CustomSheet>
+      <ModalActivityIndicator show={preloading} />
     </SafeAreaView>
   );
 };

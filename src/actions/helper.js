@@ -227,7 +227,7 @@ export const getImageBase64FromUrl = url =>
       })
       .then(base64Data => {
         // here's base64 encoded image
-        console.log('base64', base64Data);
+        //console.log('base64', base64Data);
         resolve('data:image/jpeg;base64,' + base64Data);
         // remove the file from storage
       })
