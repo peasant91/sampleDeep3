@@ -33,6 +33,8 @@ import translate from '../../locales/translate';
 import Config from '../../constants/Config';
 import Constant from '../../constants/Constant';
 import { getFirebaseToken } from '../../actions/helper';
+import IconLogo from '../../assets/images/oto_logo.svg';
+import IconBg from '../../assets/images/login_bg_top.svg';
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
@@ -75,11 +77,11 @@ const LoginScreen = ({ navigation, route }) => {
     if (formState.formIsValid) {
       setIsLoading(true);
       try {
-      var token = await AsyncStorage.getItem(StorageKey.KEY_FIREBASE_TOKEN)
-        if (!token){
+        var token = await AsyncStorage.getItem(StorageKey.KEY_FIREBASE_TOKEN)
+        if (!token) {
           token = await getFirebaseToken()
         }
-        console.log("fcm",token);
+        console.log("fcm", token);
         login({
           ...formState.inputValues,
           fcm_token: token
@@ -136,7 +138,13 @@ const LoginScreen = ({ navigation, route }) => {
             contentContainerStyle={{ flexGrow: 1 }}>
             <View style={style.container}>
               <View style={{ flex: 1 }}>
-                <Image
+                <View style={{alignItems:'center' }}>
+                  <IconBg/>
+                  <IconLogo
+                  style={{marginTop:16}}
+                  />
+                </View>
+                {/* <Image
                   source={require('../../assets/images/ic_login.png')}
                   style={{
                     width: '100%',
@@ -144,7 +152,7 @@ const LoginScreen = ({ navigation, route }) => {
                     aspectRatio: 1.8,
                     resizeMode: 'cover',
                   }}
-                />
+                /> */}
 
                 <View style={{ padding: 16 }}>
                   <PhoneInput

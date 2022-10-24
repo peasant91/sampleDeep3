@@ -32,6 +32,10 @@ import translate from '../locales/translate';
 import { getBank, getColor, getCompanies, getDivisionApi, getGender, getProvince, getVehicleOwnership, getVehicleSticker, getVehicleType, getVehicleUsage } from '../services/utilities';
 import messaging, { firebase } from '@react-native-firebase/messaging';
 import { useIsFocused } from '@react-navigation/native';
+import IconLogo from '../assets/images/oto_logo.svg';
+import IconBgBottom from '../assets/images/splash_bottom_bg.svg'
+import IconBgTop from '../assets/images/splash_top_bg.svg'
+
 
 import axios from 'axios';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
@@ -90,11 +94,11 @@ const SplashScreen = ({ navigation, route }) => {
   const getProvinceApi = async () => {
     getProvince()
       .then(response => {
-        
-        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response)).then(() =>{
+
+        AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(response)).then(() => {
           getCompaniesApi()
-        }).catch(err=>{
-          showDialog(JSON.stringify(err));  
+        }).catch(err => {
+          showDialog(JSON.stringify(err));
         })
       })
       .catch(err => {
@@ -327,13 +331,19 @@ const SplashScreen = ({ navigation, route }) => {
         backgroundColor={'#0D233D'}
         barStyle="light-content"></StatusBar>
       <View style={styles.container}>
-        <Image
-          source={require('../assets/background/bg_splash.png')}
-          style={{ width: '100%', height: '100%' }}
-          resizeMode='contain'
-        />
-        {/* <BGSplash style={{width: '100%', height: '100%'}} /> */}
-        {/* <Image source={require('../assets/images/img_top_logo.png')} /> */}
+        <View style={{ flex: 1 }}>
+          <IconBgTop
+            preserveAspectRatio="none"
+            height='100%'
+          />
+        </View>
+        <IconLogo />
+        <View style={{ flex: 1 }}>
+          <IconBgBottom
+            preserveAspectRatio="none"
+            height='100%'
+          />
+        </View>
       </View>
       <View style={styles.versionContainer}>
         {/* <ActivityIndicator size="small" color={Colors.primary} /> */}
@@ -349,16 +359,13 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   versionContainer: {
     flexDirection: 'column',
-    width: '100%',
-    position: 'absolute',
     alignItems: 'center',
     padding: 16,
-    bottom: 16,
+    backgroundColor:'white'
   },
 });
 

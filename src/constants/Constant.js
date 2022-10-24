@@ -1,7 +1,7 @@
 export default {
   PHONE_NUMBER: '62818900603',
   PACKAGE_ID: 'id.otomedia.android',
-  TERMS_URL: 'http://otomedia.co.id/term-conditions.html',
+  TERMS_URL: 'https://otomedia.co.id/term-conditions.html',
   TOM_API_KEY: '8JY6MkByK0sBGwhG2w4VVaPYCAHGLjx0',
 
   dev: {

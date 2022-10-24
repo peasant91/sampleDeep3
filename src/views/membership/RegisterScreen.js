@@ -27,16 +27,16 @@ import CustomInput, {
   PickerInput,
   PasswordInput,
 } from '../../components/atoms/CustomInput';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import formReducer from '../../reducers/formReducer.js';
 import {
   showDialog,
   dismissDialog,
   showLocationAlwaysDialog,
 } from '../../actions/commonActions';
-import {register, updateProfile, validateRegister} from '../../services/auth';
+import { register, updateProfile, validateRegister } from '../../services/auth';
 import NavBar from '../../components/atoms/NavBar';
-import {Image} from 'react-native-elements';
+import { Image } from 'react-native-elements';
 import DatePicker from 'react-native-date-picker';
 import CustomSheet from '../../components/atoms/CustomSheet';
 
@@ -49,7 +49,7 @@ import IconCalendar from '../../assets/images/ic_calendar.svg';
 
 import GenderComponents from '../../components/molecules/GenderComponents';
 import IDCard from '../../components/atoms/IDCard';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
 import {
@@ -62,8 +62,8 @@ import {
 import moment from 'moment';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
-import {getFullLink, getImageBase64FromUrl} from '../../actions/helper';
-import {getUserBank} from '../../services/user';
+import { getFullLink, getImageBase64FromUrl } from '../../actions/helper';
+import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
 import {
   check,
@@ -72,7 +72,7 @@ import {
   request,
   RESULTS,
 } from 'react-native-permissions';
-import {useToast} from 'react-native-toast-notifications';
+import { useToast } from 'react-native-toast-notifications';
 import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
 import ModalActivityIndicator from '../../components/molecules/ModalActivityIndicator';
@@ -92,7 +92,7 @@ const dummyDivision = [
   },
 ];
 
-const RegisterScreen = ({navigation, route}) => {
+const RegisterScreen = ({ navigation, route }) => {
   const [companyData, setcompanyData] = useState();
   const [provinceData, setprovinceData] = useState();
   const [cityData, setcityData] = useState();
@@ -108,7 +108,7 @@ const RegisterScreen = ({navigation, route}) => {
   const [openDate, setopenDate] = useState(false);
   const [isEdited, setisEdited] = useState(false);
 
-  const {isEdit, data, isVerified} = route.params;
+  const { isEdit, data, isVerified } = route.params;
   const toast = useToast();
   const toastMessage = useRef(translate('please_select_province'));
 
@@ -209,7 +209,7 @@ const RegisterScreen = ({navigation, route}) => {
 
   //translate form into input state if edit profile
   const translateForm = async () => {
-    console.log('translateForm', data.city.id);
+    console.log('translateForm', data);
     const state = {
       inputValues: {
         name: data.name,
@@ -227,9 +227,9 @@ const RegisterScreen = ({navigation, route}) => {
         driver_company_id_value: data.driver_company?.name,
         driver_partner_id: data.driver_partner?.id,
         driver_partner_id_value: data.driver_partner?.name,
-        profile_image: await getImageBase64FromUrl(
+        profile_image: data.profile_image ? await getImageBase64FromUrl(
           data.profile_image,
-        ),
+        ) : null,
         profile_image_uri: data.profile_image,
         gender: data.gender,
       },
@@ -255,20 +255,22 @@ const RegisterScreen = ({navigation, route}) => {
     const stateCard = {
       inputValues: {
         ktp: data.ktp.number,
-        ktp_image : await getImageBase64FromUrl(
+        ktp_image: data.ktp.image ? await getImageBase64FromUrl(
           data.ktp.image,
-        ),
+        ) : null,
         ktp_image_uri: data.ktp.image,
         sim_a: data.sim_a.number,
-        sim_a_image: await getImageBase64FromUrl(
+        sim_a_image: data.sim_a.image ? await getImageBase64FromUrl(
           data.sim_a.image,
-        ),
+        ) : null,
         sim_a_image_uri: data.sim_a.image,
         sim_b: data.sim_b?.number,
         sim_b_image_uri: data.sim_b?.image,
       },
       formIsValid: true,
     };
+
+    console.log("state detail",stateDetail);
 
     dispatchDetail({
       type: 'update',
@@ -319,7 +321,7 @@ const RegisterScreen = ({navigation, route}) => {
   //delete village_id if manual input
   const getFormAddress = () => {
     if (formStateAddress.inputValues.village_name) {
-      const {village_id, ...object} = formStateAddress.inputValues;
+      const { village_id, ...object } = formStateAddress.inputValues;
       return object;
     } else {
       return formStateAddress.inputValues;
@@ -347,7 +349,7 @@ const RegisterScreen = ({navigation, route}) => {
       updateProfile(data)
         .then(() => {
           setIsLoading(false);
-          navigation.navigate('Account', {isChangeProfile: true}, true);
+          navigation.navigate('Account', { isChangeProfile: true }, true);
         })
         .catch(err => {
           setIsLoading(false);
@@ -364,7 +366,7 @@ const RegisterScreen = ({navigation, route}) => {
       .then(response => {
         setIsLoading(false);
         data.password = '';
-        navigation.navigate('RegisterPassword', {data: data});
+        navigation.navigate('RegisterPassword', { data: data });
       })
       .catch(error => {
         setIsLoading(false);
@@ -417,7 +419,7 @@ const RegisterScreen = ({navigation, route}) => {
       uri: undefined,
       isValid:
         selectedPicker.id == 'profile_image' ||
-        selectedPicker.id == 'sim_b_image'
+          selectedPicker.id == 'sim_b_image'
           ? true
           : false,
     });
@@ -554,7 +556,7 @@ const RegisterScreen = ({navigation, route}) => {
     } else {
       selectedId = formStateAddress.inputValues[id];
     }
-    console.log("selected id",selectedId);
+    console.log("selected id", selectedId);
     navigation.navigate('Picker', {
       pickerId: id,
       title: title,
@@ -580,29 +582,34 @@ const RegisterScreen = ({navigation, route}) => {
     translateForm();
   }, []);
 
-  const fetchPreloadData = async()=>{
-    try{
-      const partner = await getDriverRekanan();
-      setPartnerData(partner);
+  const getRekanan = async () => {
+    const partner = await getDriverRekanan();
+    setPartnerData(partner);
+  }
+
+  const fetchPreloadData = async () => {
+    try {
+      console.log("preloading data");
+      getRekanan()
       const city = await getCity(data.province.id)
-      setcityData(city)  
+      setcityData(city)
       const district = await getDistrict(data.city.id)
       setdistrictData(district)
       const village = await getVillage(data.district.id)
       setvillageData(village)
       setpreloading(false);
-    }catch(e){
+    } catch (e) {
       showDialog(e)
     }
   }
 
   useEffect(() => {
-    console.log("parames",route.params);
+    console.log("parames", route.params);
 
     if (route.params?.pickerId) {
       const id = route.params.pickerId;
       const dispatch = route.params.dispatch;
-      console.log("picker id",id);
+      console.log("picker id", id);
       dispatch({
         type: 'picker',
         id: id,
@@ -701,7 +708,8 @@ const RegisterScreen = ({navigation, route}) => {
     if (isEdit) {
       console.log('data', data);
       fetchPreloadData()
-    }else{
+    } else {
+      getRekanan()
       setpreloading(false)
     }
   }, []);
@@ -754,7 +762,7 @@ const RegisterScreen = ({navigation, route}) => {
   ]);
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
       <NavBar
         navigation={navigation}
@@ -763,21 +771,21 @@ const RegisterScreen = ({navigation, route}) => {
         onBackPress={showBackPrompt}
       />
       <KeyboardAvoidingView
-        style={{flex: 1, zIndex: -1}}
+        style={{ flex: 1, zIndex: -1 }}
         behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
         <ScrollView style={styles.container}>
-          <View style={{paddingBottom: 40}}>
+          <View style={{ paddingBottom: 40 }}>
             {!isEdit && (
               <View>
                 <LatoBold>{translate('register_form_title')}</LatoBold>
-                <LatoRegular containerStyle={{marginTop: 5}}>
+                <LatoRegular containerStyle={{ marginTop: 5 }}>
                   {translate('register_form_desc')}
                 </LatoRegular>
               </View>
             )}
 
             <TouchableOpacity
-              style={{alignItems: 'center', margin: 16}}
+              style={{ alignItems: 'center', margin: 16 }}
               onPress={() => {
                 !isVerified
                   ? openImagePicker('profile_image', 'Detail', dispatchDetail)
@@ -790,8 +798,8 @@ const RegisterScreen = ({navigation, route}) => {
                       uri: formStateDetail.inputValues.profile_image_uri
                         ? formStateDetail.inputValues.profile_image_uri
                         : getFullLink(
-                            formStateDetail.inputValues.profile_image_uri,
-                          ),
+                          formStateDetail.inputValues.profile_image_uri,
+                        ),
                     }}
                     style={{
                       width: 80,
@@ -805,7 +813,7 @@ const RegisterScreen = ({navigation, route}) => {
                 )}
                 {!isVerified && (
                   <IconProfileAddImage
-                    style={{position: 'absolute', bottom: 0, right: 0}}
+                    style={{ position: 'absolute', bottom: 0, right: 0 }}
                   />
                 )}
               </View>
@@ -827,7 +835,7 @@ const RegisterScreen = ({navigation, route}) => {
               title={translate('phone_title')}
               placeholder={translate('phone_placeholder')}
               dispatcher={dispatch}
-              containerStyle={{marginVertical: 16}}
+              containerStyle={{ marginVertical: 16 }}
               value={formState.inputValues.phone1}
               isCheck={formState.isChecked}
               viewOnly={isVerified}
@@ -850,7 +858,7 @@ const RegisterScreen = ({navigation, route}) => {
               id={'email'}
               title={translate('email_title')}
               placeholder={translate('email_placeholder')}
-              containerStyle={{marginVertical: 16}}
+              containerStyle={{ marginVertical: 16 }}
               dispatcher={dispatch}
               value={formState.inputValues.email}
               isCheck={formState.isChecked}
@@ -878,7 +886,7 @@ const RegisterScreen = ({navigation, route}) => {
 
             <InfoMenu
               text={translate('company_bank_info')}
-              containerStyle={{marginTop: 16}}
+              containerStyle={{ marginTop: 16 }}
             />
 
             <PickerInput
@@ -887,7 +895,7 @@ const RegisterScreen = ({navigation, route}) => {
               placeholder={translate('partner_placeholder')}
               value={formStateDetail.inputValues.driver_partner_id_value}
               viewOnly={isVerified}
-              containerStyle={{marginTop: 16}}
+              containerStyle={{ marginTop: 16 }}
               disabled={isVerified}
               onPress={() => {
                 openPicker(
@@ -905,7 +913,7 @@ const RegisterScreen = ({navigation, route}) => {
               title={translate('address_title')}
               placeholder={translate('address_placeholder')}
               value={formStateAddress.inputValues.address}
-              containerStyle={{marginVertical: 16}}
+              containerStyle={{ marginVertical: 16 }}
               dispatcher={dispatchAddress}
               isCheck={formState.isChecked}
               required
@@ -934,7 +942,7 @@ const RegisterScreen = ({navigation, route}) => {
             <PickerInput
               id={'city_id'}
               title={translate('city_title')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               placeholder={translate('city_placeholder')}
               value={formStateAddress.inputValues.city_id_value}
               isCheck={formState.isChecked}
@@ -944,18 +952,18 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() =>
                 cityData == null
                   ? toast.show(toastMessage.current, {
-                      type: 'custom',
-                      placement: 'bottom',
-                      duration: 2000,
-                      offset: 30,
-                      animationType: 'slide-in',
-                    })
+                    type: 'custom',
+                    placement: 'bottom',
+                    duration: 2000,
+                    offset: 30,
+                    animationType: 'slide-in',
+                  })
                   : openPicker(
-                      'city_id',
-                      'city_title',
-                      cityData,
-                      dispatchAddress,
-                    )
+                    'city_id',
+                    'city_title',
+                    cityData,
+                    dispatchAddress,
+                  )
               }
               required
             />
@@ -972,18 +980,18 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() =>
                 districtData == null
                   ? toast.show(toastMessage.current, {
-                      type: 'custom',
-                      placement: 'bottom',
-                      duration: 2000,
-                      offset: 30,
-                      animationType: 'slide-in',
-                    })
+                    type: 'custom',
+                    placement: 'bottom',
+                    duration: 2000,
+                    offset: 30,
+                    animationType: 'slide-in',
+                  })
                   : openPicker(
-                      'district_id',
-                      'district_title',
-                      districtData,
-                      dispatchAddress,
-                    )
+                    'district_id',
+                    'district_title',
+                    districtData,
+                    dispatchAddress,
+                  )
               }
               required
             />
@@ -991,7 +999,7 @@ const RegisterScreen = ({navigation, route}) => {
             <PickerInput
               id={'village_id'}
               title={translate('village_title')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               placeholder={translate('village_placeholder')}
               value={formStateAddress.inputValues.village_id_value}
               isCheck={formState.isChecked}
@@ -1001,18 +1009,18 @@ const RegisterScreen = ({navigation, route}) => {
               onPress={() =>
                 villageData == null
                   ? toast.show(toastMessage.current, {
-                      type: 'custom',
-                      placement: 'bottom',
-                      duration: 2000,
-                      offset: 30,
-                      animationType: 'slide-in',
-                    })
+                    type: 'custom',
+                    placement: 'bottom',
+                    duration: 2000,
+                    offset: 30,
+                    animationType: 'slide-in',
+                  })
                   : openPicker(
-                      'village_id',
-                      'village_title',
-                      villageData,
-                      dispatchAddress,
-                    )
+                    'village_id',
+                    'village_title',
+                    villageData,
+                    dispatchAddress,
+                  )
               }
               required
             />
@@ -1022,7 +1030,7 @@ const RegisterScreen = ({navigation, route}) => {
                 <CustomInput
                   id={'village_name'}
                   title={translate('manual_input')}
-                  containerStyle={{paddingBottom: 16}}
+                  containerStyle={{ paddingBottom: 16 }}
                   placeholder={translate('village_placeholder')}
                   value={formStateAddress.inputValues.village_name}
                   isCheck={formState.isChecked}
@@ -1045,7 +1053,7 @@ const RegisterScreen = ({navigation, route}) => {
             />
 
             <GenderComponents
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               selectedId={formStateDetail.inputValues.gender}
               isCheck={formState.isChecked}
               disabled={isVerified}
@@ -1070,7 +1078,7 @@ const RegisterScreen = ({navigation, route}) => {
                   id={'bank_id'}
                   title={translate('bank_title')}
                   placeholder={translate('bank_placeholder')}
-                  containerStyle={{paddingVertical: 16}}
+                  containerStyle={{ paddingVertical: 16 }}
                   value={formStateBank.inputValues.bank_id_value}
                   isCheck={formState.isChecked}
                   required
@@ -1096,7 +1104,7 @@ const RegisterScreen = ({navigation, route}) => {
                   id={'branch'}
                   title={translate('branch_title')}
                   placeholder={translate('branch_placeholder')}
-                  containerStyle={{paddingVertical: 16}}
+                  containerStyle={{ paddingVertical: 16 }}
                   value={formStateBank.inputValues.branch}
                   dispatcher={dispatchBank}
                   isCheck={formState.isChecked}
@@ -1119,9 +1127,9 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomInput
               id={'ktp'}
-              title={translate('number', {string: translate('ktp')})}
+              title={translate('number', { string: translate('ktp') })}
               placeholder={translate('ktp_placeholder')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               value={formStateCard.inputValues.ktp}
               dispatcher={dispatchCard}
               viewOnly={isVerified}
@@ -1145,9 +1153,9 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomInput
               id={'sim_a'}
-              title={translate('number', {string: translate('sim_a')})}
+              title={translate('number', { string: translate('sim_a') })}
               placeholder={translate('sim_placeholder')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               value={formStateCard.inputValues.sim_a}
               dispatcher={dispatchCard}
               viewOnly={isVerified}
@@ -1171,9 +1179,9 @@ const RegisterScreen = ({navigation, route}) => {
 
             <CustomInput
               id={'sim_b'}
-              title={translate('number', {string: translate('sim_b')})}
+              title={translate('number', { string: translate('sim_b') })}
               placeholder={translate('sim_placeholder')}
-              containerStyle={{paddingVertical: 16}}
+              containerStyle={{ paddingVertical: 16 }}
               value={formStateCard.inputValues.sim_b}
               dispatcher={dispatchCard}
               viewOnly={isVerified}
@@ -1198,7 +1206,7 @@ const RegisterScreen = ({navigation, route}) => {
               <CustomButton
                 types="primary"
                 title={translate('next')}
-                containerStyle={{marginTop: 16}}
+                containerStyle={{ marginTop: 16 }}
                 onPress={doRegister}
                 isLoading={isLoading}
               />
@@ -1219,11 +1227,11 @@ const RegisterScreen = ({navigation, route}) => {
       />
 
       <CustomSheet ref={pickerSheet}>
-        <View style={{padding: 16}}>
+        <View style={{ padding: 16 }}>
           <LatoBold>{translate('pick_photo')}</LatoBold>
           <TouchableOpacity
             onPress={() => setimagePickerId(1)}
-            style={{marginVertical: 10}}>
+            style={{ marginVertical: 10 }}>
             <LatoRegular Icon={IconGallery}>
               {translate('pick_gallery')}
             </LatoRegular>
