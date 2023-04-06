@@ -31,6 +31,8 @@ import DistanceChart from '../../../components/atoms/DistanceChart';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useIsFocused} from '@react-navigation/native';
 import moment from 'moment';
+import InfoMenu from "../../../components/atoms/InfoMenu";
+import CustomButton from "../../../components/atoms/CustomButton";
 
 const dummyReport = [
   {
@@ -371,6 +373,15 @@ const CurrentContractScreen = ({navigation, route}) => {
                       {translate('+create_report')}
                     </LatoBold>
                   </TouchableOpacity>
+
+                  <InfoMenu
+                      text={"Masih kesulitan untuk buat report mingguan dengan benar?"}
+                      containerStyle={{margin: 16}}
+                      actionButton={true}
+                      actionButtonTitle={"Lihat Panduan"}
+                      actionButtonAction={() => {}}
+                  />
+
                 </View>
               )}
 

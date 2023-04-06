@@ -72,6 +72,7 @@
     "ktp": "KTP",
     "sim_a": "Sim A",
     "sim_b": "Sim B",
+    "sim_c": "Sim C",
     "take_picture": "Ambil gambar %{string}",
     "save": "Simpan",
     "go_to_login": "Ke Halaman Login",
@@ -89,7 +90,7 @@
     "register_form_desc" : "Silahkan Isi Data diri Anda dengan lengkap.",
 
     "back_to_login": "Kembali ke Login",
-    "back_to_home": "Kembali ke Beranda",   
+    "back_to_home": "Kembali ke Beranda",
 
     "my_profile": "Profilku",
     "change_password": "Ganti Kata Sandi",
@@ -306,5 +307,5 @@
     "report_invalid_desc": "Anda bisa membuat laporan jika campaign sudah dimulai.",
     "rejected": "Verifikasi ditolak",
     "blocked": "Akun di nonaktifkan"
-    
+
 }

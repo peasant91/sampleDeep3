@@ -74,6 +74,7 @@ import { showDialog } from './src/actions/commonActions';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import notifee, { EventType } from '@notifee/react-native';
 import { DistanceSchema, SpeedSchema } from './src/data/realm/speed';
+import PickerCompanyScreen from "./src/views/PickerCompanyScreen";
 
 //realm
 
@@ -180,7 +181,7 @@ const App = ({ navigation, route }) => {
                 dispatch({ type: 'SIGN_OUT' });
               })
             })
-            
+
           })
         }).catch(err => {
           BackgroundGeolocation.stop()
@@ -502,6 +503,11 @@ const App = ({ navigation, route }) => {
                       component={PickerScreen}
                       options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name={"PickerCompany"}
+                        component={PickerCompanyScreen}
+                        options={{headerShown: false}}
+                        />
                     <Stack.Screen
                       name="Success"
                       component={SuccessScreen}

@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
     marginHorizontal: 16,
     backgroundColor: 'white',
-    borderRadius: 5,
+    borderRadius: 12,
   },
 });
 

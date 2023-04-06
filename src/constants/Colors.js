@@ -2,6 +2,7 @@ export default {
     primary: '#20215A',
     darkPrimary: '#172B4D',
     lightPrimary: '#CFCFFD',
+    lightestPrimary: "#EEEEFF",
     primaryText: '#323232',
     secondText: '#78849E',
     secondary: '#00B2FF',
@@ -20,6 +21,7 @@ export default {
     subGray: '#737373',
     darkRed: '#CB3A31',
     darkBrown: '#CD7B2E',
-    lightBrown: '#FFF2E2'
+    lightBrown: '#FFF2E2',
+    white: '#FFFFFF',
 
 }
