@@ -27,6 +27,7 @@ import axios from 'axios'
 import { getFullLink, getImageBase64FromUrl } from '../../actions/helper'
 import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
+import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
 
 
 const RegisterVehicleScreen = ({ navigation, route }) => {
@@ -183,7 +184,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
 
   const openGalleryPicker = async () => {
     if (Platform.OS == 'android') {
-      const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+      const permission = await checkGalleryPermission()
       console.log(permission)
       if (permission == RESULTS.BLOCKED) {
         showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
@@ -191,7 +192,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       }
 
       if (permission == RESULTS.DENIED) {
-        const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        const result = await requestGalleryPermission()
         console.log(result)
         if (result != RESULTS.GRANTED) {
           showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)

@@ -237,6 +237,7 @@ const SplashScreen = ({ navigation, route }) => {
       }
 
     } catch (err) {
+      console.log('err', err)
       showDialog(
         err.message,
         false,

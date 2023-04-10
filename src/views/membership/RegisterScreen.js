@@ -77,6 +77,8 @@ import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
 import ModalActivityIndicator from '../../components/molecules/ModalActivityIndicator';
 import CustomCheckbox from "../../components/atoms/Checkbox";
+import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
+import {AccountTypeEnum} from "../../data/enums/AccountTypeEnum";
 
 const dummyDivision = [
     {
@@ -147,6 +149,8 @@ const RegisterScreen = ({navigation, route}) => {
     const [formStateDetail, dispatchDetail] = useReducer(formReducer, {
         inputValues: {
             gender: '',
+            account_type: AccountTypeEnum.INDIVIDUAL,
+            driver_company_request: "",
             is_company: false,
         },
         inputValidities: {
@@ -310,7 +314,7 @@ const RegisterScreen = ({navigation, route}) => {
     const buildCardForm = () => {
         //console.log('cardform', formStateCard.inputValues)
         var card = [];
-        for (item in Config.cardList) {
+        for (let item in Config.cardList) {
             if (
                 formStateCard.inputValues[Config.cardList[item]] &&
                 formStateCard.inputValues[`${Config.cardList[item]}_image`]
@@ -366,7 +370,8 @@ const RegisterScreen = ({navigation, route}) => {
                     showDialog(err.message);
                 });
         } else {
-            validate(data);
+            console.log("data", JSON.stringify(data, null, 2))
+            // validate(data);
         }
     };
 
@@ -450,7 +455,7 @@ const RegisterScreen = ({navigation, route}) => {
 
     const openGalleryPicker = async () => {
         if (Platform.OS == 'android') {
-            const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+            const permission = await checkGalleryPermission();
             console.log(permission);
             if (permission == RESULTS.BLOCKED) {
                 showDialog(
@@ -466,7 +471,7 @@ const RegisterScreen = ({navigation, route}) => {
             }
 
             if (permission == RESULTS.DENIED) {
-                const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+                const result = await requestGalleryPermission();
                 console.log(result);
                 if (result != RESULTS.GRANTED) {
                     showDialog(
@@ -563,12 +568,56 @@ const RegisterScreen = ({navigation, route}) => {
             selectedId = formStateDetail.inputValues[id];
             navigation.navigate('PickerCompany', {
                 pickerId: id,
-                title: title,
                 data: data,
                 selectedId: selectedId,
                 isEdit: isEdit,
                 previousRoute: !isEdit ? 'Register' : 'EditProfile',
+                driver_company_request: formStateDetail?.inputValues?.driver_company_request,
                 dispatch: dispatch,
+
+                // onPressList: (id, name) => {
+                //     //make bank null if company is picked
+                //     dispatch({
+                //         type: 'input',
+                //         id: 'bank',
+                //         input: null,
+                //         isValid: true,
+                //     });
+                //     getUserBank(id).then(response => {
+                //         const state = {
+                //             inputValues: {
+                //                 bank_id: response.id,
+                //                 bank_id_value: response.bank_name,
+                //                 ...response,
+                //             },
+                //             formIsValid: true,
+                //         };
+                //         dispatchBank({
+                //             type: 'update',
+                //             state: state,
+                //         });
+                //     });
+                //
+                // },
+                // onSubmit:({
+                //               new_company,
+                //           }) => {
+                //     console.log("new company", new_company);
+                //     dispatchDetail({
+                //         type: "update",
+                //         state: {
+                //             ...formStateDetail,
+                //             inputValues: {
+                //                 ...formStateDetail.inputValues,
+                //                 account_type: AccountTypeEnum.INDIVIDUAL,
+                //                 driver_company_request: new_company,
+                //                 driver_company_id: null,
+                //                 driver_company_value: null
+                //             }
+                //
+                //         }
+                //     })
+                // }
             });
         } else {
             if (id == 'driver_company_id' || id == 'driver_partner_id') {
@@ -642,6 +691,21 @@ const RegisterScreen = ({navigation, route}) => {
             });
 
             if (id == 'driver_company_id') {
+                //set account type to company
+                dispatchDetail({
+                    type: 'update',
+                    state: {
+                        ...formStateDetail,
+                        inputValues: {
+                            ...formStateDetail.inputValues,
+                            account_type: AccountTypeEnum.COMPANY,
+                            driver_company_request: null,
+                            driver_company_id: route.params.id,
+                            driver_company_id_value: route.params.name,
+                        },
+                    },
+                })
+
                 //make bank null if company is picked
                 dispatch({
                     type: 'input',
@@ -649,6 +713,7 @@ const RegisterScreen = ({navigation, route}) => {
                     input: null,
                     isValid: true,
                 });
+
                 getUserBank(route.params.id).then(response => {
                     const state = {
                         inputValues: {
@@ -805,7 +870,7 @@ const RegisterScreen = ({navigation, route}) => {
                                     {translate('register_form_desc')}
                                 </LatoRegular>
                             </View>
-                        ): null}
+                        ) : null}
 
                         <TouchableOpacity
                             style={{alignItems: 'center', margin: 16}}
@@ -838,7 +903,7 @@ const RegisterScreen = ({navigation, route}) => {
                                     <IconProfileAddImage
                                         style={{position: 'absolute', bottom: 0, right: 0}}
                                     />
-                                ): null}
+                                ) : null}
                             </View>
                         </TouchableOpacity>
 
@@ -1171,7 +1236,7 @@ const RegisterScreen = ({navigation, route}) => {
                                     required
                                 />
                             </View>
-                        ): null}
+                        ) : null}
 
                         <CustomInput
                             id={'ktp'}

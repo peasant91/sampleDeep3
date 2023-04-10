@@ -19,6 +19,7 @@ import IconCamera from '../../../assets/images/ic_camera_picker.svg';
 import IconDelete from '../../../assets/images/ic_trash_black.svg';
 import Colors from '../../../constants/Colors'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
+import {checkGalleryPermission, requestGalleryPermission} from "../../../actions/permissionAction";
 
 const CrudReportScreen = ({ navigation, route }) => {
 
@@ -166,7 +167,7 @@ const CrudReportScreen = ({ navigation, route }) => {
 
     const openGalleryPicker = async selectedPicker => {
         if (Platform.OS == 'android') {
-            const permission = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+            const permission = await checkGalleryPermission()
             console.log(permission)
             if (permission == RESULTS.BLOCKED) {
                 showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
@@ -174,7 +175,7 @@ const CrudReportScreen = ({ navigation, route }) => {
             }
 
             if (permission == RESULTS.DENIED) {
-                const result = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+                const result = await requestGalleryPermission()
                 console.log(result)
                 if (result != RESULTS.GRANTED) {
                     showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)

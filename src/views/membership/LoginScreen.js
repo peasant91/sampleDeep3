@@ -1,29 +1,20 @@
-import React, {useState, useReducer, useEffect, useContext} from 'react';
+import React, {useContext, useReducer, useState} from 'react';
 import {
-    View,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    StatusBar,
+    KeyboardAvoidingView,
     SafeAreaView,
     ScrollView,
-    Keyboard,
-    KeyboardAvoidingView,
-    Image,
+    StatusBar,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import CustomText, {
-    LatoRegular,
-} from '../../components/atoms/CustomText';
+import {LatoBold, LatoRegular,} from '../../components/atoms/CustomText';
 import CustomButton from '../../components/atoms/CustomButton';
 import Colors from '../../constants/Colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
-import {showDialog, dismissDialog, showErrorDialog} from '../../actions/commonActions';
-import CustomInput, {
-    PasswordInput,
-    PhoneInput,
-} from '../../components/atoms/CustomInput';
-import {LatoBold} from '../../components/atoms/CustomText';
+import {showDialog, showErrorDialog} from '../../actions/commonActions';
+import {PasswordInput, PhoneInput,} from '../../components/atoms/CustomInput';
 import {login} from '../../services/auth';
 import formReducer from '../../reducers/formReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,7 +23,7 @@ import {AuthContext} from '../../../App';
 import translate from '../../locales/translate';
 import Config from '../../constants/Config';
 import Constant from '../../constants/Constant';
-import {getFirebaseToken} from '../../actions/helper';
+import {getFirebaseToken, openWhatsapp} from '../../actions/helper';
 import IconLogo from '../../assets/images/oto_logo.svg';
 import IconBg from '../../assets/images/login_bg_top.svg';
 
@@ -211,6 +202,13 @@ const LoginScreen = ({navigation, route}) => {
                                         onPress={doLogin}
                                         isLoading={isLoading}
                                     />
+                                    <CustomButton
+                                        types="secondary"
+                                        title={"DAFTAR DISINI"}
+                                        containerStyle={{marginTop: 12}}
+                                        onPress={goToRegister}
+                                    />
+
                                 </View>
                             </View>
 
@@ -245,11 +243,13 @@ const LoginScreen = ({navigation, route}) => {
                                             textDecorationLine: 'underline',
                                         }}>{translate('see_term_and_condition')}</LatoBold>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={goToRegister}>
+                                    <TouchableOpacity onPress={openWhatsapp}>
                                         <LatoBold style={{
                                             color: Colors.secondary,
                                             textDecorationLine: 'underline',
-                                        }}>{translate('register_here')}</LatoBold>
+                                        }}>
+                                            Hubungi Admin
+                                        </LatoBold>
                                     </TouchableOpacity>
                                 </View>
 

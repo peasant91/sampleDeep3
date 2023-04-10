@@ -150,7 +150,6 @@ export const PhoneInput = ({
 
     let isValid = true;
     setError(null);
-    console.log("text nih anjing",text);
     if (!optional){
       if (text == undefined || text.trim().length <= 0) {
         isValid = false;
@@ -169,7 +168,7 @@ export const PhoneInput = ({
     if (id === 'phone2' && isUniqueWith.length > 0){
       if (text === isUniqueWith){
           isValid = false
-          setError(translate('invalid_phone_unique'))     
+          setError(translate('invalid_phone_unique'))
       }
     }
 

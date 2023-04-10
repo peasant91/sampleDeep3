@@ -19,9 +19,33 @@ import formReducer from "../reducers/formReducer";
 
 const PickerCompanyScreen = ({navigation, route}) => {
 
-    const {pickerId, title, data, selectedId, isEdit, dispatch, isRegister} = route.params;
+    const {
+        pickerId,
+        data,
+        selectedId,
+        isEdit,
+        dispatch,
+        isRegister,
+        driver_company_request,
+        onSubmit,
+        // onPressList
+    } = route.params;
 
     const [filteredData, setfilteredData] = useState(data ? data : [])
+
+    const [formState, dispatchForm] = useReducer(formReducer, {
+        inputValues: {
+            company: driver_company_request,
+            isNewCompany: false,
+            selectedId: selectedId
+        },
+        inputValidities: {
+            // company: formState?.inputValues?.selectedId ? true : !!formState?.inputValues?.company?.length,
+            selectedId: true,
+        },
+        formIsValid: false,
+        isChecked: isEdit,
+    });
     const manualInputId = -99
 
     const onPressList = (id, name) => {
@@ -36,43 +60,46 @@ const PickerCompanyScreen = ({navigation, route}) => {
         }, true)
     }
 
-    const onPressReset = () => {
-        navigation.navigate(route.params.previousRoute, {
-            pickerId: pickerId,
-            id: undefined,
-            name: undefined,
-            isEdit: isEdit,
-            dispatch: dispatch,
-            isRegister: isRegister
-        }, true)
+    const handleSubmit = () => {
+        if (formState?.inputValues?.isNewCompany) {
+            onSubmit({
+                new_company: formState?.inputValues?.company,
+            })
+            navigation?.goBack()
+        } else {
+            navigation?.goBack()
+        }
     }
+
+    const onPressReset = () => {
+        // navigation.navigate(route.params.previousRoute, {
+        //     pickerId: pickerId,
+        //     id: undefined,
+        //     name: undefined,
+        //     isEdit: isEdit,
+        //     dispatch: dispatch,
+        //     isRegister: isRegister
+        // }, true)
+    }
+
 
     const onChangeText = (text) => {
         console.log(data)
+        if (text) {
+
+        }
         setfilteredData(data.filter(item => item.name.toLowerCase().includes(text.toLowerCase()) || item.address?.toLowerCase().includes(text.toLowerCase())))
     }
 
-    const [formState, dispatchForm] = useReducer(formReducer, {
-        inputValues: {
-            company: '',
-            isNewCompany: false,
-            selectedId: selectedId
-        },
-        inputValidities: {
-            // company: formState?.inputValues?.selectedId ? true : !!formState?.inputValues?.company?.length,
-            selectedId: true,
-        },
-        formIsValid: false,
-        isChecked: isEdit,
-    });
-
     useEffect(() => {
-        dispatchForm({
-            type: "input",
-            id: "selectedId",
-            input: selectedId,
-            isValid: !!selectedId
-        })
+        if (selectedId) {
+            dispatchForm({
+                type: "input",
+                id: "selectedId",
+                input: selectedId,
+                isValid: !!selectedId
+            })
+        }
     }, [selectedId]);
 
 
@@ -94,7 +121,7 @@ const PickerCompanyScreen = ({navigation, route}) => {
                         onChangeText={onChangeText}
                         rightIcon={IconSearch}
                         rightIconContainerStyle={{marginVertical: 0}}
-                        placeholder={translate('find_picker', {title: translate(title)})}
+                        placeholder={translate('find_picker', {title: "Perusahaan"})}
                         style={{flex: 1}}
                         containerStyle={{flex: 1, marginBottom: -15}}/>
                 </View>
@@ -174,14 +201,15 @@ const PickerCompanyScreen = ({navigation, route}) => {
 
                 </View>
                 <Divider/>
-                {filteredData.length <= 0 ? <EmptySearch title={translate(title)}/> :
+                {filteredData.length <= 0 ? <EmptySearch title={"Perusahaan"}/> :
                     <FlatList
                         contentContainerStyle={{paddingTop: 16}}
                         style={{flex: 0, flexShrink: 1}}
                         data={[...filteredData]}
                         keyExtractor={item => item.id}
                         renderItem={({item, index}) => {
-                            return <ListCompany data={item} onPress={onPressList} selectedId={formState?.inputValues?.selectedId}/>
+                            return <ListCompany data={item} onPress={onPressList}
+                                                selectedId={formState?.inputValues?.selectedId}/>
                         }}
                     />}
 
@@ -192,7 +220,8 @@ const PickerCompanyScreen = ({navigation, route}) => {
                     types="primary"
                     title='Simpan'
                     containerStyle={{margin: 16}}
-                    onPress={onPressReset}
+                    onPress={handleSubmit}
+                    // onPress={onPressReset}
                 />
             }
 
