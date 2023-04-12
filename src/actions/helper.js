@@ -10,6 +10,8 @@ import Realm from 'realm';
 import messaging, {firebase} from '@react-native-firebase/messaging';
 import {Linking, Platform} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
+import {check, PERMISSIONS} from "react-native-permissions";
+import Geolocation from "react-native-geolocation-service";
 
 export const getCurrentWeek = () => {
   currentdate = new Date();
@@ -235,3 +237,28 @@ export const getImageBase64FromUrl = url =>
         reject(err);
       });
   });
+
+export const checkIsFakeGPS = async (onLoad) => {
+  const isPermissionLocationGranted = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION) === "granted" && await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION) === "granted"
+      if(isPermissionLocationGranted){
+        Geolocation.getCurrentPosition(
+            (position) => {
+              console.log(position)
+              if(position?.mocked){
+                onLoad(true)
+              }else{
+                onLoad(false)
+              }
+            },
+            (error) => {
+              // See error code charts below.
+              console.log(error.code, error.message);
+              onLoad(false)
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+      }else{
+        console.log("permission not granted yet")
+        onLoad(false)
+      }
+};

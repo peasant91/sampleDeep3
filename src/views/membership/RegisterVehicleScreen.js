@@ -293,8 +293,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
 
     const formStateDetail = {
       inputValues: {
-        color_id: form.detail.color.id,
-        color_id_value: form.detail.color.name,
+        color : form.detail.color,
         images: form.images,
         model_vehicle_id: form.detail.vehicle_model.id,
         model_vehicle_id_value: form.detail.vehicle_model.name,
@@ -639,23 +638,35 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           required
         />
 
-        <PickerInput
-          id={'color_id'}
-          title={translate('car_color_title')}
-          placeholder={translate('car_color_placeholder')}
-          value={formStateDetail.inputValues.color_id_value}
-          onPress={() =>
-            openPicker('color_id', 'car_color_title', colorData, formStateDetail, dispatchDetail)
-          }
-          isCheck={formState.isChecked}
-          required
+        {/*<PickerInput*/}
+        {/*  id={'color_id'}*/}
+        {/*  title={translate('car_color_title')}*/}
+        {/*  placeholder={translate('car_color_placeholder')}*/}
+        {/*  value={formStateDetail.inputValues.color_id_value}*/}
+        {/*  onPress={() =>*/}
+        {/*    openPicker('color_id', 'car_color_title', colorData, formStateDetail, dispatchDetail)*/}
+        {/*  }*/}
+        {/*  isCheck={formState.isChecked}*/}
+        {/*  required*/}
+        {/*/>*/}
+
+        <CustomInput
+            id={'color'}
+            title={translate('car_color_title')}
+            placeholder={translate('car_color_placeholder')}
+            containerStyle={{ paddingBottom: 16 }}
+            value={formStateDetail.inputValues.color}
+            dispatcher={dispatchDetail}
+            isCheck={formState.isChecked}
+            required
         />
+
 
         <CustomInput
           id={'plate_number'}
           title={translate('car_plate_title')}
           placeholder={translate('car_plate_placeholder')}
-          containerStyle={{ paddingVertical: 16 }}
+          containerStyle={{ paddingBottom: 16 }}
           value={formStateDetail.inputValues.plate_number}
           dispatcher={dispatchDetail}
           isCheck={formState.isChecked}

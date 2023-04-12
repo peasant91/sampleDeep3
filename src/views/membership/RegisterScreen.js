@@ -79,6 +79,7 @@ import ModalActivityIndicator from '../../components/molecules/ModalActivityIndi
 import CustomCheckbox from "../../components/atoms/Checkbox";
 import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
 import {AccountTypeEnum} from "../../data/enums/AccountTypeEnum";
+import {useDeepEffect} from "../../hooks/useDeepEffect";
 
 const dummyDivision = [
     {
@@ -106,29 +107,29 @@ const RegisterScreen = ({navigation, route}) => {
     const [selectedPicker, setselectedPicker] = useState();
     const [imagePickerId, setimagePickerId] = useState(99);
     const [preloading, setpreloading] = useState(true);
-
+    //
     const [isLoading, setIsLoading] = useState(false);
     const [openDate, setopenDate] = useState(false);
     const [isEdited, setisEdited] = useState(false);
-
+    //
     const {isEdit, data, isVerified} = route.params;
     const toast = useToast();
     const toastMessage = useRef(translate('please_select_province'));
-
+    //
     const pickerSheet = useRef();
-
+    //
     const [formStateBank, dispatchBank] = useReducer(formReducer, {
         inputValues: {},
         inputValidities: {},
         formIsValid: isEdit,
     });
-
+    //
     const [formStateAddress, dispatchAddress] = useReducer(formReducer, {
         inputValues: {},
         inputValidities: {},
         formIsValid: isEdit,
     });
-
+    //
     const [formStateCard, dispatchCard] = useReducer(formReducer, {
         inputValues: {},
         inputValidities: {
@@ -145,27 +146,24 @@ const RegisterScreen = ({navigation, route}) => {
         },
         formIsValid: isEdit,
     });
-
+    //
     const [formStateDetail, dispatchDetail] = useReducer(formReducer, {
         inputValues: {
             gender: '',
-            account_type: AccountTypeEnum.INDIVIDUAL,
-            driver_company_request: "",
-            is_company: false,
         },
         inputValidities: {
             gender: isEdit,
         },
         formIsValid: isEdit,
     });
-
+    //
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {},
         inputValidities: {},
         formIsValid: isEdit,
         isChecked: false,
     });
-
+    //
     const showBackPrompt = () => {
         if (isEdited) {
             showDialog(
@@ -179,15 +177,15 @@ const RegisterScreen = ({navigation, route}) => {
             return;
         }
 
-        navigation.pop();
+        navigation?.pop();
     };
-
+    //
     const checkEdited = () => {
         if (isEdit && !isEdited) {
             setisEdited(true);
         }
     };
-
+    //
     const doRegister = () => {
         dispatch({
             type: 'check',
@@ -197,7 +195,7 @@ const RegisterScreen = ({navigation, route}) => {
             buildForm(formState);
         }
     };
-
+    //
     const isAllFormValid = () => {
         console.log('sim b input', formStateCard?.inputValues?.sim_b?.length);
         console.log(
@@ -205,6 +203,7 @@ const RegisterScreen = ({navigation, route}) => {
             formStateCard.inputValidities,
             formStateCard?.inputValues?.sim_b?.length,
         );
+
         return (
             formState.formIsValid &&
             formStateCard.formIsValid &&
@@ -214,10 +213,10 @@ const RegisterScreen = ({navigation, route}) => {
                 formStateDetail.inputValues.driver_company_id != null)
         );
     };
-
-    //translate form into input state if edit profile
+    //
+    // //translate form into input state if edit profile
     const translateForm = async () => {
-        console.log('translateForm', data);
+        console.log('translateForm', JSON.stringify(data, null, 2));
         const state = {
             inputValues: {
                 name: data.name,
@@ -240,10 +239,14 @@ const RegisterScreen = ({navigation, route}) => {
                 ) : null,
                 profile_image_uri: data.profile_image,
                 gender: data.gender,
-                is_company: data?.is_company,
+                is_company: ((data?.account_type === AccountTypeEnum.COMPANY) || !!data?.account_type) ,
+                account_type: data?.account_type,
+                driver_company_request: data?.driver_company_request
             },
             formIsValid: true,
         };
+
+        console.log("state detail value", JSON.stringify(stateDetail, null,2))
 
         const stateAddress = {
             inputValues: {
@@ -310,7 +313,7 @@ const RegisterScreen = ({navigation, route}) => {
 
         onPickDate(data.birth_date);
     };
-
+    //
     const buildCardForm = () => {
         //console.log('cardform', formStateCard.inputValues)
         var card = [];
@@ -331,8 +334,8 @@ const RegisterScreen = ({navigation, route}) => {
 
         return card;
     };
-
-    //delete village_id if manual input
+    //
+    // //delete village_id if manual input
     const getFormAddress = () => {
         if (formStateAddress.inputValues.village_name) {
             const {village_id, ...object} = formStateAddress.inputValues;
@@ -341,7 +344,7 @@ const RegisterScreen = ({navigation, route}) => {
             return formStateAddress.inputValues;
         }
     };
-
+    //
     const buildForm = formState => {
         const detail = {
             ...formStateDetail.inputValues,
@@ -370,11 +373,11 @@ const RegisterScreen = ({navigation, route}) => {
                     showDialog(err.message);
                 });
         } else {
-            console.log("data", JSON.stringify(data, null, 2))
-            // validate(data);
+            // console.log("data", JSON.stringify(data, null, 2))
+            validate(data);
         }
     };
-
+    //
     const validate = data => {
         setIsLoading(true);
         validateRegister(data)
@@ -409,9 +412,9 @@ const RegisterScreen = ({navigation, route}) => {
             isValid: true,
         });
     };
-
+    //
     useEffect(() => {
-        pickerSheet.current.close();
+        pickerSheet?.current?.close();
         setTimeout(() => {
             if (imagePickerId == 0) {
                 openCameraPicker(selectedPicker);
@@ -424,7 +427,7 @@ const RegisterScreen = ({navigation, route}) => {
             setimagePickerId(99);
         }, 500);
     }, [imagePickerId]);
-
+    //
     const deleteImage = selectedPicker => {
         console.log(selectedPicker.id);
         selectedPicker.dispatch({
@@ -439,7 +442,7 @@ const RegisterScreen = ({navigation, route}) => {
                     : false,
         });
     };
-
+    //
     const openCameraPicker = async () => {
         launchCamera(
             {
@@ -452,7 +455,7 @@ const RegisterScreen = ({navigation, route}) => {
             },
         );
     };
-
+    //
     const openGalleryPicker = async () => {
         if (Platform.OS == 'android') {
             const permission = await checkGalleryPermission();
@@ -574,50 +577,26 @@ const RegisterScreen = ({navigation, route}) => {
                 previousRoute: !isEdit ? 'Register' : 'EditProfile',
                 driver_company_request: formStateDetail?.inputValues?.driver_company_request,
                 dispatch: dispatch,
+                onSubmit:({
+                              new_company,
+                          }) => {
+                    console.log("new company", new_company);
+                    dispatchDetail({
+                        type: "update",
+                        state: {
+                            ...formStateDetail,
+                            inputValues: {
+                                ...formStateDetail.inputValues,
 
-                // onPressList: (id, name) => {
-                //     //make bank null if company is picked
-                //     dispatch({
-                //         type: 'input',
-                //         id: 'bank',
-                //         input: null,
-                //         isValid: true,
-                //     });
-                //     getUserBank(id).then(response => {
-                //         const state = {
-                //             inputValues: {
-                //                 bank_id: response.id,
-                //                 bank_id_value: response.bank_name,
-                //                 ...response,
-                //             },
-                //             formIsValid: true,
-                //         };
-                //         dispatchBank({
-                //             type: 'update',
-                //             state: state,
-                //         });
-                //     });
-                //
-                // },
-                // onSubmit:({
-                //               new_company,
-                //           }) => {
-                //     console.log("new company", new_company);
-                //     dispatchDetail({
-                //         type: "update",
-                //         state: {
-                //             ...formStateDetail,
-                //             inputValues: {
-                //                 ...formStateDetail.inputValues,
-                //                 account_type: AccountTypeEnum.INDIVIDUAL,
-                //                 driver_company_request: new_company,
-                //                 driver_company_id: null,
-                //                 driver_company_value: null
-                //             }
-                //
-                //         }
-                //     })
-                // }
+                                account_type: AccountTypeEnum.INDIVIDUAL,
+                                driver_company_request: new_company,
+                                driver_company_id: null,
+                                driver_company_value: null
+                            }
+
+                        }
+                    })
+                }
             });
         } else {
             if (id == 'driver_company_id' || id == 'driver_partner_id') {
@@ -640,7 +619,7 @@ const RegisterScreen = ({navigation, route}) => {
         }
     };
 
-    useEffect(async () => {
+    useDeepEffect(async () => {
         AsyncStorage.getItem(StorageKey.KEY_COMPANY).then(company => {
             setcompanyData(JSON.parse(company));
         });
@@ -674,8 +653,8 @@ const RegisterScreen = ({navigation, route}) => {
             showDialog(e)
         }
     }
-
-    useEffect(() => {
+    //
+    useDeepEffect(() => {
         console.log("parames", route.params);
 
         if (route.params?.pickerId) {
@@ -792,7 +771,7 @@ const RegisterScreen = ({navigation, route}) => {
     }, [route.params]);
 
     //preload region
-    useEffect(() => {
+    useDeepEffect(() => {
         if (isEdit) {
             console.log('data', data);
             fetchPreloadData()
@@ -803,7 +782,7 @@ const RegisterScreen = ({navigation, route}) => {
     }, []);
 
     //reset if region changed
-    useEffect(() => {
+    useDeepEffect(() => {
         if (!isEdit || !preloading) {
             dispatchAddress({
                 type: 'picker',
@@ -815,7 +794,7 @@ const RegisterScreen = ({navigation, route}) => {
         }
     }, [cityData]);
 
-    useEffect(() => {
+    useDeepEffect(() => {
         if (!isEdit || !preloading) {
             dispatchAddress({
                 type: 'picker',
@@ -827,7 +806,8 @@ const RegisterScreen = ({navigation, route}) => {
         }
     }, [cityData, districtData]);
 
-    useEffect(() => {
+
+    useDeepEffect(() => {
         if (!isEdit || !preloading) {
             dispatchAddress({
                 type: 'picker',
@@ -839,7 +819,7 @@ const RegisterScreen = ({navigation, route}) => {
         }
     }, [cityData, districtData, villageData]);
 
-    useEffect(() => {
+    useDeepEffect(() => {
         if (isEdit && !preloading) checkEdited();
     }, [
         formState,
@@ -863,6 +843,7 @@ const RegisterScreen = ({navigation, route}) => {
                 behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
                 <ScrollView style={styles.container}>
                     <View style={{paddingBottom: 40}}>
+
                         {!isEdit ? (
                             <View>
                                 <LatoBold>{translate('register_form_title')}</LatoBold>
@@ -870,7 +851,7 @@ const RegisterScreen = ({navigation, route}) => {
                                     {translate('register_form_desc')}
                                 </LatoRegular>
                             </View>
-                        ) : null}
+                        ) : <></>}
 
                         <TouchableOpacity
                             style={{alignItems: 'center', margin: 16}}
@@ -957,6 +938,7 @@ const RegisterScreen = ({navigation, route}) => {
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                             <LatoBold>Anda tergabung di perusahaan?</LatoBold>
                             <CustomCheckbox
+                                disabled={isVerified}
                                 onPress={() => {
                                     dispatchDetail({
                                         type: "update",
@@ -964,34 +946,56 @@ const RegisterScreen = ({navigation, route}) => {
                                             ...formStateDetail,
                                             inputValues: {
                                                 ...formStateDetail.inputValues,
-                                                isCompany: !formStateDetail.inputValues.isCompany
+                                                is_company: !formStateDetail.inputValues.is_company
                                             }
                                         }
                                     })
                                 }}
-                                isChecked={formStateDetail?.inputValues?.isCompany}/>
+                                isChecked={formStateDetail?.inputValues?.is_company}/>
                         </View>
 
                         {
-                            formStateDetail?.inputValues?.isCompany
+                            formStateDetail?.inputValues?.is_company
                                 ? <>
-                                    <PickerInput
-                                        id={'driver_company_id'}
-                                        title={translate('company_title')}
-                                        placeholder={translate('company_placeholder')}
-                                        value={formStateDetail.inputValues.driver_company_id_value}
-                                        viewOnly={isVerified}
-                                        disabled={isVerified}
-                                        onPress={() => {
-                                            openPicker(
-                                                'driver_company_id',
-                                                'company_title',
-                                                companyData,
-                                                dispatchDetail,
-                                            );
-                                        }}
-                                        isCheck={formState.isChecked}
-                                    />
+                                {
+                                    formStateDetail?.inputValues?.driver_company_request
+                                    ? <View style={{
+                                        }}>
+                                        <PickerInput
+                                            onPress={() => {
+                                                openPicker(
+                                                    'driver_company_id',
+                                                    'company_title',
+                                                    companyData,
+                                                    dispatchDetail,
+                                                );
+                                            }}
+                                            viewOnly={isVerified}
+                                            disabled={isVerified}
+                                            title={translate('company_title')}
+                                            value={formStateDetail?.inputValues?.driver_company_request}
+                                        />
+                                        </View>
+                                        : <>
+                                            <PickerInput
+                                                id={'driver_company_id'}
+                                                title={translate('company_title')}
+                                                placeholder={translate('company_placeholder')}
+                                                value={formStateDetail.inputValues.driver_company_id_value}
+                                                viewOnly={isVerified}
+                                                disabled={isVerified}
+                                                onPress={() => {
+                                                    openPicker(
+                                                        'driver_company_id',
+                                                        'company_title',
+                                                        companyData,
+                                                        dispatchDetail,
+                                                    );
+                                                }}
+                                                isCheck={formState.isChecked}
+                                            />
+                                        </>
+                                }
                                 </>
                                 : <></>
                         }

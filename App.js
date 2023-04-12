@@ -75,6 +75,7 @@ import BackgroundGeolocation from '@mauron85/react-native-background-geolocation
 import notifee, { EventType } from '@notifee/react-native';
 import { DistanceSchema, SpeedSchema } from './src/data/realm/speed';
 import PickerCompanyScreen from "./src/views/PickerCompanyScreen";
+import FakeGPSLayer from "./src/views/layer/FakeGPSLayer";
 
 //realm
 
@@ -415,6 +416,7 @@ const App = ({ navigation, route }) => {
               </View>
             ),
           }}>
+          <FakeGPSLayer>
           <NavigationContainer ref={navigationRef}>
             <AuthContext.Provider value={authContextValue}>
               <Stack.Navigator initialRouteName={initialRoute}>
@@ -597,6 +599,13 @@ const App = ({ navigation, route }) => {
                     />
 
                     <Stack.Screen
+                        name={"PickerCompany"}
+                        component={PickerCompanyScreen}
+                        options={{headerShown: false}}
+                    />
+
+
+                    <Stack.Screen
                       name="CurrentContract"
                       component={CurrentContractScreen}
                       options={{ headerShown: false, animationEnabled: enableAnimation }}
@@ -643,10 +652,12 @@ const App = ({ navigation, route }) => {
               <ModalPortal />
             </AuthContext.Provider>
           </NavigationContainer>
+          </FakeGPSLayer>
         </ToastProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
 };
+
 
 export default App;

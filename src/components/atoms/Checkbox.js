@@ -5,7 +5,7 @@ import { CheckBox } from 'react-native-elements'
 import IconChecked from '../../assets/images/ic_checked_box.svg'
 import IconUnchecked from '../../assets/images/ic_unchecked_box.svg'
 
-const CustomCheckbox = ({isChecked, title, onPress}) => {
+const CustomCheckbox = ({isChecked, title, onPress, disabled}) => {
 
 
     return <CheckBox
@@ -14,6 +14,7 @@ const CustomCheckbox = ({isChecked, title, onPress}) => {
     checked={isChecked}
     title={title}
     onPress={onPress}
+    disabled={disabled}
     containerStyle={{backgroundColor: 'white', borderWidth: 0, marginLeft: 0, paddingLeft: 0, marginRight: 0, marginBottom: 0}}
     />
 }

@@ -3,13 +3,13 @@
  * Copyright (c) 2023 - Made with love
  */
 import React from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {Image, ImageSourcePropType, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import CustomButton from "../atoms/CustomButton";
 import translate from "../../locales/translate";
 
 interface Props {
-    image?: string;
+    imageSrc?: ImageSourcePropType;
     title?: string;
     description?: string;
     positiveTitle?: string;
@@ -23,6 +23,15 @@ interface Props {
 const CustomAlertComponent = ({...props}: Props) => {
     return (
         <View {...props} style={styles.mainContainer}>
+            {
+                props?.imageSrc
+                ? <View style={{
+                    marginBottom: 4
+                    }}>
+                        <Image source={props.imageSrc}/>
+                    </View>
+                    : <></>
+            }
             {
                 props?.title
                     ? <Text

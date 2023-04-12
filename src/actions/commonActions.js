@@ -73,16 +73,23 @@ export const showErrorDialog = ({
                                     negativeAction,
                                     negativeTitle,
                                     isDoubleButton,
+                                    imageSrc
                                 }) => {
     const title = error?.title
     console.log('error', JSON.stringify(error, null, 2))
     const description = error?.message
+    let usedImageSrc = imageSrc;
+    if(error?.status == 401){
+        usedImageSrc = require("../assets/illusts/illust_nonactive_account/illust_nonactive_account.png")
+    }
+
     showAlert({
         alertType: 'custom',
         animationIn: 'fadeIn',
         animationOut: 'fadeOut',
         customAlert: (
             <CustomAlertComponent
+                imageSrc={usedImageSrc}
                 title={title}
                 description={description}
                 isDoubleButton={isDoubleButton}

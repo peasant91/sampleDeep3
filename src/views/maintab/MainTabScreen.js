@@ -247,7 +247,7 @@ const MainTabScreen = ({ navigation, route }) => {
         component={OfferScreen} />
       <Tab.Screen
         options={{
-          tabBarLabel: "Beranda",
+          tabBarLabel: "Akun",
         }}
         name="Account" 
         component={AccountScreen} />

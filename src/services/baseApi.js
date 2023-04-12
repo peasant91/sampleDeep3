@@ -124,26 +124,27 @@ export const getErrorMessage = err => {
         );
         console.log('ERROR RESPONSE:', JSON.stringify(err.response.data, null, 2));
         const errorData = err.response.data;
+        const errorStatus = errorData?.error?.code
         const errorTitle = errorData.error.title;
         const errorMessage = errorData.error.errors[0].message;
         switch (errorMessage) {
             case 'Unauthenticated':
-                throw new APIError(errorData?.status, errorTitle, "Data Anda Belum Terdaftar");
+                throw new APIError(errorStatus, errorTitle, "Data Anda Belum Terdaftar");
             case 'The email has already been taken.':
-                throw new APIError(errorData?.status, errorTitle, 'Email yang anda gunakan telah terdaftar');
+                throw new APIError(errorStatus, errorTitle, 'Email yang anda gunakan telah terdaftar');
             case 'The phone has already been taken.':
-                throw new APIError(errorData?.status, errorTitle, 'Nomor Handphone yang anda gunakan telah terdaftar');
+                throw new APIError(errorStatus, errorTitle, 'Nomor Handphone yang anda gunakan telah terdaftar');
             case 'Unauthenticated.':
                 forceSignOut();
-                throw new APIError(errorData?.status, errorTitle, 'Anda Tidak Memiliki Akses, Silahkan Login Ulang');
+                throw new APIError(errorStatus, errorTitle, 'Anda Tidak Memiliki Akses, Silahkan Login Ulang');
             case 'Wrong password':
-                throw new APIError(errorData?.status, errorTitle, 'Kata Sandi Lama Salah. Pastikan Kata Sandi Lama Anda Benar');
+                throw new APIError(errorStatus, errorTitle, 'Kata Sandi Lama Salah. Pastikan Kata Sandi Lama Anda Benar');
             case 'Password anda salah':
-                throw new APIError(errorData?.status, errorTitle, 'Kata Sandi Anda Salah');
+                throw new APIError(errorStatus, errorTitle, 'Kata Sandi Anda Salah');
             case '':
-                throw new APIError(errorData?.status, errorTitle, errorMessage);
+                throw new APIError(errorStatus, errorTitle, errorMessage);
             default:
-                throw new APIError(errorData?.status, errorTitle, errorMessage);
+                throw new APIError(errorStatus, errorTitle, errorMessage);
         }
     } else if (err.message === 'Network Error') {
         throw new Error(translate('network_error'));

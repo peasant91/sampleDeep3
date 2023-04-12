@@ -36,7 +36,7 @@ const PickerCompanyScreen = ({navigation, route}) => {
     const [formState, dispatchForm] = useReducer(formReducer, {
         inputValues: {
             company: driver_company_request,
-            isNewCompany: false,
+            isNewCompany: !!driver_company_request,
             selectedId: selectedId
         },
         inputValidities: {
