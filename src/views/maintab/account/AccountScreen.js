@@ -295,6 +295,12 @@ const AccountScreen = ({navigation, route}) => {
             Icon={IconLogout}
             text={translate('logout')}
             containerStyle={{margin: 16}}
+            // onPress={() => {
+            //   navigation.navigate("PDFViewerScreen", {
+            //     title: "Panduan Report Mingguan",
+            //     source: "https://dev-otomedia.timedoor-host.web.id/storage/report/weekly-report.pdf"
+            //   })
+            // }}
             onPress={logout}
             tintColor={'red'}
           />

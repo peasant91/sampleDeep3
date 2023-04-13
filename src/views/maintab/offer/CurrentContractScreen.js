@@ -25,7 +25,7 @@ import Divider from '../../../components/atoms/Divider';
 import ListInstallationSchedule from '../../../components/atoms/list/ListInstallationSchedule';
 import KeyValueComponent from '../../../components/atoms/KeyValueComponent';
 import axios from 'axios';
-import {getChartData, getReportList} from '../../../services/report';
+import {getChartData, getReportExample, getReportList} from '../../../services/report';
 import ListReport from '../../../components/atoms/list/ListReport';
 import DistanceChart from '../../../components/atoms/DistanceChart';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -33,6 +33,8 @@ import {useIsFocused} from '@react-navigation/native';
 import moment from 'moment';
 import InfoMenu from "../../../components/atoms/InfoMenu";
 import CustomButton from "../../../components/atoms/CustomButton";
+import toast from "react-native-toast-notifications/src/toast";
+import {useToast} from "react-native-toast-notifications";
 
 const dummyReport = [
   {
@@ -81,6 +83,8 @@ const CurrentContractScreen = ({navigation, route}) => {
   const [contractData, setcontractData] = useState();
   const [reportData, setreportData] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [exampleReport, setExampleReport] = useState()
+  const toast = useToast();
 
   const [isLoading, setisLoading] = useState(true);
   const {id, isEmpty, isCurrent} = route.params;
@@ -121,12 +125,13 @@ const CurrentContractScreen = ({navigation, route}) => {
     if (isFocus) {
       if (id) {
         axios
-          .all([getReportList(id), getContract(id), getChartData(id)])
+          .all([getReportList(id), getContract(id), getChartData(id), getReportExample()])
           .then(
-            axios.spread(async (report, contract, chart) => {
+            axios.spread(async (report, contract, chart, example) => {
               setcontractData(contract);
               setreportData(report);
               setChartData(chart);
+              setExampleReport(example);
               setisLoading(false);
             }),
           )
@@ -379,7 +384,18 @@ const CurrentContractScreen = ({navigation, route}) => {
                       containerStyle={{margin: 16}}
                       actionButton={true}
                       actionButtonTitle={"Lihat Panduan"}
-                      actionButtonAction={() => {}}
+                      actionButtonAction={() => {
+                        if(exampleReport?.url) {
+                          navigation.navigate("PDFViewerScreen", {
+                            title: "Panduan Report Mingguan",
+                            source: exampleReport?.url
+                          })
+                        }else {
+                          toast.show("Gagal memuat panduan", {
+                            type: "danger"
+                          })
+                        }
+                      }}
                   />
 
                 </View>

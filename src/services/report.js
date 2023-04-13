@@ -23,3 +23,7 @@ export const postReport = (id,data) => {
 export const postReportImage = (id, data) => {
     return post(`v1/contract/report/${id}/image`, data)
 }
+
+export const getReportExample = () => {
+    return get(`v1/report/example`)
+}

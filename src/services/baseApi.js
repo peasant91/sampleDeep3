@@ -136,7 +136,7 @@ export const getErrorMessage = err => {
                 throw new APIError(errorStatus, errorTitle, 'Nomor Handphone yang anda gunakan telah terdaftar');
             case 'Unauthenticated.':
                 forceSignOut();
-                throw new APIError(errorStatus, errorTitle, 'Anda Tidak Memiliki Akses, Silahkan Login Ulang');
+                throw new APIError(errorStatus, errorTitle, errorMessage ??'Anda Tidak Memiliki Akses, Silahkan Login Ulang');
             case 'Wrong password':
                 throw new APIError(errorStatus, errorTitle, 'Kata Sandi Lama Salah. Pastikan Kata Sandi Lama Anda Benar');
             case 'Password anda salah':

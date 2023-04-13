@@ -76,6 +76,7 @@ import notifee, { EventType } from '@notifee/react-native';
 import { DistanceSchema, SpeedSchema } from './src/data/realm/speed';
 import PickerCompanyScreen from "./src/views/PickerCompanyScreen";
 import FakeGPSLayer from "./src/views/layer/FakeGPSLayer";
+import PDFViewerScreen from "./src/views/PDFViewerScreen";
 
 //realm
 
@@ -648,6 +649,9 @@ const App = ({ navigation, route }) => {
                     />
                   </>
                 )}
+                <Stack.Screen name={"PDFViewerScreen"} component={PDFViewerScreen} options={{
+                  headerShown: false,
+                }}/>
               </Stack.Navigator>
               <ModalPortal />
             </AuthContext.Provider>
