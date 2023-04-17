@@ -2,7 +2,6 @@ import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { FlatList, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { showDialog } from '../../../actions/commonActions'
 import { momentx } from '../../../actions/helper'
 import BlueHeader from '../../../components/atoms/BlueHeader'
 import { LatoRegular } from '../../../components/atoms/CustomText'
@@ -14,11 +13,13 @@ import { ShimmerTripDetail } from '../../../components/atoms/shimmer/Shimmer'
 import Colors from '../../../constants/Colors'
 import translate from '../../../locales/translate'
 import { getTripDetail } from '../../../services/report'
+import {useCommonAction} from "../../../actions/commonActions";
 
 const TripDetailScreen = ({ navigation, route }) => {
 
     const { id } = route.params
 
+    const {showErrorDialog} = useCommonAction()
     const [data, setdata] = useState([])
     const [childrenData, setChildrenData] = useState()
     const [selectedIndex, setSelectedIndex] = useState()
@@ -34,7 +35,9 @@ const TripDetailScreen = ({ navigation, route }) => {
             }
             setisLoading(false)
         }).catch(err => {
-            showDialog(err.message)
+            showErrorDialog({
+                error: err,
+            })
         })
     }
 

@@ -21,7 +21,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import CustomButton from '../../components/atoms/CustomButton'
 import { getCity, getDistrict, getVehicleBrand, getVehicleModel, getVehicleType, getVillage } from '../../services/utilities'
 import { getVehicle, registerVehicle, updateVehicle } from '../../services/user'
-import { dismissDialog, showDialog } from '../../actions/commonActions'
+import {dismissDialog, showDialog, useCommonAction} from '../../actions/commonActions'
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions'
 import axios from 'axios'
 import { getFullLink, getImageBase64FromUrl } from '../../actions/helper'
@@ -31,6 +31,7 @@ import {checkGalleryPermission, requestGalleryPermission} from "../../actions/pe
 
 
 const RegisterVehicleScreen = ({ navigation, route }) => {
+  const {showErrorDialog} = useCommonAction()
   const StickerType = [
     {
       id: 'full_body',
@@ -159,7 +160,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
         goToRegisterVehicleSuccess()
       }).catch(error => {
         setisLoading(false)
-        showDialog(error.message)
+        showErrorDialog({
+          error: error,
+        })
       })
     } else {
       updateVehicle(form).then(response => {
@@ -167,7 +170,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
         goToRegisterVehicleSuccess()
       }).catch(error => {
         setisLoading(false)
-        showDialog(error.message)
+        showErrorDialog({
+          error: error,
+        })
       })
     }
   }
@@ -281,7 +286,9 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
       getVehicle().then(response => {
         translateEditForm(response)
       }).catch(err => {
-        showDialog(err.message)
+        showErrorDialog({
+          error: err,
+        })
       })
     }
   }

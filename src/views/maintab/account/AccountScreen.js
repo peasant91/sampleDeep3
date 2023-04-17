@@ -25,7 +25,7 @@ import Colors from '../../../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../../constants/StorageKey';
 import {AuthContext} from '../../../../App';
-import {showDialog} from '../../../actions/commonActions';
+import {showDialog, useCommonAction} from '../../../actions/commonActions';
 import {getProfile} from '../../../services/user';
 import {getDriverVehicle, getVehicleRoute} from '../../../services/utilities';
 import {isEmpty, openWhatsapp} from '../../../actions/helper';
@@ -58,6 +58,7 @@ const AccountScreen = ({navigation, route}) => {
   const [refreshing, setrefreshing] = useState(false);
   const [incomeData, setincomeData] = useState({});
   const {signOut} = useContext(AuthContext);
+  const {showErrorDialog} = useCommonAction()
 
   const getProfileApi = () => {
     setisLoading(true);
@@ -72,7 +73,9 @@ const AccountScreen = ({navigation, route}) => {
       .catch(err => {
         setrefreshing(false);
         setisLoading(false);
-        showDialog(err.message);
+        showErrorDialog({
+          error: err
+        })
       });
     getVehicleRoute()
       .then(Response => {
@@ -81,7 +84,9 @@ const AccountScreen = ({navigation, route}) => {
       .catch(err => {
         setrefreshing(false);
         setisLoading(false);
-        showDialog(err.message);
+        showErrorDialog({
+          error: err
+        })
       });
     getHome()
       .then(Response => {
@@ -90,7 +95,9 @@ const AccountScreen = ({navigation, route}) => {
       .catch(err => {
         setrefreshing(false);
         setisLoading(false);
-        showDialog(err.message);
+        showErrorDialog({
+          error: err
+        })
       });
     getIncomeList({
       year: moment(Date()).format('yyyy'),
@@ -103,7 +110,9 @@ const AccountScreen = ({navigation, route}) => {
       .catch(err => {
         setrefreshing(false);
         setisLoading(false);
-        showDialog(error.message);
+        showErrorDialog({
+          error: err
+        })
       });
     // axios.all([
     //   getProfile(),

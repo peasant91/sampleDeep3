@@ -24,6 +24,10 @@ export const postReportImage = (id, data) => {
     return post(`v1/contract/report/${id}/image`, data)
 }
 
+export const patchReportImage = (id, imageId,data) => {
+    return patch(`v1/contract/report/${id}/image/${imageId}`, data)
+}
+
 export const getReportExample = () => {
     return get(`v1/report/example`)
 }

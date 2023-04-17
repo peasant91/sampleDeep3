@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import NavBar from '../../../components/atoms/NavBar'
 import translate from '../../../locales/translate'
 import { createWithdraw, getIncomeList } from '../../../services/transaction'
-import { showDialog } from '../../../actions/commonActions'
 import moment from 'moment'
 import { range, toCurrency } from '../../../actions/helper'
 import { ShimmerIncome, ShimmerTripDetail } from '../../../components/atoms/shimmer/Shimmer'
@@ -17,6 +16,7 @@ import IconPendapatan from '../../../assets/images/pendapatan.svg'
 import IconPenarikan from '../../../assets/images/penarikan.svg'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomSheet from '../../../components/atoms/CustomSheet'
+import {useCommonAction} from "../../../actions/commonActions";
 
 const statusText = (status) => {
     switch (status) {
@@ -31,6 +31,7 @@ const statusText = (status) => {
 
 const IncomeDetailScreen = ({ navigation, route }) => {
 
+    const {showErrorDialog} = useCommonAction()
     const currentYear = moment(Date()).format('yyyy')
     const [data, setdata] = useState({})
     const [selectedYear, setselectedYear] = useState(currentYear)
@@ -47,7 +48,9 @@ const IncomeDetailScreen = ({ navigation, route }) => {
             setdata(response)
         }).catch(err => {
             setisLoading(false)
-            showDialog(err.message)
+            showErrorDialog({
+                error: err,
+            })
         })
     }
 
@@ -62,7 +65,9 @@ const IncomeDetailScreen = ({ navigation, route }) => {
         createWithdraw().then(response => {
             getDetail(selectedYear)
         }).catch(err => {
-            showDialog(err.message)
+            showErrorDialog({
+                error: err,
+            })
         })
     }
 

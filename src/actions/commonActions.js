@@ -1,5 +1,5 @@
 import {Alert, View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import {getBundleId} from 'react-native-device-info';
 import LottieView from 'lottie-react-native';
 
@@ -22,6 +22,9 @@ import moment from 'moment';
 import {showAlert, closeAlert} from 'react-native-customisable-alert';
 import CustomUploadAlertComponent from '../components/molecules/CustomUploadAlertComponent';
 import CustomAlertComponent from "../components/molecules/CustomAlertComponent";
+import {AuthContext} from "../../App";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import StorageKey from "../constants/StorageKey";
 
 let id = 0;
 
@@ -35,6 +38,7 @@ export const showDialog = (
     isReversed,
     desc
 ) => {
+
     console.log('alert dialog show');
     showAlert({
         alertType: 'custom',
@@ -64,54 +68,6 @@ export const showDialog = (
             />
         ),
     });
-};
-
-export const showErrorDialog = ({
-                                    error,
-                                    positiveAction,
-                                    positiveTitle,
-                                    negativeAction,
-                                    negativeTitle,
-                                    isDoubleButton,
-                                    imageSrc
-                                }) => {
-    const title = error?.title
-    console.log('error', JSON.stringify(error, null, 2))
-    const description = error?.message
-    let usedImageSrc = imageSrc;
-    if(error?.status == 401){
-        usedImageSrc = require("../assets/illusts/illust_nonactive_account/illust_nonactive_account.png")
-    }
-
-    showAlert({
-        alertType: 'custom',
-        animationIn: 'fadeIn',
-        animationOut: 'fadeOut',
-        customAlert: (
-            <CustomAlertComponent
-                imageSrc={usedImageSrc}
-                title={title}
-                description={description}
-                isDoubleButton={isDoubleButton}
-                onPositivePress={() => {
-                    if (positiveAction) {
-                        positiveAction()
-                    }
-                    dismissDialog()
-                }}
-                onNegativePress={
-                    () => {
-                        if (negativeAction) {
-                            negativeAction()
-                        }
-                        dismissDialog()
-                    }}
-                positiveTitle={positiveTitle}
-                negativeTitle={negativeTitle}
-            />
-        ),
-    });
-
 };
 
 export const showUploadDialog = (message, totalData, currentPosition) => {
@@ -299,3 +255,100 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
 });
+
+
+export const useCommonAction = () => {
+    // const {} = useContext(AuthContext)
+    const authContext = useContext(AuthContext);
+
+    const showErrorDialog = async ({
+                                 error,
+                                 positiveAction,
+                                 positiveTitle,
+                                 negativeAction,
+                                 negativeTitle,
+                                 isDoubleButton,
+                                 imageSrc
+                             }) => {
+        const title = error?.title
+        console.log('error', JSON.stringify(error, null, 2))
+        const description = error?.message
+        let usedImageSrc = imageSrc;
+        let usedPositiveTitle = positiveTitle
+        let usedPositiveAction = positiveAction
+
+
+        if(error?.status == 401){
+            const token = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
+            usedImageSrc = require("../assets/illusts/illust_nonactive_account/illust_nonactive_account.png")
+            usedPositiveTitle = token? "KEMBALI KE LOGIN":"BAIK, SAYA MENGERTI"
+            usedPositiveAction = () => {
+                dismissDialog()
+                if(token){
+                    authContext?.signOut()
+                }
+            }
+        }
+
+        showAlert({
+            alertType: 'custom',
+            animationIn: 'fadeIn',
+            animationOut: 'fadeOut',
+            customAlert: (
+                <CustomAlertComponent
+                    imageSrc={usedImageSrc}
+                    title={title}
+                    description={description}
+                    isDoubleButton={isDoubleButton}
+                    onPositivePress={() => {
+                        if (usedPositiveAction) {
+                            usedPositiveAction()
+                        }
+                        dismissDialog()
+                    }}
+                    onNegativePress={
+                        () => {
+                            if (negativeAction) {
+                                negativeAction()
+                            }
+                            dismissDialog()
+                        }}
+                    positiveTitle={usedPositiveTitle}
+                    negativeTitle={negativeTitle}
+                />
+            ),
+        });
+    };
+    const hideErrorDialog = () => {
+        dismissDialog()
+    };
+
+    const showLoadingDialog = ({
+        title, description
+                               }) => {
+        showAlert({
+            alertType: 'custom',
+            animationIn: 'fadeIn',
+            animationOut: 'fadeOut',
+            customAlert: (
+                <CustomAlertComponent
+                    title={title?? "Mohon Tunggu"}
+                    description={description ?? "Sedang memproses data"}
+                    loading={true}
+                />
+            ),
+        });
+    };
+
+    const hideLoadingDialog = () => {
+        dismissDialog()
+    };
+
+
+
+    return {
+        showErrorDialog,
+        hideErrorDialog,
+        showLoadingDialog, hideLoadingDialog
+    }
+}

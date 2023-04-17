@@ -19,6 +19,8 @@ target 'otomedia' do
 
   pod 'react-native-image-base64', :path => '../node_modules/react-native-image-base64'
 
+  pod 'RNLocalize', :path => '../node_modules/react-native-localize'
+
   target 'otomediaTests' do
     inherit! :complete
     # Pods for testing

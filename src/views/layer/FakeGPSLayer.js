@@ -2,11 +2,17 @@ import React, {useEffect, useRef, useState} from 'react'
 import {AppState, BackHandler} from "react-native";
 import {checkIsFakeGPS} from "../../actions/helper";
 import Geolocation from 'react-native-geolocation-service';
-import {showErrorDialog} from "../../actions/commonActions";
+import {useCommonAction} from "../../actions/commonActions";
 
 export default function FakeGPSLayer(props){
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
+    const {showErrorDialog} = useCommonAction()
+
+    useEffect(() => {
+        checkFakeGPS()
+    },[])
+
     useEffect(() => {
         const subscription = AppState.addEventListener('change', async nextAppState => {
             if (
@@ -14,23 +20,7 @@ export default function FakeGPSLayer(props){
                 nextAppState === 'active'
             ) {
                 console.log("CHECK FAKE GPS")
-                checkIsFakeGPS((isFake) => {
-                    console.log("isFake", isFake)
-                    if(isFake){
-                        showErrorDialog({
-                            error: {
-                                title: "Terdeteksi menggunakan Fake GPS",
-                                message: "Perangkat Anda terdeteksi menggunakan aplikasi pihak ketiga. Matikan aplikasi tersebut untuk melanjutkan menggunakan aplikasi Otomedia.",
-                            },
-                            positiveTitle: "BAIK, SAYA MENGERTI",
-                            positiveAction: () => {
-                                BackHandler.exitApp()
-                            },
-                            imageSrc: require('../../assets/illusts/illust_fake_gps/illust_fake_gps.png')
-                        })
-                    }
-                })
-
+                checkFakeGPS()
             }
             appState.current = nextAppState;
             setAppStateVisible(appState.current);
@@ -41,6 +31,25 @@ export default function FakeGPSLayer(props){
             subscription.remove();
         };
     }, []);
+
+    const checkFakeGPS = () => {
+        checkIsFakeGPS((isFake) => {
+            console.log("isFake", isFake)
+            if(isFake){
+                showErrorDialog({
+                    error: {
+                        title: "Terdeteksi menggunakan Fake GPS",
+                        message: "Perangkat Anda terdeteksi menggunakan aplikasi pihak ketiga. Matikan aplikasi tersebut untuk melanjutkan menggunakan aplikasi Otomedia.",
+                    },
+                    positiveTitle: "BAIK, SAYA MENGERTI",
+                    positiveAction: () => {
+                        BackHandler.exitApp()
+                    },
+                    imageSrc: require('../../assets/illusts/illust_fake_gps/illust_fake_gps.png')
+                })
+            }
+        })
+    }
 
     return <>
         {props?.children}

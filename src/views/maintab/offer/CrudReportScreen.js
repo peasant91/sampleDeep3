@@ -1,46 +1,78 @@
-import React, { useReducer, useEffect, useState, useRef } from 'react'
-import { FlatList, ScrollView, TouchableOpacity, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { dismissDialog, showDialog, showLoadingDialog, showUploadDialog } from '../../../actions/commonActions'
-import { mapReportImages, mapStickerArea } from '../../../actions/helper'
+import React, {useReducer, useEffect, useState, useRef} from 'react'
+import {FlatList, ScrollView, TouchableOpacity, View} from 'react-native'
+import {SafeAreaView} from 'react-native-safe-area-context'
+import {
+    dismissDialog,
+    showDialog,
+    showLoadingDialog,
+    showUploadDialog, useCommonAction
+} from '../../../actions/commonActions'
+import {getFullLink, mapReportImages, mapStickerArea} from '../../../actions/helper'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomInput from '../../../components/atoms/CustomInput'
 import CustomSheet from '../../../components/atoms/CustomSheet'
-import { LatoBold, LatoRegular } from '../../../components/atoms/CustomText'
+import {LatoBold, LatoRegular} from '../../../components/atoms/CustomText'
 import NavBar from '../../../components/atoms/NavBar'
 import ReportImage from '../../../components/atoms/ReportImage'
 import translate from '../../../locales/translate'
 import formReducer from '../../../reducers/formReducer'
-import { getReportDetail, postReport, postReportImage } from '../../../services/report'
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import {getReportDetail, patchReportImage, postReport, postReportImage} from '../../../services/report'
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 import IconGallery from '../../../assets/images/ic_gallery_picker.svg';
 import IconCamera from '../../../assets/images/ic_camera_picker.svg';
 import IconDelete from '../../../assets/images/ic_trash_black.svg';
 import Colors from '../../../constants/Colors'
-import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
+import {check, PERMISSIONS, RESULTS} from 'react-native-permissions'
 import {checkGalleryPermission, requestGalleryPermission} from "../../../actions/permissionAction";
+import {LinearProgress} from "react-native-elements";
+import ReportImageEditBS from "../../../components/molecules/ReportImageEditBS";
 
-const CrudReportScreen = ({ navigation, route }) => {
+const CrudReportScreen = ({navigation, route}) => {
 
-    const { isAdd, id, stickerArea } = route.params
+    const {isAdd, id, stickerArea} = route.params
     const [stickerLayoutData, setStickerLayoutData] = useState([])
-    const [selectedPicker, setselectedPicker] = useState()
     const [imagePickerId, setimagePickerId] = useState(99);
-    const [imageIndicator, setImageIndicator] = useState({ current: 1, last: 99 })
-    const pickerSheet = useRef()
+    const [imageIndicator, setImageIndicator] = useState({current: 1, last: 99})
     const [imageQueue, setimageQueue] = useState([])
     const [isloading, setisloading] = useState(false)
     const reportId = useRef(0)
     const totalImageUpload = useRef(0)
-    const [currentUploadTask,setCurrentUploadTask] = useState()
+    const [currentUploadTask, setCurrentUploadTask] = useState()
+    const {showErrorDialog, hideErrorDialog, showLoadingDialog, hideLoadingDialog} = useCommonAction()
 
+    const [isOpenEditBS, setIsOpenEditBS] = useState(false)
+    const [selectedPicker, setSelectedPicker] = useState(undefined)
+
+    const handleOpenEditBS = ({
+                                  id,
+                                  location,
+                                  index,
+                                  imageId,
+                                  imageUri,
+                                  imageTitle
+                              }) => {
+        setSelectedPicker({
+            id,
+            location,
+            index,
+            imageId,
+            imageUri,
+            imageTitle
+        })
+        setIsOpenEditBS(true)
+    }
+
+    const handleCloseEditBS = () => {
+        setIsOpenEditBS(false)
+    }
 
 
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {
             desc: '',
-            odometer: ' '
+            odometer: ' ',
+            is_new_odometer: false
         },
         inputValidities: {
             odometer: false
@@ -55,31 +87,58 @@ const CrudReportScreen = ({ navigation, route }) => {
         })
     }
 
-    const makeImageQueue = () => {
-        var array = []
-        for (index in stickerLayoutData) {
+    const postImagesData = async () => {
+        const stickerImages = []
+        for (let index in stickerLayoutData) {
             const data = {
                 sticker_area: stickerLayoutData[index].value,
                 images: [...stickerLayoutData[index].images]
             }
-            totalImageUpload.current += stickerLayoutData[index].images.length
-            array.push(data)
+            stickerImages.push(data)
         }
-        console.log("total image upload",totalImageUpload.current);
-        console.log("image queue",array);
-        setimageQueue([...array])
+
+        for (let stickerImage of stickerImages) {
+            for (let image of stickerImage.images) {
+                const response = await postReportImage(reportId.current, {
+                    image: image?.image,
+                    sticker_area: stickerImage.sticker_area
+                })
+            }
+        }
     }
 
-    const openImagePicker = async (id, location, index) => {
-        pickerSheet.current.expand();
-        setselectedPicker({
-            id,
-            location,
-            index
-        });
-    };
+    const patchImageData = async () => {
+        const stickerImages = []
+        for (let index in stickerLayoutData) {
+            const data = {
+                sticker_area: stickerLayoutData[index].value,
+                images: [...stickerLayoutData[index].images]
+            }
+            stickerImages.push(data)
+        }
 
-    const doReport = () => {
+        for (let stickerImage of stickerImages) {
+            for (let image of stickerImage.images) {
+                if (image?.is_new) {
+                    if (image?.id) {
+                        const response = await patchReportImage(reportId.current, image?.id, {
+                            image: image?.image,
+                            sticker_area: stickerImage.sticker_area
+                        })
+                    } else {
+                        const response = await postReportImage(reportId.current, {
+                            image: image?.image,
+                            sticker_area: stickerImage.sticker_area
+                        })
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    const doReport = async () => {
 
         dispatch({
             type: 'check'
@@ -88,23 +147,44 @@ const CrudReportScreen = ({ navigation, route }) => {
         //console.log(formState)
         let imageIsValid = true
 
-        for (index in stickerLayoutData) {
+        for (let index in stickerLayoutData) {
             const item = stickerLayoutData[index]
-            imageIsValid = !item.images.includes(" ")
+            imageIsValid = item.images?.every(image => image?.image) ? true : false
         }
 
         if (formState.formIsValid && imageIsValid) {
-            showUploadDialog("Mengunggah",totalImageUpload.current,0)
-            setisloading(true)
-            postReport(reportId.current,formState.inputValues).then(response => {
-                // reportId.current = response.report_id
-                setCurrentUploadTask(0)
-                makeImageQueue()
-            }).catch(err => {
+            try {
+                // showUploadDialog("Mengunggah", totalImageUpload.current, 0)
+                showLoadingDialog({
+                    title: "Mengunggah",
+                    message: "Sedang memproses laporan..."
+                })
+                setisloading(true)
+                const response = await postReport(reportId.current, formState.inputValues)
+                if (isAdd) {
+                    const postImagesRes = await postImagesData()
+                } else {
+                    const res = await patchImageData()
+                }
+
                 setisloading(false)
-                dismissDialog()
-                showDialog(err.message)
-            })
+                hideLoadingDialog()
+
+                await showErrorDialog({
+                    error: {
+                        title: "Berhasil",
+                        message: "Laporan berhasil disimpan"
+                    },
+                    positiveAction: () => {
+                        navigation.goBack()
+                    }
+                })
+            } catch (e) {
+                hideLoadingDialog()
+                showErrorDialog({
+                    error: e
+                })
+            }
         }
     }
 
@@ -116,11 +196,13 @@ const CrudReportScreen = ({ navigation, route }) => {
                     image: image.images[0],
                     sticker_area: image.sticker_area
                 }).then(response => {
-                    setCurrentUploadTask(prev=>prev+1)
+                    setCurrentUploadTask(prev => prev + 1)
                     image.images.shift()
                     setimageQueue([...imageQueue])
                 }).catch(err => {
-                    showDialog(err.message)
+                    showErrorDialog({
+                        error: err
+                    })
                 })
             } else {
                 if (imageQueue.length <= 1) {
@@ -138,125 +220,94 @@ const CrudReportScreen = ({ navigation, route }) => {
 
 
     //detect bottomsheet state should visible the delete button or not
-    const isPickedImageEmpty = () => {
-        if (selectedPicker) {
-            if (selectedPicker.location == 'body') {
-                return (
-                    formStateCard.inputValues[selectedPicker.id] == ' ' ||
-                    formStateCard.inputValues[selectedPicker.id] == undefined
-                );
-            } else {
-                return (
-                    formState.inputValues[selectedPicker.id] == ' ' ||
-                    formState.inputValues[selectedPicker.id] == undefined
-                );
-            }
-        } else {
-            return false;
-        }
-    };
+    // const isPickedImageEmpty = () => {
+    //     if (selectedPicker) {
+    //         if (selectedPicker.location == 'body') {
+    //             return (
+    //                 formStateCard.inputValues[selectedPicker.id] == ' ' ||
+    //                 formStateCard.inputValues[selectedPicker.id] == undefined
+    //             );
+    //         } else {
+    //             return (
+    //                 formState.inputValues[selectedPicker.id] == ' ' ||
+    //                 formState.inputValues[selectedPicker.id] == undefined
+    //             );
+    //         }
+    //     } else {
+    //         return false;
+    //     }
+    // };
 
-    const openCameraPicker = async selectedPicker => {
+    const openCameraPicker = async selected => {
         const result = await launchCamera({
             quality: 0.5,
             includeBase64: true,
             mediaType: 'photo',
         });
-        processResult(result)
+        processResult(result, selected)
     };
 
-    const openGalleryPicker = async selectedPicker => {
-        if (Platform.OS == 'android') {
-            const permission = await checkGalleryPermission()
-            console.log(permission)
-            if (permission == RESULTS.BLOCKED) {
-                showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-                return
-            }
-
-            if (permission == RESULTS.DENIED) {
-                const result = await requestGalleryPermission()
-                console.log(result)
-                if (result != RESULTS.GRANTED) {
-                    showDialog(translate('please_allow_storage'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-                    return
-                }
-            }
-        }
-        const result = await launchImageLibrary({
-            quality: 0.5,
-            includeBase64: true,
-            mediaType: 'photo',
-        });
-        processResult(result)
-    };
-
-    const processResult = (result) => {
+    const processResult = (result, selected) => {
         if (result == null || result == undefined || result.assets == undefined) {
             return
         }
         console.log("get data");
-        if (selectedPicker.location != 'odometer') {
-            const data = stickerLayoutData.filter(item => item.value == selectedPicker.id)
-            if (data.length == 1) {
-                data[0].images[selectedPicker.index] = 'data:image/jpg;base64,' + result.assets[0].base64
-                //console.log('data', data)
-                setStickerLayoutData([...stickerLayoutData])
+        if (selected.location != 'odometer') {
+            const data = stickerLayoutData.filter(item => item.value == selected.id)
+            const dataIndex = stickerLayoutData.findIndex(item => item.value == selected.id)
+            console.log(dataIndex, data)
+            if (data?.length == 1) {
+                const newStickerLayoutData = [...stickerLayoutData]
+                const newItem = {
+                    ...newStickerLayoutData[dataIndex].images[selected.index],
+                    image: 'data:image/jpg;base64,' + result.assets[0].base64,
+                    is_new: true
+                }
+                newStickerLayoutData[dataIndex].images[selected.index] = newItem
+                console.log("new sticker layout data", newStickerLayoutData[dataIndex].images[selected.index])
+                setStickerLayoutData(newStickerLayoutData)
             }
         } else {
+            console.log("get data odometer", result.assets[0].base64)
             dispatch({
                 type: 'input',
-                id: selectedPicker.id,
+                id: selected.id,
                 input: 'data:image/jpg;base64,' + result.assets[0].base64,
                 isValid: true,
             });
         }
     }
 
-    useEffect(() => {
-        pickerSheet.current.close();
-        setTimeout(() => {
-            if (imagePickerId == 0) {
-                openCameraPicker(selectedPicker);
-            } else if (imagePickerId == 1) {
-                openGalleryPicker(selectedPicker);
-            } else if (imagePickerId == 2) {
-                deleteImage(selectedPicker);
-            }
-
-            setimagePickerId(99);
-        }, 500);
-    }, [imagePickerId]);
+    // useEffect(() => {
+    //     if (imageQueue.length > 0) {
+    //         postReportImageAPI()
+    //     } else {
+    //         if (isloading) {
+    //             showDialog(translate('report_send_success'), false, () => navigation.pop())
+    //         }
+    //     }
+    // }, [imageQueue])
 
 
     useEffect(() => {
-        if (imageQueue.length > 0) {
-            postReportImageAPI()
-        } else {
-            if (isloading) {
-                showDialog(translate('report_send_success'), false, () => navigation.pop())
-            }
-        }
-    }, [imageQueue])
-
-
-    useEffect(()=>{
-        if(!currentUploadTask){
+        if (!currentUploadTask) {
             return
         }
-        console.log("current upload task",currentUploadTask)
-        console.log("current total task",totalImageUpload.current)
-        showUploadDialog("Mengunggah",totalImageUpload.current,currentUploadTask)
-        if(currentUploadTask == totalImageUpload.current-1){
+        console.log("current upload task", currentUploadTask)
+        console.log("current total task", totalImageUpload.current)
+        showUploadDialog("Mengunggah", totalImageUpload.current, currentUploadTask)
+        if (currentUploadTask == totalImageUpload.current - 1) {
             dismissDialog()
         }
-    },[currentUploadTask])
+    }, [currentUploadTask])
 
 
     useEffect(() => {
         if (!isAdd) {
+            reportId.current = id
             getReportDetail(id)
                 .then(response => {
+                    console.log("REPORT DETAIL", JSON.stringify(response, null, 2))
                     dispatch({
                         type: 'update',
                         state: {
@@ -273,104 +324,147 @@ const CrudReportScreen = ({ navigation, route }) => {
                     })
 
                     mapReportImages(response.report_images).then(data => {
+                        console.log("sticker layout data", JSON.stringify(data, null, 2))
                         setStickerLayoutData(data)
                     })
                 }).catch(err => {
-                    showDialog(err.message)
+                showErrorDialog({
+                    error: err
                 })
+            })
         } else {
             reportId.current = id
             getStickers()
         }
     }, [])
 
-    return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-        <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} shadowEnabled />
-        <ScrollView style={{ padding: 16, flex: 1 }}>
-            <CustomInput
-                id={'desc'}
-                title={translate('report_detail')}
-                placeholder={translate('report_detail_placeholder')}
-                dispatcher={dispatch}
-                value={formState.inputValues.desc}
-                containerStyle={{ paddingBottom: 16 }}
-                disabled={!isAdd}
-                required
-                isCheck={formState.isChecked}
-            />
-            {
-                stickerLayoutData?.map((value, index) => {
-                    // console.log(value)
-                    return <View style={{ marginBottom: 16 }}>
-                        <LatoBold>{translate('report_string', { body: value.name })}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
-                        <FlatList
-                            style={{ zIndex: -99 }}
-                            scrollEnabled={false}
-                            columnWrapperStyle={{ justifyContent: 'space-between' }}
-                            data={value.images}
-                            numColumns={2}
-                            renderItem={({ item, index }) => {
-                                return <ReportImage imageUri={item} navigation={navigation} title={value.name} onPress={() => openImagePicker(value.value, value.value, index)} />
-                            }} />
-                        {
-                            stickerLayoutData.filter(item => item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ marginTop: 10 }}>{translate('error_image', { string: value.name })}</LatoBold>
-                        }
-                    </View>
+
+    const handlePickImage = async ({
+                                       id,
+                                       location,
+                                       index
+                                   }) => {
+        await openCameraPicker({
+            id,
+            location,
+            index
+        });
+    };
+
+
+    return <>
+        <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+            <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} shadowEnabled/>
+            <ScrollView style={{padding: 16, flex: 1}}>
+                <CustomInput
+                    id={'desc'}
+                    title={translate('report_detail')}
+                    placeholder={translate('report_detail_placeholder')}
+                    dispatcher={dispatch}
+                    value={formState.inputValues.desc}
+                    containerStyle={{paddingBottom: 16}}
+                    disabled={!isAdd}
+                    required
+                    isCheck={formState.isChecked}
+                />
+                {
+                    stickerLayoutData?.map((value, index) => {
+                        // console.log(value)
+                        return <View style={{marginBottom: 16}}>
+                            <LatoBold>{translate('report_string', {body: value.name})}<LatoBold
+                                style={{color: 'red'}}>*</LatoBold></LatoBold>
+                            <FlatList
+                                style={{zIndex: -99}}
+                                scrollEnabled={false}
+                                columnWrapperStyle={{justifyContent: 'space-between'}}
+                                data={value.images}
+                                numColumns={2}
+                                renderItem={({item, index}) => {
+                                    console.log("item new", item.is_new)
+                                    return <ReportImage item={item} navigation={navigation} title={value.name}
+                                                        onPress={() => handlePickImage({
+                                                            id: value.value,
+                                                            location: value.value,
+                                                            index
+                                                        })}
+                                                        // onPressEdit={() => {
+                                                        //     handleOpenEditBS({
+                                                        //         id: value.value,
+                                                        //         location: value.value,
+                                                        //         index,
+                                                        //         imageId: item.id,
+                                                        //         imageUri: item.image,
+                                                        //         imageTitle: value.name
+                                                        //     })
+                                                        // }}
+                                    />
+                                }}/>
+                            {
+                                stickerLayoutData.filter(item => item.value == value.value)[0]?.images?.includes(' ') && formState.isChecked &&
+                                <LatoBold style={{color: 'red'}}
+                                          containerStyle={{marginTop: 10}}>{translate('error_image', {string: value.name})}</LatoBold>
+                            }
+                        </View>
+                    })
+                }
+
+                <LatoBold>{translate('odometer_photo')}<LatoBold style={{color: 'red'}}>*</LatoBold></LatoBold>
+
+                <View style={{paddingBottom: 24}}>
+                    <ReportImage
+                        type={"odometer"}
+                        item={formState.inputValues.odometer}
+                        onPress={() => handlePickImage({
+                            id: "odometer",
+                            location: "odometer",
+                        })}
+                        navigation={navigation}
+                        // onPressEdit={() => {
+                        //     handleOpenEditBS({
+                        //         id: "odometer",
+                        //         location: "odometer",
+                        //         imageUri: formState.inputValues.odometer,
+                        //         imageTitle: "Odometer"
+                        //     })
+                        //
+                        // }}
+                        title={translate('odometer')}/>
+                </View>
+                {
+                    !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{color: 'red'}}
+                                                                                            containerStyle={{paddingBottom: 10}}>{translate('error_odometer')}</LatoBold>
+                }
+
+                {
+                    isAdd ? <CustomButton types={'primary'} title={translate('save')} onPress={doReport}
+                                          containerStyle={{marginBottom: 24}} isLoading={isloading}/>
+                        : <></>
+                }
+
+
+            </ScrollView>
+
+        </SafeAreaView>
+        <ReportImageEditBS
+            open={isOpenEditBS}
+            onClose={handleCloseEditBS}
+            onOpenPreview={() => {
+                handleCloseEditBS()
+                navigation.navigate('ImageViewer', {
+                    imageUrl: selectedPicker.imageUri?.includes('/storage/') ? getFullLink(selectedPicker.imageUri) : item,
+                    title: selectedPicker?.imageTitle
                 })
-            }
-
-            <LatoBold>{translate('odometer_photo')}<LatoBold style={{ color: 'red' }}>*</LatoBold></LatoBold>
-
-            <View style={{ paddingBottom: 24 }}>
-
-                <ReportImage
-                    imageUri={formState.inputValues.odometer}
-                    onPress={() => openImagePicker('odometer', 'odometer')}
-                    navigation={navigation}
-                    title={translate('odometer')} />
-
-            </View>
-            {
-                !formState.inputValidities.odometer && formState.isChecked && <LatoBold style={{ color: 'red' }} containerStyle={{ paddingBottom: 10 }}>{translate('error_odometer')}</LatoBold>
-            }
-
-            {
-                isAdd && <CustomButton types={'primary'} title={translate('save')} onPress={doReport} containerStyle={{ marginBottom: 24 }} isLoading={isloading} />
-            }
-
-
-
-        </ScrollView>
-
-        <CustomSheet ref={pickerSheet}>
-            <View style={{ padding: 16 }}>
-                <LatoBold style={{ marginBottom: 10 }}>{translate('pick_photo')}</LatoBold>
-                <TouchableOpacity onPress={() => setimagePickerId(0)}>
-                    <LatoRegular Icon={IconCamera}>
-                        {translate('pick_camera')}
-                    </LatoRegular>
-                </TouchableOpacity>
-                {!isPickedImageEmpty() && (
-                    <View>
-                        <View
-                            style={{
-                                height: 1,
-                                backgroundColor: Colors.divider,
-                                marginTop: 10,
-                                marginBottom: 10,
-                                marginLeft: 28,
-                            }}
-                        />
-                        <TouchableOpacity onPress={() => setimagePickerId(2)}>
-                            <LatoRegular Icon={IconDelete}>
-                                {translate('pick_delete')}
-                            </LatoRegular>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
-        </CustomSheet>
-    </SafeAreaView>
+            }}
+            onRetakeImage={() => {
+                handleCloseEditBS()
+                handlePickImage({
+                    id: selectedPicker.id,
+                    location: selectedPicker.location,
+                    index: selectedPicker.index
+                })
+            }}
+        />
+    </>
 
 }
 

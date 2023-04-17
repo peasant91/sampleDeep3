@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useReducer, useState, useEffect } from 'react'
 import { SafeAreaView, ScrollView } from 'react-native'
-import { showDialog,dismissDialog } from '../../../actions/commonActions'
+import {showDialog, dismissDialog, useCommonAction} from '../../../actions/commonActions'
 import CustomButton from '../../../components/atoms/CustomButton'
 import CustomInput, { PickerInput } from '../../../components/atoms/CustomInput'
 import NavBar from '../../../components/atoms/NavBar'
@@ -17,6 +17,7 @@ const BankScreen = ({ navigation, route }) => {
     const [bankData, setbankData] = useState()
     const [isEdited, setisEdited] = useState(false)
     const [preloading, setpreloading] = useState(true)
+    const {showErrorDialog}  = useCommonAction()
 
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {
@@ -32,7 +33,7 @@ const BankScreen = ({ navigation, route }) => {
         if (isEdited) {
             showDialog(translate('edit_confirm_desc'), true, () => dismissDialog(), () => navigation.pop(), translate('cancel_short'), translate('sure'))
             return
-        } 
+        }
 
         navigation.pop()
     }
@@ -59,7 +60,9 @@ const BankScreen = ({ navigation, route }) => {
                 .then(response => {
                     showDialog(translate('update_bank_account_success'), false,() => navigation.navigate('Account',{isUpdate: true}, true))
                 }).catch(err => {
-                    showDialog(err.message)
+                    showErrorDialog({
+                        error: err,
+                    })
                 })
         }
     }
@@ -89,7 +92,9 @@ const BankScreen = ({ navigation, route }) => {
             })
             setpreloading(false)
         }).catch(err => {
-            showDialog(err.message)
+            showErrorDialog({
+                error: err,
+            })
         })
     }, [])
 
@@ -106,7 +111,7 @@ const BankScreen = ({ navigation, route }) => {
             setpreloading(false)
         }
     }, [route.params])
-    
+
 
     return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
 

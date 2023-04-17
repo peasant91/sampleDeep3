@@ -7,6 +7,7 @@ import {Image, ImageSourcePropType, StyleSheet, Text, View} from "react-native";
 import Colors from "../../constants/Colors";
 import CustomButton from "../atoms/CustomButton";
 import translate from "../../locales/translate";
+import {LinearProgress} from "react-native-elements";
 
 interface Props {
     imageSrc?: ImageSourcePropType;
@@ -17,6 +18,7 @@ interface Props {
     onPositivePress?: () => void;
     onNegativePress?: () => void;
     isDoubleButton?: boolean;
+    loading?: boolean;
 
 }
 
@@ -25,8 +27,8 @@ const CustomAlertComponent = ({...props}: Props) => {
         <View {...props} style={styles.mainContainer}>
             {
                 props?.imageSrc
-                ? <View style={{
-                    marginBottom: 4
+                    ? <View style={{
+                        marginBottom: 4
                     }}>
                         <Image source={props.imageSrc}/>
                     </View>
@@ -66,54 +68,63 @@ const CustomAlertComponent = ({...props}: Props) => {
                     </Text>
                     : null
             }
-            {props.isDoubleButton ? (
-                <View
-                    style={{
-                        flexDirection: 'column',
-                        display: 'flex',
-                        marginTop: 10,
-                        marginBottom: 10,
-                    }}>
-                    <View style={{flex: 1}}>
-                        <CustomButton
-                            types="secondary"
-                            onPress={props.onNegativePress}
-                            style={{height: 40, marginHorizontal: 2}}
-                            title={
-                                props.negativeTitle ? props.negativeTitle : translate('cancel')
-                            }
-                        />
-                    </View>
-                    <View style={{flex: 1, marginLeft: 10}}>
-                        <CustomButton
-                            types="primary"
-                            onPress={props.onPositivePress}
-                            style={{height: 40, marginHorizontal: 2}}
-                            title={
-                                props.positiveTitle ? props.positiveTitle : translate('retry')
-                            }
-                        />
-                    </View>
-                </View>
-            ) : (
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        display: 'flex',
-                        marginTop: 10,
-                        marginBottom: 10,
-                    }}>
-                    <View style={{flex: 1}}>
-                        <CustomButton
-                            types="primary"
-                            onPress={props.onPositivePress}
-                            title={
-                                props.positiveTitle ? props.positiveTitle : translate('ok')
-                            }
-                        />
-                    </View>
-                </View>
-            )}
+
+            {
+                props.loading
+                    ? <>
+                    <LinearProgress color={Colors.primary}/>
+                    </>
+                    : <>
+                        {props.isDoubleButton ? (
+                            <View
+                                style={{
+                                    flexDirection: 'column',
+                                    display: 'flex',
+                                    marginTop: 10,
+                                    marginBottom: 10,
+                                }}>
+                                <View style={{flex: 1}}>
+                                    <CustomButton
+                                        types="secondary"
+                                        onPress={props.onNegativePress}
+                                        style={{height: 40, marginHorizontal: 2}}
+                                        title={
+                                            props.negativeTitle ? props.negativeTitle : translate('cancel')
+                                        }
+                                    />
+                                </View>
+                                <View style={{flex: 1, marginLeft: 10}}>
+                                    <CustomButton
+                                        types="primary"
+                                        onPress={props.onPositivePress}
+                                        style={{height: 40, marginHorizontal: 2}}
+                                        title={
+                                            props.positiveTitle ? props.positiveTitle : translate('retry')
+                                        }
+                                    />
+                                </View>
+                            </View>
+                        ) : (
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    display: 'flex',
+                                    marginTop: 10,
+                                    marginBottom: 10,
+                                }}>
+                                <View style={{flex: 1}}>
+                                    <CustomButton
+                                        types="primary"
+                                        onPress={props.onPositivePress}
+                                        title={
+                                            props.positiveTitle ? props.positiveTitle : translate('ok')
+                                        }
+                                    />
+                                </View>
+                            </View>
+                        )}
+                    </>
+            }
         </View>
     );
 };

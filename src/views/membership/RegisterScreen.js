@@ -31,8 +31,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import formReducer from '../../reducers/formReducer.js';
 import {
     showDialog,
-    dismissDialog,
-    showLocationAlwaysDialog,
+    dismissDialog, useCommonAction,
 } from '../../actions/commonActions';
 import {register, updateProfile, validateRegister} from '../../services/auth';
 import NavBar from '../../components/atoms/NavBar';
@@ -80,6 +79,7 @@ import CustomCheckbox from "../../components/atoms/Checkbox";
 import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
 import {AccountTypeEnum} from "../../data/enums/AccountTypeEnum";
 import {useDeepEffect} from "../../hooks/useDeepEffect";
+import CustomRegisterImagePickerBS from "../../components/molecules/CustomRegisterImagePickerBS";
 
 const dummyDivision = [
     {
@@ -97,6 +97,7 @@ const dummyDivision = [
 ];
 
 const RegisterScreen = ({navigation, route}) => {
+    const {showErrorDialog} = useCommonAction()
     const [companyData, setcompanyData] = useState();
     const [provinceData, setprovinceData] = useState();
     const [cityData, setcityData] = useState();
@@ -115,6 +116,10 @@ const RegisterScreen = ({navigation, route}) => {
     const {isEdit, data, isVerified} = route.params;
     const toast = useToast();
     const toastMessage = useRef(translate('please_select_province'));
+    const [isOpenImagePicker, setIsOpenImagePicker] = useState(false);
+    const handleCloseImagePicker = useCallback(() => {
+        setIsOpenImagePicker(false);
+    }, []);
     //
     const pickerSheet = useRef();
     //
@@ -239,14 +244,14 @@ const RegisterScreen = ({navigation, route}) => {
                 ) : null,
                 profile_image_uri: data.profile_image,
                 gender: data.gender,
-                is_company: ((data?.account_type === AccountTypeEnum.COMPANY) || !!data?.account_type) ,
+                is_company: ((data?.account_type === AccountTypeEnum.COMPANY) || !!data?.account_type),
                 account_type: data?.account_type,
                 driver_company_request: data?.driver_company_request
             },
             formIsValid: true,
         };
 
-        console.log("state detail value", JSON.stringify(stateDetail, null,2))
+        console.log("state detail value", JSON.stringify(stateDetail, null, 2))
 
         const stateAddress = {
             inputValues: {
@@ -370,7 +375,9 @@ const RegisterScreen = ({navigation, route}) => {
                 })
                 .catch(err => {
                     setIsLoading(false);
-                    showDialog(err.message);
+                    showErrorDialog({
+                        error: err
+                    })
                 });
         } else {
             // console.log("data", JSON.stringify(data, null, 2))
@@ -388,7 +395,9 @@ const RegisterScreen = ({navigation, route}) => {
             })
             .catch(error => {
                 setIsLoading(false);
-                showDialog(error.message);
+                showErrorDialog({
+                    error: error,
+                })
             });
     };
 
@@ -413,8 +422,8 @@ const RegisterScreen = ({navigation, route}) => {
         });
     };
     //
-    useEffect(() => {
-        pickerSheet?.current?.close();
+    useDeepEffect(() => {
+        // pickerSheet?.current?.close();
         setTimeout(() => {
             if (imagePickerId == 0) {
                 openCameraPicker(selectedPicker);
@@ -536,16 +545,26 @@ const RegisterScreen = ({navigation, route}) => {
         }
     };
 
-    const openImagePicker = async (id, location, dispatch) => {
+    const openImagePicker = useCallback(async (id, location, dispatch) => {
         setselectedPicker({
             id,
             location,
             dispatch,
         });
         setTimeout(() => {
-            pickerSheet.current.expand();
+            setIsOpenImagePicker(true);
         }, 100);
-    };
+    }, [])
+    // const openImagePicker = async (id, location, dispatch) => {
+    //     setselectedPicker({
+    //         id,
+    //         location,
+    //         dispatch,
+    //     });
+    //     setTimeout(() => {
+    //         pickerSheet.current.expand();
+    //     }, 100);
+    // };
 
     const isPickedImageEmpty = () => {
         if (selectedPicker) {
@@ -577,9 +596,9 @@ const RegisterScreen = ({navigation, route}) => {
                 previousRoute: !isEdit ? 'Register' : 'EditProfile',
                 driver_company_request: formStateDetail?.inputValues?.driver_company_request,
                 dispatch: dispatch,
-                onSubmit:({
-                              new_company,
-                          }) => {
+                onSubmit: ({
+                               new_company,
+                           }) => {
                     console.log("new company", new_company);
                     dispatchDetail({
                         type: "update",
@@ -830,594 +849,579 @@ const RegisterScreen = ({navigation, route}) => {
     ]);
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-            <StatusBar backgroundColor="white" barStyle="dark-content"/>
-            <NavBar
-                navigation={navigation}
-                title={isEdit ? translate('edit_profile') : translate('register_form')}
-                shadowEnabled={true}
-                onBackPress={showBackPrompt}
-            />
-            <KeyboardAvoidingView
-                style={{flex: 1, zIndex: -1}}
-                behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
-                <ScrollView style={styles.container}>
-                    <View style={{paddingBottom: 40}}>
+        <>
+            <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+                <StatusBar backgroundColor="white" barStyle="dark-content"/>
+                <NavBar
+                    navigation={navigation}
+                    title={isEdit ? translate('edit_profile') : translate('register_form')}
+                    shadowEnabled={true}
+                    onBackPress={showBackPrompt}
+                />
+                <KeyboardAvoidingView
+                    style={{flex: 1, zIndex: -1}}
+                    behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
+                    <ScrollView style={styles.container}>
+                        <View style={{paddingBottom: 40}}>
 
-                        {!isEdit ? (
-                            <View>
-                                <LatoBold>{translate('register_form_title')}</LatoBold>
-                                <LatoRegular containerStyle={{marginTop: 5}}>
-                                    {translate('register_form_desc')}
-                                </LatoRegular>
+                            {!isEdit ? (
+                                <View>
+                                    <LatoBold>{translate('register_form_title')}</LatoBold>
+                                    <LatoRegular containerStyle={{marginTop: 5}}>
+                                        {translate('register_form_desc')}
+                                    </LatoRegular>
+                                </View>
+                            ) : <></>}
+
+                            <TouchableOpacity
+                                style={{alignItems: 'center', margin: 16}}
+                                onPress={() => {
+                                    !isVerified
+                                        ? openImagePicker('profile_image', 'Detail', dispatchDetail)
+                                        : null;
+                                }}>
+                                <View>
+                                    {formStateDetail.inputValues.profile_image_uri ? (
+                                        <Image
+                                            source={{
+                                                uri: formStateDetail.inputValues.profile_image_uri
+                                                    ? formStateDetail.inputValues.profile_image_uri
+                                                    : getFullLink(
+                                                        formStateDetail.inputValues.profile_image_uri,
+                                                    ),
+                                            }}
+                                            style={{
+                                                width: 80,
+                                                height: 80,
+                                                borderRadius: 50,
+                                                resizeMode: 'cover',
+                                            }}
+                                        />
+                                    ) : (
+                                        <IconProfilePlaceholder/>
+                                    )}
+                                    {!isVerified ? (
+                                        <IconProfileAddImage
+                                            style={{position: 'absolute', bottom: 0, right: 0}}
+                                        />
+                                    ) : null}
+                                </View>
+                            </TouchableOpacity>
+
+                            <CustomInput
+                                id={'name'}
+                                title={translate('name_title')}
+                                placeholder={translate('name_placeholder')}
+                                value={formState.inputValues.name}
+                                dispatcher={dispatch}
+                                isCheck={formState.isChecked}
+                                required
+                                viewOnly={isVerified}
+                            />
+
+                            <PhoneInput
+                                id={'phone1'}
+                                title={translate('phone_title')}
+                                placeholder={translate('phone_placeholder')}
+                                dispatcher={dispatch}
+                                containerStyle={{marginVertical: 16}}
+                                value={formState.inputValues.phone1}
+                                isCheck={formState.isChecked}
+                                viewOnly={isVerified}
+                            />
+
+                            <PhoneInput
+                                id={'phone2'}
+                                title={translate('phone_title2')}
+                                placeholder={translate('phone_placeholder')}
+                                dispatcher={dispatch}
+                                value={formState.inputValues.phone2}
+                                isCheck={formState.isChecked}
+                                optional
+                                isUnique={true}
+                                isUniqueWith={formState.inputValues.phone1}
+                                viewOnly={isVerified}
+                            />
+
+                            <CustomInput
+                                id={'email'}
+                                title={translate('email_title')}
+                                placeholder={translate('email_placeholder')}
+                                containerStyle={{marginVertical: 16}}
+                                dispatcher={dispatch}
+                                value={formState.inputValues.email}
+                                isCheck={formState.isChecked}
+                                required
+                                viewOnly={isVerified}
+                            />
+
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                <LatoBold>Anda tergabung di perusahaan?</LatoBold>
+                                <CustomCheckbox
+                                    disabled={isVerified}
+                                    onPress={() => {
+                                        dispatchDetail({
+                                            type: "update",
+                                            state: {
+                                                ...formStateDetail,
+                                                inputValues: {
+                                                    ...formStateDetail.inputValues,
+                                                    is_company: !formStateDetail.inputValues.is_company
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    isChecked={formStateDetail?.inputValues?.is_company}/>
                             </View>
-                        ) : <></>}
 
-                        <TouchableOpacity
-                            style={{alignItems: 'center', margin: 16}}
-                            onPress={() => {
-                                !isVerified
-                                    ? openImagePicker('profile_image', 'Detail', dispatchDetail)
-                                    : null;
-                            }}>
-                            <View>
-                                {formStateDetail.inputValues.profile_image_uri ? (
-                                    <Image
-                                        source={{
-                                            uri: formStateDetail.inputValues.profile_image_uri
-                                                ? formStateDetail.inputValues.profile_image_uri
-                                                : getFullLink(
-                                                    formStateDetail.inputValues.profile_image_uri,
-                                                ),
-                                        }}
-                                        style={{
-                                            width: 80,
-                                            height: 80,
-                                            borderRadius: 50,
-                                            resizeMode: 'cover',
-                                        }}
-                                    />
-                                ) : (
-                                    <IconProfilePlaceholder/>
-                                )}
-                                {!isVerified ? (
-                                    <IconProfileAddImage
-                                        style={{position: 'absolute', bottom: 0, right: 0}}
-                                    />
-                                ) : null}
-                            </View>
-                        </TouchableOpacity>
+                            {
+                                formStateDetail?.inputValues?.is_company
+                                    ? <>
+                                        {
+                                            formStateDetail?.inputValues?.driver_company_request
+                                                ? <View style={{}}>
+                                                    <PickerInput
+                                                        onPress={() => {
+                                                            openPicker(
+                                                                'driver_company_id',
+                                                                'company_title',
+                                                                companyData,
+                                                                dispatchDetail,
+                                                            );
+                                                        }}
+                                                        viewOnly={isVerified}
+                                                        disabled={isVerified}
+                                                        title={translate('company_title')}
+                                                        value={formStateDetail?.inputValues?.driver_company_request}
+                                                    />
+                                                </View>
+                                                : <>
+                                                    <PickerInput
+                                                        id={'driver_company_id'}
+                                                        title={translate('company_title')}
+                                                        placeholder={translate('company_placeholder')}
+                                                        value={formStateDetail.inputValues.driver_company_id_value}
+                                                        viewOnly={isVerified}
+                                                        disabled={isVerified}
+                                                        onPress={() => {
+                                                            openPicker(
+                                                                'driver_company_id',
+                                                                'company_title',
+                                                                companyData,
+                                                                dispatchDetail,
+                                                            );
+                                                        }}
+                                                        isCheck={formState.isChecked}
+                                                    />
+                                                </>
+                                        }
+                                    </>
+                                    : <></>
+                            }
 
-                        <CustomInput
-                            id={'name'}
-                            title={translate('name_title')}
-                            placeholder={translate('name_placeholder')}
-                            value={formState.inputValues.name}
-                            dispatcher={dispatch}
-                            isCheck={formState.isChecked}
-                            required
-                            viewOnly={isVerified}
-                        />
 
-                        <PhoneInput
-                            id={'phone1'}
-                            title={translate('phone_title')}
-                            placeholder={translate('phone_placeholder')}
-                            dispatcher={dispatch}
-                            containerStyle={{marginVertical: 16}}
-                            value={formState.inputValues.phone1}
-                            isCheck={formState.isChecked}
-                            viewOnly={isVerified}
-                        />
+                            <InfoMenu
+                                text={translate('company_bank_info')}
+                                containerStyle={{marginTop: 16}}
+                            />
 
-                        <PhoneInput
-                            id={'phone2'}
-                            title={translate('phone_title2')}
-                            placeholder={translate('phone_placeholder')}
-                            dispatcher={dispatch}
-                            value={formState.inputValues.phone2}
-                            isCheck={formState.isChecked}
-                            optional
-                            isUnique={true}
-                            isUniqueWith={formState.inputValues.phone1}
-                            viewOnly={isVerified}
-                        />
-
-                        <CustomInput
-                            id={'email'}
-                            title={translate('email_title')}
-                            placeholder={translate('email_placeholder')}
-                            containerStyle={{marginVertical: 16}}
-                            dispatcher={dispatch}
-                            value={formState.inputValues.email}
-                            isCheck={formState.isChecked}
-                            required
-                            viewOnly={isVerified}
-                        />
-
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <LatoBold>Anda tergabung di perusahaan?</LatoBold>
-                            <CustomCheckbox
+                            <PickerInput
+                                id={'driver_partner_id'}
+                                title={translate('partner_title')}
+                                placeholder={translate('partner_placeholder')}
+                                value={formStateDetail.inputValues.driver_partner_id_value}
+                                viewOnly={isVerified}
+                                containerStyle={{marginTop: 16}}
                                 disabled={isVerified}
                                 onPress={() => {
-                                    dispatchDetail({
-                                        type: "update",
-                                        state: {
-                                            ...formStateDetail,
-                                            inputValues: {
-                                                ...formStateDetail.inputValues,
-                                                is_company: !formStateDetail.inputValues.is_company
-                                            }
-                                        }
-                                    })
+                                    openPicker(
+                                        'driver_partner_id',
+                                        'partner_title',
+                                        partnerData,
+                                        dispatchDetail,
+                                    );
                                 }}
-                                isChecked={formStateDetail?.inputValues?.is_company}/>
-                        </View>
+                                isCheck={formState.isChecked}
+                            />
 
-                        {
-                            formStateDetail?.inputValues?.is_company
-                                ? <>
-                                {
-                                    formStateDetail?.inputValues?.driver_company_request
-                                    ? <View style={{
-                                        }}>
-                                        <PickerInput
-                                            onPress={() => {
-                                                openPicker(
-                                                    'driver_company_id',
-                                                    'company_title',
-                                                    companyData,
-                                                    dispatchDetail,
-                                                );
-                                            }}
-                                            viewOnly={isVerified}
-                                            disabled={isVerified}
-                                            title={translate('company_title')}
-                                            value={formStateDetail?.inputValues?.driver_company_request}
-                                        />
-                                        </View>
-                                        : <>
-                                            <PickerInput
-                                                id={'driver_company_id'}
-                                                title={translate('company_title')}
-                                                placeholder={translate('company_placeholder')}
-                                                value={formStateDetail.inputValues.driver_company_id_value}
-                                                viewOnly={isVerified}
-                                                disabled={isVerified}
-                                                onPress={() => {
-                                                    openPicker(
-                                                        'driver_company_id',
-                                                        'company_title',
-                                                        companyData,
-                                                        dispatchDetail,
-                                                    );
-                                                }}
-                                                isCheck={formState.isChecked}
-                                            />
-                                        </>
+                            <CustomInput
+                                id={'address'}
+                                title={translate('address_title')}
+                                placeholder={translate('address_placeholder')}
+                                value={formStateAddress.inputValues.address}
+                                containerStyle={{marginVertical: 16}}
+                                dispatcher={dispatchAddress}
+                                isCheck={formState.isChecked}
+                                required
+                                viewOnly={isVerified}
+                            />
+
+                            <PickerInput
+                                id={'province_id'}
+                                title={translate('province_title')}
+                                placeholder={translate('province_placeholder')}
+                                value={formStateAddress.inputValues.province_id_value}
+                                isCheck={formState.isChecked}
+                                viewOnly={isVerified}
+                                disabled={isVerified}
+                                onPress={() =>
+                                    openPicker(
+                                        'province_id',
+                                        'province_title',
+                                        provinceData,
+                                        dispatchAddress,
+                                    )
                                 }
-                                </>
-                                : <></>
-                        }
+                                required
+                            />
 
+                            <PickerInput
+                                id={'city_id'}
+                                title={translate('city_title')}
+                                containerStyle={{paddingVertical: 16}}
+                                placeholder={translate('city_placeholder')}
+                                value={formStateAddress.inputValues.city_id_value}
+                                isCheck={formState.isChecked}
+                                viewOnly={isVerified}
+                                disabled={isVerified}
+                                //disabled={formStateAddress.inputValues.province_id == null && cityData == null}
+                                onPress={() =>
+                                    cityData == null
+                                        ? toast.show(toastMessage.current, {
+                                            type: 'custom',
+                                            placement: 'bottom',
+                                            duration: 2000,
+                                            offset: 30,
+                                            animationType: 'slide-in',
+                                        })
+                                        : openPicker(
+                                            'city_id',
+                                            'city_title',
+                                            cityData,
+                                            dispatchAddress,
+                                        )
+                                }
+                                required
+                            />
 
-                        <InfoMenu
-                            text={translate('company_bank_info')}
-                            containerStyle={{marginTop: 16}}
-                        />
+                            <PickerInput
+                                id={'district_id'}
+                                title={translate('district_title')}
+                                placeholder={translate('district_placeholder')}
+                                value={formStateAddress.inputValues.district_id_value}
+                                isCheck={formState.isChecked}
+                                viewOnly={isVerified}
+                                disabled={isVerified}
+                                //disabled={formStateAddress.inputValues.city_id == null }
+                                onPress={() =>
+                                    districtData == null
+                                        ? toast.show(toastMessage.current, {
+                                            type: 'custom',
+                                            placement: 'bottom',
+                                            duration: 2000,
+                                            offset: 30,
+                                            animationType: 'slide-in',
+                                        })
+                                        : openPicker(
+                                            'district_id',
+                                            'district_title',
+                                            districtData,
+                                            dispatchAddress,
+                                        )
+                                }
+                                required
+                            />
 
-                        <PickerInput
-                            id={'driver_partner_id'}
-                            title={translate('partner_title')}
-                            placeholder={translate('partner_placeholder')}
-                            value={formStateDetail.inputValues.driver_partner_id_value}
-                            viewOnly={isVerified}
-                            containerStyle={{marginTop: 16}}
-                            disabled={isVerified}
-                            onPress={() => {
-                                openPicker(
-                                    'driver_partner_id',
-                                    'partner_title',
-                                    partnerData,
-                                    dispatchDetail,
-                                );
-                            }}
-                            isCheck={formState.isChecked}
-                        />
+                            <PickerInput
+                                id={'village_id'}
+                                title={translate('village_title')}
+                                containerStyle={{paddingVertical: 16}}
+                                placeholder={translate('village_placeholder')}
+                                value={formStateAddress.inputValues.village_id_value}
+                                isCheck={formState.isChecked}
+                                viewOnly={isVerified}
+                                disabled={isVerified}
+                                //disabled={formStateAddress.inputValues.district_id == null}
+                                onPress={() =>
+                                    villageData == null
+                                        ? toast.show(toastMessage.current, {
+                                            type: 'custom',
+                                            placement: 'bottom',
+                                            duration: 2000,
+                                            offset: 30,
+                                            animationType: 'slide-in',
+                                        })
+                                        : openPicker(
+                                            'village_id',
+                                            'village_title',
+                                            villageData,
+                                            dispatchAddress,
+                                        )
+                                }
+                                required
+                            />
 
-                        <CustomInput
-                            id={'address'}
-                            title={translate('address_title')}
-                            placeholder={translate('address_placeholder')}
-                            value={formStateAddress.inputValues.address}
-                            containerStyle={{marginVertical: 16}}
-                            dispatcher={dispatchAddress}
-                            isCheck={formState.isChecked}
-                            required
-                            viewOnly={isVerified}
-                        />
+                            {formStateAddress.inputValues.village_id == -99 ?
+                                formStateAddress.inputValues.village_id_value != null && (
+                                    <CustomInput
+                                        id={'village_name'}
+                                        title={translate('manual_input')}
+                                        containerStyle={{paddingBottom: 16}}
+                                        placeholder={translate('village_placeholder')}
+                                        value={formStateAddress.inputValues.village_name}
+                                        isCheck={formState.isChecked}
+                                        viewOnly={isVerified}
+                                        dispatcher={dispatchAddress}
+                                        required
+                                    />
+                                ) : null}
 
-                        <PickerInput
-                            id={'province_id'}
-                            title={translate('province_title')}
-                            placeholder={translate('province_placeholder')}
-                            value={formStateAddress.inputValues.province_id_value}
-                            isCheck={formState.isChecked}
-                            viewOnly={isVerified}
-                            disabled={isVerified}
-                            onPress={() =>
-                                openPicker(
-                                    'province_id',
-                                    'province_title',
-                                    provinceData,
-                                    dispatchAddress,
-                                )
-                            }
-                            required
-                        />
+                            <CustomInput
+                                id={'postal_code'}
+                                title={translate('postal_code_title')}
+                                placeholder={translate('postal_code_placeholder')}
+                                value={formStateAddress.inputValues.postal_code}
+                                dispatcher={dispatchAddress}
+                                isCheck={formState.isChecked}
+                                viewOnly={isVerified}
+                                keyboardType={'number-pad'}
+                                required
+                            />
 
-                        <PickerInput
-                            id={'city_id'}
-                            title={translate('city_title')}
-                            containerStyle={{paddingVertical: 16}}
-                            placeholder={translate('city_placeholder')}
-                            value={formStateAddress.inputValues.city_id_value}
-                            isCheck={formState.isChecked}
-                            viewOnly={isVerified}
-                            disabled={isVerified}
-                            //disabled={formStateAddress.inputValues.province_id == null && cityData == null}
-                            onPress={() =>
-                                cityData == null
-                                    ? toast.show(toastMessage.current, {
-                                        type: 'custom',
-                                        placement: 'bottom',
-                                        duration: 2000,
-                                        offset: 30,
-                                        animationType: 'slide-in',
-                                    })
-                                    : openPicker(
-                                        'city_id',
-                                        'city_title',
-                                        cityData,
-                                        dispatchAddress,
-                                    )
-                            }
-                            required
-                        />
+                            <GenderComponents
+                                containerStyle={{paddingVertical: 16}}
+                                selectedId={formStateDetail.inputValues.gender}
+                                isCheck={formState.isChecked}
+                                disabled={isVerified}
+                                onPress={onGenderPicked}
+                            />
 
-                        <PickerInput
-                            id={'district_id'}
-                            title={translate('district_title')}
-                            placeholder={translate('district_placeholder')}
-                            value={formStateAddress.inputValues.district_id_value}
-                            isCheck={formState.isChecked}
-                            viewOnly={isVerified}
-                            disabled={isVerified}
-                            //disabled={formStateAddress.inputValues.city_id == null }
-                            onPress={() =>
-                                districtData == null
-                                    ? toast.show(toastMessage.current, {
-                                        type: 'custom',
-                                        placement: 'bottom',
-                                        duration: 2000,
-                                        offset: 30,
-                                        animationType: 'slide-in',
-                                    })
-                                    : openPicker(
-                                        'district_id',
-                                        'district_title',
-                                        districtData,
-                                        dispatchAddress,
-                                    )
-                            }
-                            required
-                        />
+                            <PickerInput
+                                id={'birth_date'}
+                                title={translate('birthdate_title')}
+                                placeholder={translate('birthdate_placeholder')}
+                                value={formStateDetail.inputValues.birth_date_value}
+                                isCheck={formState.isChecked}
+                                Icon={IconCalendar}
+                                viewOnly={isVerified}
+                                disabled={isVerified}
+                                required
+                                onPress={() => setopenDate(true)}
+                            />
+                            {!isEdit ? (
+                                <View>
+                                    <PickerInput
+                                        id={'bank_id'}
+                                        title={translate('bank_title')}
+                                        placeholder={translate('bank_placeholder')}
+                                        containerStyle={{paddingVertical: 16}}
+                                        value={formStateBank.inputValues.bank_id_value}
+                                        isCheck={formState.isChecked}
+                                        required
+                                        disabled={formStateDetail.inputValues.driver_company_id}
+                                        onPress={() =>
+                                            openPicker('bank_id', 'bank_title', bankData, dispatchBank)
+                                        }
+                                    />
 
-                        <PickerInput
-                            id={'village_id'}
-                            title={translate('village_title')}
-                            containerStyle={{paddingVertical: 16}}
-                            placeholder={translate('village_placeholder')}
-                            value={formStateAddress.inputValues.village_id_value}
-                            isCheck={formState.isChecked}
-                            viewOnly={isVerified}
-                            disabled={isVerified}
-                            //disabled={formStateAddress.inputValues.district_id == null}
-                            onPress={() =>
-                                villageData == null
-                                    ? toast.show(toastMessage.current, {
-                                        type: 'custom',
-                                        placement: 'bottom',
-                                        duration: 2000,
-                                        offset: 30,
-                                        animationType: 'slide-in',
-                                    })
-                                    : openPicker(
-                                        'village_id',
-                                        'village_title',
-                                        villageData,
-                                        dispatchAddress,
-                                    )
-                            }
-                            required
-                        />
+                                    <CustomInput
+                                        id={'number'}
+                                        title={translate('bank_no_title')}
+                                        placeholder={translate('bank_no_placeholder')}
+                                        value={formStateBank.inputValues.number}
+                                        dispatcher={dispatchBank}
+                                        isCheck={formState.isChecked}
+                                        disabled={formStateDetail.inputValues.driver_company_id}
+                                        keyboardType={'number-pad'}
+                                        required
+                                    />
 
-                        {formStateAddress.inputValues.village_id == -99 ?
-                            formStateAddress.inputValues.village_id_value != null && (
-                                <CustomInput
-                                    id={'village_name'}
-                                    title={translate('manual_input')}
-                                    containerStyle={{paddingBottom: 16}}
-                                    placeholder={translate('village_placeholder')}
-                                    value={formStateAddress.inputValues.village_name}
-                                    isCheck={formState.isChecked}
-                                    viewOnly={isVerified}
-                                    dispatcher={dispatchAddress}
-                                    required
-                                />
+                                    <CustomInput
+                                        id={'branch'}
+                                        title={translate('branch_title')}
+                                        placeholder={translate('branch_placeholder')}
+                                        containerStyle={{paddingVertical: 16}}
+                                        value={formStateBank.inputValues.branch}
+                                        dispatcher={dispatchBank}
+                                        isCheck={formState.isChecked}
+                                        disabled={formStateDetail.inputValues.driver_company_id}
+                                        required
+                                    />
+
+                                    <CustomInput
+                                        id={'name'}
+                                        title={translate('bank_owner_title')}
+                                        placeholder={translate('bank_owner_placeholder')}
+                                        value={formStateBank.inputValues.name}
+                                        dispatcher={dispatchBank}
+                                        isCheck={formState.isChecked}
+                                        disabled={formStateDetail.inputValues.driver_company_id}
+                                        required
+                                    />
+                                </View>
                             ) : null}
 
-                        <CustomInput
-                            id={'postal_code'}
-                            title={translate('postal_code_title')}
-                            placeholder={translate('postal_code_placeholder')}
-                            value={formStateAddress.inputValues.postal_code}
-                            dispatcher={dispatchAddress}
-                            isCheck={formState.isChecked}
-                            viewOnly={isVerified}
-                            keyboardType={'number-pad'}
-                            required
-                        />
-
-                        <GenderComponents
-                            containerStyle={{paddingVertical: 16}}
-                            selectedId={formStateDetail.inputValues.gender}
-                            isCheck={formState.isChecked}
-                            disabled={isVerified}
-                            onPress={onGenderPicked}
-                        />
-
-                        <PickerInput
-                            id={'birth_date'}
-                            title={translate('birthdate_title')}
-                            placeholder={translate('birthdate_placeholder')}
-                            value={formStateDetail.inputValues.birth_date_value}
-                            isCheck={formState.isChecked}
-                            Icon={IconCalendar}
-                            viewOnly={isVerified}
-                            disabled={isVerified}
-                            required
-                            onPress={() => setopenDate(true)}
-                        />
-                        {!isEdit ? (
-                            <View>
-                                <PickerInput
-                                    id={'bank_id'}
-                                    title={translate('bank_title')}
-                                    placeholder={translate('bank_placeholder')}
-                                    containerStyle={{paddingVertical: 16}}
-                                    value={formStateBank.inputValues.bank_id_value}
-                                    isCheck={formState.isChecked}
-                                    required
-                                    disabled={formStateDetail.inputValues.driver_company_id}
-                                    onPress={() =>
-                                        openPicker('bank_id', 'bank_title', bankData, dispatchBank)
-                                    }
-                                />
-
-                                <CustomInput
-                                    id={'number'}
-                                    title={translate('bank_no_title')}
-                                    placeholder={translate('bank_no_placeholder')}
-                                    value={formStateBank.inputValues.number}
-                                    dispatcher={dispatchBank}
-                                    isCheck={formState.isChecked}
-                                    disabled={formStateDetail.inputValues.driver_company_id}
-                                    keyboardType={'number-pad'}
-                                    required
-                                />
-
-                                <CustomInput
-                                    id={'branch'}
-                                    title={translate('branch_title')}
-                                    placeholder={translate('branch_placeholder')}
-                                    containerStyle={{paddingVertical: 16}}
-                                    value={formStateBank.inputValues.branch}
-                                    dispatcher={dispatchBank}
-                                    isCheck={formState.isChecked}
-                                    disabled={formStateDetail.inputValues.driver_company_id}
-                                    required
-                                />
-
-                                <CustomInput
-                                    id={'name'}
-                                    title={translate('bank_owner_title')}
-                                    placeholder={translate('bank_owner_placeholder')}
-                                    value={formStateBank.inputValues.name}
-                                    dispatcher={dispatchBank}
-                                    isCheck={formState.isChecked}
-                                    disabled={formStateDetail.inputValues.driver_company_id}
-                                    required
-                                />
-                            </View>
-                        ) : null}
-
-                        <CustomInput
-                            id={'ktp'}
-                            title={translate('number', {string: translate('ktp')})}
-                            placeholder={translate('ktp_placeholder')}
-                            containerStyle={{paddingVertical: 16}}
-                            value={formStateCard.inputValues.ktp}
-                            dispatcher={dispatchCard}
-                            viewOnly={isVerified}
-                            isCheck={formState.isChecked}
-                            keyboardType={'number-pad'}
-                            required
-                        />
-
-                        <IDCard
-                            title={translate('ktp')}
-                            navigation={navigation}
-                            onPress={() => {
-                                !isVerified
-                                    ? openImagePicker('ktp_image', 'card', dispatchCard)
-                                    : null;
-                            }}
-                            imageUri={formStateCard.inputValues.ktp_image_uri}
-                            isCheck={formState.isChecked}
-                            required
-                        />
-
-                        <CustomInput
-                            id={'sim_a'}
-                            title={translate('number', {string: translate('sim_a')})}
-                            placeholder={translate('sim_placeholder')}
-                            containerStyle={{paddingVertical: 16}}
-                            value={formStateCard.inputValues.sim_a}
-                            dispatcher={dispatchCard}
-                            viewOnly={isVerified}
-                            isCheck={formState.isChecked}
-                            keyboardType={'number-pad'}
-                            required
-                        />
-
-                        <IDCard
-                            title={translate('sim_a')}
-                            navigation={navigation}
-                            onPress={() => {
-                                !isVerified
-                                    ? openImagePicker('sim_a_image', 'card', dispatchCard)
-                                    : null;
-                            }}
-                            imageUri={formStateCard.inputValues.sim_a_image_uri}
-                            isCheck={formState.isChecked}
-                            required
-                        />
-
-                        <CustomInput
-                            id={'sim_b'}
-                            title={translate('number', {string: translate('sim_b')})}
-                            placeholder={translate('sim_placeholder')}
-                            containerStyle={{paddingVertical: 16}}
-                            value={formStateCard.inputValues.sim_b}
-                            dispatcher={dispatchCard}
-                            viewOnly={isVerified}
-                            keyboardType={'number-pad'}
-                            isCheck={formState.isChecked}
-                            required={formStateCard.inputValues.sim_b_image?.length > 0}
-                        />
-
-                        <IDCard
-                            navigation={navigation}
-                            title={translate('sim_b')}
-                            onPress={() => {
-                                !isVerified
-                                    ? openImagePicker('sim_b_image', 'card', dispatchCard)
-                                    : null;
-                            }}
-                            imageUri={formStateCard.inputValues.sim_b_image_uri}
-                            isCheck={formState.isChecked}
-                            required={formStateCard.inputValues.sim_b?.length > 0}
-                        />
-
-                        <CustomInput
-                            id={'sim_c'}
-                            title={translate('number', {string: translate('sim_c')})}
-                            placeholder={translate('sim_placeholder')}
-                            containerStyle={{paddingVertical: 16}}
-                            value={formStateCard.inputValues.sim_c}
-                            dispatcher={dispatchCard}
-                            viewOnly={isVerified}
-                            isCheck={formState.isChecked}
-                            keyboardType={'number-pad'}
-                            required
-                        />
-
-
-                        <IDCard
-                            title={translate('sim_c')}
-                            navigation={navigation}
-                            onPress={() => {
-                                !isVerified
-                                    ? openImagePicker('sim_c_image', 'card', dispatchCard)
-                                    : null;
-                            }}
-                            imageUri={formStateCard.inputValues.sim_c_image_uri}
-                            isCheck={formState.isChecked}
-                            required
-                        />
-
-
-                        {!isVerified && (
-                            <CustomButton
-                                types="primary"
-                                title={translate('next')}
-                                containerStyle={{marginTop: 16}}
-                                onPress={doRegister}
-                                isLoading={isLoading}
+                            <CustomInput
+                                id={'ktp'}
+                                title={translate('number', {string: translate('ktp')})}
+                                placeholder={translate('ktp_placeholder')}
+                                containerStyle={{paddingVertical: 16}}
+                                value={formStateCard.inputValues.ktp}
+                                dispatcher={dispatchCard}
+                                viewOnly={isVerified}
+                                isCheck={formState.isChecked}
+                                keyboardType={'number-pad'}
+                                required
                             />
-                        )}
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
 
-            <DatePicker
-                open={openDate}
-                mode="date"
-                modal
-                androidVariant="iosClone"
-                date={new Date()}
-                maximumDate={new Date()}
-                onConfirm={onPickDate}
-                onCancel={() => setopenDate(false)}
+                            <IDCard
+                                title={translate('ktp')}
+                                navigation={navigation}
+                                onPress={
+                                    !isVerified
+                                        ? () => {
+                                            openImagePicker('ktp_image', 'card', dispatchCard)
+                                        }
+                                        : undefined
+                                }
+                                imageUri={formStateCard.inputValues.ktp_image_uri}
+                                isCheck={formState.isChecked}
+                                required
+                            />
+
+                            <CustomInput
+                                id={'sim_a'}
+                                title={translate('number', {string: translate('sim_a')})}
+                                placeholder={translate('sim_placeholder')}
+                                containerStyle={{paddingVertical: 16}}
+                                value={formStateCard.inputValues.sim_a}
+                                dispatcher={dispatchCard}
+                                viewOnly={isVerified}
+                                isCheck={formState.isChecked}
+                                keyboardType={'number-pad'}
+                                required
+                            />
+
+                            <IDCard
+                                title={translate('sim_a')}
+                                navigation={navigation}
+                                onPress={!isVerified
+                                    ? () => {
+                                        openImagePicker('sim_a_image', 'card', dispatchCard)
+                                    }
+                                    : undefined
+                                }
+                                imageUri={formStateCard.inputValues.sim_a_image_uri}
+                                isCheck={formState.isChecked}
+                                required
+                            />
+
+                            <CustomInput
+                                id={'sim_b'}
+                                title={translate('number', {string: translate('sim_b')})}
+                                placeholder={translate('sim_placeholder')}
+                                containerStyle={{paddingVertical: 16}}
+                                value={formStateCard.inputValues.sim_b}
+                                dispatcher={dispatchCard}
+                                viewOnly={isVerified}
+                                keyboardType={'number-pad'}
+                                isCheck={formState.isChecked}
+                                required={formStateCard.inputValues.sim_b_image?.length > 0}
+                            />
+
+                            <IDCard
+                                navigation={navigation}
+                                title={translate('sim_b')}
+                                onPress={!isVerified
+                                    ? () => {
+                                        openImagePicker('sim_b_image', 'card', dispatchCard)
+                                    }
+                                    : undefined
+                                }
+                                imageUri={formStateCard.inputValues.sim_b_image_uri}
+                                isCheck={formState.isChecked}
+                                required={formStateCard.inputValues.sim_b?.length > 0}
+                            />
+
+                            <CustomInput
+                                id={'sim_c'}
+                                title={translate('number', {string: translate('sim_c')})}
+                                placeholder={translate('sim_placeholder')}
+                                containerStyle={{paddingVertical: 16}}
+                                value={formStateCard.inputValues.sim_c}
+                                dispatcher={dispatchCard}
+                                viewOnly={isVerified}
+                                isCheck={formState.isChecked}
+                                keyboardType={'number-pad'}
+                                required
+                            />
+
+
+                            <IDCard
+                                title={translate('sim_c')}
+                                navigation={navigation}
+                                onPress={!isVerified
+                                    ? () => {
+                                        openImagePicker('sim_c_image', 'card', dispatchCard)
+                                    }
+                                    : undefined
+                                }
+                                imageUri={formStateCard.inputValues.sim_c_image_uri}
+                                isCheck={formState.isChecked}
+                                required
+                            />
+
+
+                            {!isVerified && (
+                                <CustomButton
+                                    types="primary"
+                                    title={translate('next')}
+                                    containerStyle={{marginTop: 16}}
+                                    onPress={doRegister}
+                                    isLoading={isLoading}
+                                />
+                            )}
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+
+                <DatePicker
+                    open={openDate}
+                    mode="date"
+                    modal
+                    androidVariant="iosClone"
+                    date={new Date()}
+                    maximumDate={new Date()}
+                    onConfirm={onPickDate}
+                    onCancel={() => setopenDate(false)}
+                />
+
+                <ModalActivityIndicator show={preloading}/>
+            </SafeAreaView>
+
+
+            <CustomRegisterImagePickerBS
+                open={isOpenImagePicker}
+                onClose={() => {
+                    setIsOpenImagePicker(false)
+                }}
+                onCamera={() => {
+                    handleCloseImagePicker()
+                    setimagePickerId(0)
+                }}
+                onGallery={() => {
+                    handleCloseImagePicker()
+                    setimagePickerId(1)
+                }}
+                onDelete={() => {
+                    handleCloseImagePicker()
+                    setimagePickerId(2)
+                }}
+                isImageEmpty={isPickedImageEmpty()}
             />
 
-            <CustomSheet ref={pickerSheet}>
-                <View style={{padding: 16}}>
-                    <LatoBold>{translate('pick_photo')}</LatoBold>
-                    <TouchableOpacity
-                        onPress={() => setimagePickerId(1)}
-                        style={{marginVertical: 10}}>
-                        <LatoRegular Icon={IconGallery}>
-                            {translate('pick_gallery')}
-                        </LatoRegular>
-                    </TouchableOpacity>
-                    <View
-                        style={{
-                            height: 1,
-                            backgroundColor: Colors.divider,
-                            marginBottom: 10,
-                            marginLeft: 28,
-                        }}
-                    />
-                    <TouchableOpacity onPress={() => setimagePickerId(0)}>
-                        <LatoRegular Icon={IconCamera}>
-                            {translate('pick_camera')}
-                        </LatoRegular>
-                    </TouchableOpacity>
 
-                    {!isPickedImageEmpty() && (
-                        <View>
-                            <View
-                                style={{
-                                    height: 1,
-                                    backgroundColor: Colors.divider,
-                                    marginTop: 10,
-                                    marginBottom: 10,
-                                    marginLeft: 28,
-                                }}
-                            />
-                            <TouchableOpacity onPress={() => setimagePickerId(2)}>
-                                <LatoRegular Icon={IconDelete}>
-                                    {translate('pick_delete')}
-                                </LatoRegular>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                </View>
-            </CustomSheet>
-            <ModalActivityIndicator show={preloading}/>
-        </SafeAreaView>
+        </>
     );
 };
 

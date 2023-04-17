@@ -13,7 +13,6 @@ import CustomButton from '../../components/atoms/CustomButton';
 import Colors from '../../constants/Colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
-import {showDialog, showErrorDialog} from '../../actions/commonActions';
 import {PasswordInput, PhoneInput,} from '../../components/atoms/CustomInput';
 import {login} from '../../services/auth';
 import formReducer from '../../reducers/formReducer';
@@ -26,10 +25,12 @@ import Constant from '../../constants/Constant';
 import {getFirebaseToken, openWhatsapp} from '../../actions/helper';
 import IconLogo from '../../assets/images/oto_logo.svg';
 import IconBg from '../../assets/images/login_bg_top.svg';
+import {useCommonAction} from "../../actions/commonActions";
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const LoginScreen = ({navigation, route}) => {
+    const {showErrorDialog} = useCommonAction()
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {
             phone: Config.isDevMode ? '82112233445' : '',
@@ -90,7 +91,9 @@ const LoginScreen = ({navigation, route}) => {
                     });
             } catch (err) {
                 console.log("login error 2");
-                showDialog(err.message)
+                showErrorDialog({
+                    error: err,
+                })
             }
         }
     }

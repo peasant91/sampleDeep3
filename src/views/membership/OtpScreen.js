@@ -10,7 +10,6 @@ import {
   BackHandler,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import {showDialog} from '../../actions/commonActions';
 import CountdownOtp from '../../components/atoms/CountdownOtp';
 import CustomButton from '../../components/atoms/CustomButton';
 import CustomInput from '../../components/atoms/CustomInput';
@@ -26,10 +25,11 @@ import {
   verifyForgotPassword,
   verifyOtp,
 } from '../../services/auth';
+import {useCommonAction} from "../../actions/commonActions";
 
 const OtpScreen = ({navigation, route}) => {
   const {isRegister} = route.params;
-
+const {showErrorDialog} = useCommonAction()
   const [otpId, setotpId] = useState(route.params.data.otpId);
   const [otpCode, setotpCode] = useState();
   const [data, setData] = useState(route.params.data);
@@ -48,7 +48,9 @@ const OtpScreen = ({navigation, route}) => {
         })
         .catch(error => {
           console.log(error);
-          showDialog(error.message);
+          showErrorDialog({
+            error: error,
+          })
         });
     } else {
       setisLoading(true);
@@ -62,7 +64,9 @@ const OtpScreen = ({navigation, route}) => {
         })
         .catch(error => {
           setisLoading(false);
-          showDialog(error.message);
+          showErrorDialog({
+            error: error,
+          })
           console.log(error);
         });
     }
@@ -82,7 +86,9 @@ const OtpScreen = ({navigation, route}) => {
           })
           .catch(error => {
             setisLoading(false);
-            showDialog(error.message);
+            showErrorDialog({
+              error: error,
+            })
           });
       } else {
         verifyForgotPassword({
@@ -95,7 +101,9 @@ const OtpScreen = ({navigation, route}) => {
           })
           .catch(error => {
             setisLoading(false);
-            showDialog(error.message);
+            showErrorDialog({
+              error: error,
+            })
           });
       }
     }
@@ -125,7 +133,9 @@ const OtpScreen = ({navigation, route}) => {
       })
       .catch(error => {
         setisLoading(false);
-        showDialog(error.message);
+        showErrorDialog({
+          error: error,
+        })
         console.log(error);
       });
   };

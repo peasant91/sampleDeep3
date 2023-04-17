@@ -39,7 +39,7 @@ import {getHome} from '../../services/home';
 import {
   dismissDialog,
   showDialog,
-  showUploadDialog,
+  showUploadDialog, useCommonAction,
 } from '../../actions/commonActions';
 import {getProfile, updateFcmToken} from '../../services/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,6 +78,7 @@ const HomeScreen = ({navigation, route}) => {
   const [profileData, setprofileData] = useState({});
   const [chartData, setChartData] = useState([]);
   const [contractData, setContractData] = useState({});
+  const {showErrorDialog} = useCommonAction()
 
   const toast = useToast();
 
@@ -117,7 +118,7 @@ const HomeScreen = ({navigation, route}) => {
       .all([getHome(), getProfile(), getNotification()])
       .then(
         axios.spread(async (home, profile, notification, contract) => {
-          
+
           sethomeData(home);
           //setContractData(contract);
           AsyncStorage.setItem(
@@ -139,7 +140,9 @@ const HomeScreen = ({navigation, route}) => {
       )
       .catch(err => {
         setisLoading(false);
-        showDialog(err.message);
+        showErrorDialog({
+          error: err,
+        })
       });
   };
 
@@ -150,7 +153,9 @@ const HomeScreen = ({navigation, route}) => {
       })
         .then(response => {})
         .catch(err => {
-          showDialog(err.message);
+          showErrorDialog({
+            error: err,
+          })
         });
     });
   };
@@ -163,7 +168,9 @@ const HomeScreen = ({navigation, route}) => {
           setChartData(response);
         })
         .catch(err => {
-          showDialog(err.message);
+          showErrorDialog({
+            error: err,
+          })
         });
     }
   };
@@ -176,7 +183,9 @@ const HomeScreen = ({navigation, route}) => {
           setisLoading(false);
         })
         .catch(err => {
-          showDialog(err.message);
+          showErrorDialog({
+            error: err,
+          })
         });
     }else{
       setisLoading(false);
