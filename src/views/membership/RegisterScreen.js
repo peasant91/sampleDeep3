@@ -249,14 +249,14 @@ const RegisterScreen = ({ navigation, route }) => {
                 ) : null,
                 profile_image_uri: data.profile_image,
                 gender: data.gender,
-                is_company: ((data?.account_type === AccountTypeEnum.COMPANY) || !!data?.account_type),
+                is_company: ((data?.account_type === AccountTypeEnum.COMPANY)),
                 account_type: data ? data?.account_type : AccountTypeEnum.INDIVIDUAL,
                 driver_company_request: data?.driver_company_request
             },
             formIsValid: true,
         };
 
-        console.log("state detail value", JSON.stringify(stateDetail, null, 2))
+        console.log('state detail', JSON.stringify(stateDetail, null, 2));
 
         const stateAddress = {
             inputValues: {
@@ -288,16 +288,14 @@ const RegisterScreen = ({ navigation, route }) => {
                 sim_a_image_uri: data.sim_a.image,
                 sim_b: data.sim_b?.number,
                 sim_b_image_uri: data.sim_b?.image,
-                sim_c: data.sim_c.number,
-                sim_c_image: data.sim_c.image ? await getImageBase64FromUrl(
-                    data.sim_c.image,
+                sim_c: data.sim_c?.number,
+                sim_c_image: data.sim_c?.image ? await getImageBase64FromUrl(
+                    data.sim_c?.image,
                 ) : null,
-                sim_c_image_uri: data.sim_c.image,
+                sim_c_image_uri: data.sim_c?.image,
             },
             formIsValid: true,
         };
-
-        console.log("state detail", stateDetail);
 
         dispatchDetail({
             type: 'update',
@@ -323,7 +321,7 @@ const RegisterScreen = ({ navigation, route }) => {
 
         onPickDate(data.birth_date);
     };
-    //
+    
     const buildCardForm = () => {
         //console.log('cardform', formStateCard.inputValues)
         var card = [];
@@ -686,6 +684,7 @@ const RegisterScreen = ({ navigation, route }) => {
     };
 
     useDeepEffect(async () => {
+        console.log('masuk');
         AsyncStorage.getItem(StorageKey.KEY_COMPANY).then(company => {
             setcompanyData(JSON.parse(company));
         });

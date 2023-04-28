@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import AccountTopHeader from '../../../components/atoms/AccountTopHeader';
 import AccountCardInfo from '../../../components/atoms/AccountCardInfo';
 import Divider from '../../../components/atoms/Divider';
@@ -24,16 +24,16 @@ import IconCar from '../../../assets/images/ic_vehicle.svg';
 import Colors from '../../../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../../constants/StorageKey';
-import {AuthContext} from '../../../../App';
-import {showDialog, useCommonAction} from '../../../actions/commonActions';
-import {getProfile} from '../../../services/user';
-import {getDriverVehicle, getVehicleRoute} from '../../../services/utilities';
-import {isEmpty, openWhatsapp} from '../../../actions/helper';
+import { AuthContext } from '../../../../App';
+import { showDialog, useCommonAction } from '../../../actions/commonActions';
+import { getProfile } from '../../../services/user';
+import { getDriverVehicle, getVehicleRoute } from '../../../services/utilities';
+import { isEmpty, openWhatsapp } from '../../../actions/helper';
 import axios from 'axios';
-import {ShimmerPlaceholder} from '../../../components/atoms/shimmer/Shimmer';
-import {getHome} from '../../../services/home';
+import { ShimmerPlaceholder } from '../../../components/atoms/shimmer/Shimmer';
+import { getHome } from '../../../services/home';
 import moment from 'moment';
-import {getIncomeList} from '../../../services/transaction';
+import { getIncomeList } from '../../../services/transaction';
 import IncomeProfile from '../../../components/atoms/IncomeProfile';
 
 // const profileData = {
@@ -50,15 +50,15 @@ import IncomeProfile from '../../../components/atoms/IncomeProfile';
 //   todayTravel: 1,
 // };
 
-const AccountScreen = ({navigation, route}) => {
+const AccountScreen = ({ navigation, route }) => {
   const [profileData, setprofileData] = useState({});
   const [vehicleRute, setvehicleRute] = useState({});
   const [contractData, setContractData] = useState({});
   const [isLoading, setisLoading] = useState(true);
   const [refreshing, setrefreshing] = useState(false);
   const [incomeData, setincomeData] = useState({});
-  const {signOut} = useContext(AuthContext);
-  const {showErrorDialog} = useCommonAction()
+  const { signOut } = useContext(AuthContext);
+  const { showErrorDialog } = useCommonAction()
 
   const getProfileApi = () => {
     setisLoading(true);
@@ -141,7 +141,7 @@ const AccountScreen = ({navigation, route}) => {
   }, [route.params]);
 
   const goToEdit = () => {
-    console.log('profile data', profileData);
+    console.log('profile data', JSON.stringify(profileData, null, 2));
     if (profileData && (Object.keys(profileData).length != 0)) {
       navigation.navigate('EditProfile', {
         isEdit: true,
@@ -174,7 +174,7 @@ const AccountScreen = ({navigation, route}) => {
   };
 
   const goToBank = () => {
-    if (!profileData.account_bank && (Object.keys(profileData).length == 0)){
+    if (!profileData.account_bank && (Object.keys(profileData).length == 0)) {
       return
     }
     navigation.navigate('Bank', {
@@ -206,24 +206,24 @@ const AccountScreen = ({navigation, route}) => {
       <AccountTopHeader data={profileData} isLoading={isLoading} />
 
       <ScrollView
-        style={{zIndex: -99}}
+        style={{ zIndex: -99 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={getProfileApi} />
         }>
         <View>
           {isLoading ? (
-            <View style={{margin: 16}}>
-              <ShimmerPlaceholder style={{width: '100%', height: 100}} />
+            <View style={{ margin: 16 }}>
+              <ShimmerPlaceholder style={{ width: '100%', height: 100 }} />
             </View>
           ) : !isEmpty(vehicleRute) ? (
-            <View style={{zIndex: -1}}>
+            <View style={{ zIndex: -1 }}>
               <AccountCardInfo
-                containerStyle={{margin: 8, zIndex: -1}}
+                containerStyle={{ margin: 8, zIndex: -1 }}
                 data={vehicleRute}
                 onPress={goToEditVehicle}
               />
               <InfoMenu
-                containerStyle={{marginHorizontal: 16, marginBottom: 16}}
+                containerStyle={{ marginHorizontal: 16, marginBottom: 16 }}
                 text={translate('vehicle_can_be_change')}
               />
               <Divider />
@@ -233,12 +233,12 @@ const AccountScreen = ({navigation, route}) => {
               <AccountMenu
                 Icon={IconCar}
                 text={translate('vehicle')}
-                containerStyle={{margin: 16}}
+                containerStyle={{ margin: 16 }}
                 onPress={goToAddVehicle}
               />
 
               <InfoMenu
-                containerStyle={{marginHorizontal: 16, marginBottom: 16}}
+                containerStyle={{ marginHorizontal: 16, marginBottom: 16 }}
                 text={translate('info_not_verified')}
               />
             </View>
@@ -246,7 +246,7 @@ const AccountScreen = ({navigation, route}) => {
 
           <Divider />
 
-          <View style={{margin: 12}}>
+          <View style={{ margin: 12 }}>
             {!isEmpty(incomeData) && (
               <IncomeProfile
                 data={incomeData}
@@ -257,11 +257,11 @@ const AccountScreen = ({navigation, route}) => {
             <ShimmerPlaceholder
               isLoading={isLoading}
               height={40}
-              style={{width: '100%'}}>
+              style={{ width: '100%' }}>
               <AccountMenu
                 Icon={IconMyContract}
                 text={translate('my_contract')}
-                containerStyle={{margin: 4}}
+                containerStyle={{ margin: 4 }}
                 onPress={goToContract}
               />
             </ShimmerPlaceholder>
@@ -269,7 +269,7 @@ const AccountScreen = ({navigation, route}) => {
 
           <Divider />
 
-          <View style={{margin: 16}}>
+          <View style={{ margin: 16 }}>
             <AccountMenu
               Icon={IconChangeProfile}
               text={translate('change_profile')}
@@ -279,21 +279,21 @@ const AccountScreen = ({navigation, route}) => {
             <AccountMenu
               Icon={IconChangePassword}
               text={translate('change_password')}
-              containerStyle={{marginTop: 16}}
+              containerStyle={{ marginTop: 16 }}
               onPress={() => navigation.navigate('ChangePassword')}
             />
 
             <AccountMenu
               Icon={IconBank}
               text={translate('bank_account')}
-              containerStyle={{marginTop: 16}}
+              containerStyle={{ marginTop: 16 }}
               onPress={goToBank}
             />
 
             <AccountMenu
               Icon={IconContactUs}
               text={translate('contact_us')}
-              containerStyle={{marginTop: 16}}
+              containerStyle={{ marginTop: 16 }}
               onPress={openWhatsapp}
             />
           </View>
@@ -303,7 +303,7 @@ const AccountScreen = ({navigation, route}) => {
           <AccountMenu
             Icon={IconLogout}
             text={translate('logout')}
-            containerStyle={{margin: 16}}
+            containerStyle={{ margin: 16 }}
             // onPress={() => {
             //   navigation.navigate("PDFViewerScreen", {
             //     title: "Panduan Report Mingguan",
