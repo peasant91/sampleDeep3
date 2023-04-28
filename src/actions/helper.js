@@ -117,8 +117,8 @@ export const mapReportImages = stickerImages =>
                 console.log('sticker listnya', stickerList);
                 if (stickerList.length > 0) {
                     const data = {
-                        name: stickerData[index].name,
-                        value: stickerData[index].name,
+                        name: stickerData[index].value,
+                        value: stickerData[index].value,
                         images: stickerList.map(item => {
                             return {
                                 id: item.id,

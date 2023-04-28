@@ -1,19 +1,20 @@
-import React, {useEffect, useMemo} from 'react'
-import {TouchableOpacity, View, StyleSheet} from 'react-native'
-import {Image} from 'react-native-elements'
+import React, { useEffect, useMemo } from 'react'
+import { TouchableOpacity, View, StyleSheet } from 'react-native'
+import { Image } from 'react-native-elements'
 
 import IconView from '../../assets/images/ic_image_view.svg';
 import IconAddImage from '../../assets/images/ic_add_image.svg';
-import {LatoBold} from './CustomText';
+import { LatoBold } from './CustomText';
 import Colors from '../../constants/Colors';
 import translate from '../../locales/translate';
-import {getFullLink} from '../../actions/helper';
+import { getFullLink } from '../../actions/helper';
 
 const ReportImage = ({
-                         item, onPress,
-                         // onPressEdit,
-                         navigation, title, containerStyle, type
-                     }) => {
+    item,
+    onPress,
+    onPressEdit,
+    navigation, title, containerStyle, type
+}) => {
 
     const imageUri = useMemo(() => {
         if (type == "odometer") {
@@ -23,16 +24,18 @@ const ReportImage = ({
         }
     }, [item])
 
-
-    return <View style={[{height: 120, width: '48%', justifyContent: 'space-between', marginTop: 16}, containerStyle]}>
+    return <View style={[{ height: 120, width: '48%', justifyContent: 'space-between', marginTop: 16 }, containerStyle]}>
         {imageUri != ' ' ? (
-            <TouchableOpacity style={{flex: 1}} onPress={() => navigation.navigate('ImageViewer', {
-                imageUrl: imageUri?.includes('/storage/') ? getFullLink(imageUri) : item,
-                title: title
-            })
+            <TouchableOpacity style={{ flex: 1 }} onPress={
+                onPressEdit
+                    ? onPressEdit
+                    : () => navigation.navigate('ImageViewer', {
+                        imageUrl: imageUri?.includes('/storage/') ? getFullLink(imageUri) : item,
+                        title: title
+                    })
             }>
                 <Image
-                    source={{uri: imageUri.includes('/storage/') ? getFullLink(imageUri) : imageUri}}
+                    source={{ uri: imageUri.includes('/storage/') ? getFullLink(imageUri) : imageUri }}
                     style={{
                         height: '100%',
                         width: '100%',
@@ -46,14 +49,14 @@ const ReportImage = ({
                     width: '100%',
                     height: '100%'
                 }}>
-                    <IconView/>
+                    <IconView />
                 </View>
             </TouchableOpacity>
         ) : (
             <TouchableOpacity onPress={onPress} style={styles.idContainer}>
                 <View style={styles.idContainer}>
-                    <IconAddImage/>
-                    <LatoBold style={{color: Colors.primary, marginTop: 10}}>
+                    <IconAddImage />
+                    <LatoBold style={{ color: Colors.primary, marginTop: 10 }}>
                         {translate('add_foto')}
                     </LatoBold>
                 </View>
