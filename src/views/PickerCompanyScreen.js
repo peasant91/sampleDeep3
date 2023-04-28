@@ -28,7 +28,7 @@ const PickerCompanyScreen = ({navigation, route}) => {
         isRegister,
         driver_company_request,
         onSubmit,
-        // onPressList
+        onSelectedList
     } = route.params;
 
     const [filteredData, setfilteredData] = useState(data ? data : [])
@@ -50,14 +50,20 @@ const PickerCompanyScreen = ({navigation, route}) => {
 
     const onPressList = (id, name) => {
         console.log(isEdit)
-        navigation.navigate(route.params.previousRoute, {
-            pickerId: pickerId,
-            id: id,
-            name: name,
-            isEdit: isEdit,
-            dispatch: dispatch,
-            isRegister: isRegister
-        }, true)
+        onSelectedList({
+            id,
+            name
+        })
+        navigation?.goBack()
+        
+        // navigation.navigate(route.params.previousRoute, {
+        //     pickerId: pickerId,
+        //     id: id,
+        //     name: name,
+        //     isEdit: isEdit,
+        //     dispatch: dispatch,
+        //     isRegister: isRegister
+        // }, true)
     }
 
     const handleSubmit = () => {

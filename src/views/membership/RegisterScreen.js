@@ -27,15 +27,15 @@ import CustomInput, {
     PickerInput,
     PasswordInput,
 } from '../../components/atoms/CustomInput';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import formReducer from '../../reducers/formReducer.js';
 import {
     showDialog,
     dismissDialog, useCommonAction,
 } from '../../actions/commonActions';
-import {register, updateProfile, validateRegister} from '../../services/auth';
+import { register, updateProfile, validateRegister } from '../../services/auth';
 import NavBar from '../../components/atoms/NavBar';
-import {Image} from 'react-native-elements';
+import { Image } from 'react-native-elements';
 import DatePicker from 'react-native-date-picker';
 import CustomSheet from '../../components/atoms/CustomSheet';
 
@@ -48,7 +48,7 @@ import IconCalendar from '../../assets/images/ic_calendar.svg';
 
 import GenderComponents from '../../components/molecules/GenderComponents';
 import IDCard from '../../components/atoms/IDCard';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../constants/StorageKey';
 import {
@@ -61,8 +61,8 @@ import {
 import moment from 'moment';
 import Colors from '../../constants/Colors';
 import Config from '../../constants/Config';
-import {getFullLink, getImageBase64FromUrl} from '../../actions/helper';
-import {getUserBank} from '../../services/user';
+import { getFullLink, getImageBase64FromUrl } from '../../actions/helper';
+import { getUserBank } from '../../services/user';
 import InfoMenu from '../../components/atoms/InfoMenu';
 import {
     check,
@@ -71,14 +71,14 @@ import {
     request,
     RESULTS,
 } from 'react-native-permissions';
-import {useToast} from 'react-native-toast-notifications';
+import { useToast } from 'react-native-toast-notifications';
 import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
 import ModalActivityIndicator from '../../components/molecules/ModalActivityIndicator';
 import CustomCheckbox from "../../components/atoms/Checkbox";
-import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
-import {AccountTypeEnum} from "../../data/enums/AccountTypeEnum";
-import {useDeepEffect} from "../../hooks/useDeepEffect";
+import { checkGalleryPermission, requestGalleryPermission } from "../../actions/permissionAction";
+import { AccountTypeEnum } from "../../data/enums/AccountTypeEnum";
+import { useDeepEffect } from "../../hooks/useDeepEffect";
 import CustomRegisterImagePickerBS from "../../components/molecules/CustomRegisterImagePickerBS";
 
 const dummyDivision = [
@@ -96,8 +96,8 @@ const dummyDivision = [
     },
 ];
 
-const RegisterScreen = ({navigation, route}) => {
-    const {showErrorDialog} = useCommonAction()
+const RegisterScreen = ({ navigation, route }) => {
+    const { showErrorDialog } = useCommonAction()
     const [companyData, setcompanyData] = useState();
     const [provinceData, setprovinceData] = useState();
     const [cityData, setcityData] = useState();
@@ -113,7 +113,7 @@ const RegisterScreen = ({navigation, route}) => {
     const [openDate, setopenDate] = useState(false);
     const [isEdited, setisEdited] = useState(false);
     //
-    const {isEdit, data, isVerified} = route.params;
+    const { isEdit, data, isVerified } = route.params;
     const toast = useToast();
     const toastMessage = useRef(translate('please_select_province'));
     const [isOpenImagePicker, setIsOpenImagePicker] = useState(false);
@@ -155,6 +155,10 @@ const RegisterScreen = ({navigation, route}) => {
     const [formStateDetail, dispatchDetail] = useReducer(formReducer, {
         inputValues: {
             gender: '',
+            is_company: false,
+            account_type: AccountTypeEnum.INDIVIDUAL,
+            driver_company_request: null,
+            driver_company_id: null
         },
         inputValidities: {
             gender: isEdit,
@@ -202,6 +206,7 @@ const RegisterScreen = ({navigation, route}) => {
     };
     //
     const isAllFormValid = () => {
+        console.log('data detail input', formStateDetail?.inputValues);
         console.log('sim b input', formStateCard?.inputValues?.sim_b?.length);
         console.log(
             formState.formIsValid,
@@ -245,7 +250,7 @@ const RegisterScreen = ({navigation, route}) => {
                 profile_image_uri: data.profile_image,
                 gender: data.gender,
                 is_company: ((data?.account_type === AccountTypeEnum.COMPANY) || !!data?.account_type),
-                account_type: data?.account_type,
+                account_type: data ? data?.account_type : AccountTypeEnum.INDIVIDUAL,
                 driver_company_request: data?.driver_company_request
             },
             formIsValid: true,
@@ -343,7 +348,7 @@ const RegisterScreen = ({navigation, route}) => {
     // //delete village_id if manual input
     const getFormAddress = () => {
         if (formStateAddress.inputValues.village_name) {
-            const {village_id, ...object} = formStateAddress.inputValues;
+            const { village_id, ...object } = formStateAddress.inputValues;
             return object;
         } else {
             return formStateAddress.inputValues;
@@ -371,7 +376,7 @@ const RegisterScreen = ({navigation, route}) => {
             updateProfile(data)
                 .then(() => {
                     setIsLoading(false);
-                    navigation.navigate('Account', {isChangeProfile: true}, true);
+                    navigation.navigate('Account', { isChangeProfile: true }, true);
                 })
                 .catch(err => {
                     setIsLoading(false);
@@ -387,11 +392,12 @@ const RegisterScreen = ({navigation, route}) => {
     //
     const validate = data => {
         setIsLoading(true);
+        console.log('data submit : ', data)
         validateRegister(data)
             .then(response => {
                 setIsLoading(false);
                 data.password = '';
-                navigation.navigate('RegisterPassword', {data: data});
+                navigation.navigate('RegisterPassword', { data: data });
             })
             .catch(error => {
                 setIsLoading(false);
@@ -446,7 +452,7 @@ const RegisterScreen = ({navigation, route}) => {
             uri: undefined,
             isValid:
                 selectedPicker.id == 'profile_image' ||
-                selectedPicker.id == 'sim_b_image'
+                    selectedPicker.id == 'sim_b_image'
                     ? true
                     : false,
         });
@@ -596,9 +602,51 @@ const RegisterScreen = ({navigation, route}) => {
                 previousRoute: !isEdit ? 'Register' : 'EditProfile',
                 driver_company_request: formStateDetail?.inputValues?.driver_company_request,
                 dispatch: dispatch,
+                onSelectedList: ({
+                    id,
+                    name
+                }) => {
+                    //set account type to company
+                    dispatchDetail({
+                        type: 'update',
+                        state: {
+                            ...formStateDetail,
+                            inputValues: {
+                                ...formStateDetail.inputValues,
+                                account_type: AccountTypeEnum.COMPANY,
+                                driver_company_request: null,
+                                driver_company_id: id,
+                                driver_company_id_value: name,
+                            },
+                        },
+                    })
+
+                    //make bank null if company is picked
+                    dispatch({
+                        type: 'input',
+                        id: 'bank',
+                        input: null,
+                        isValid: true,
+                    });
+
+                    getUserBank(id).then(response => {
+                        const state = {
+                            inputValues: {
+                                bank_id: response.id,
+                                bank_id_value: response.bank_name,
+                                ...response,
+                            },
+                            formIsValid: true,
+                        };
+                        dispatchBank({
+                            type: 'update',
+                            state: state,
+                        });
+                    });
+                },
                 onSubmit: ({
-                               new_company,
-                           }) => {
+                    new_company,
+                }) => {
                     console.log("new company", new_company);
                     dispatchDetail({
                         type: "update",
@@ -606,8 +654,7 @@ const RegisterScreen = ({navigation, route}) => {
                             ...formStateDetail,
                             inputValues: {
                                 ...formStateDetail.inputValues,
-
-                                account_type: AccountTypeEnum.INDIVIDUAL,
+                                account_type: AccountTypeEnum.COMPANY,
                                 driver_company_request: new_company,
                                 driver_company_id: null,
                                 driver_company_value: null
@@ -689,43 +736,43 @@ const RegisterScreen = ({navigation, route}) => {
             });
 
             if (id == 'driver_company_id') {
-                //set account type to company
-                dispatchDetail({
-                    type: 'update',
-                    state: {
-                        ...formStateDetail,
-                        inputValues: {
-                            ...formStateDetail.inputValues,
-                            account_type: AccountTypeEnum.COMPANY,
-                            driver_company_request: null,
-                            driver_company_id: route.params.id,
-                            driver_company_id_value: route.params.name,
-                        },
-                    },
-                })
+                // //set account type to company
+                // dispatchDetail({
+                //     type: 'update',
+                //     state: {
+                //         ...formStateDetail,
+                //         inputValues: {
+                //             ...formStateDetail.inputValues,
+                //             account_type: AccountTypeEnum.COMPANY,
+                //             driver_company_request: null,
+                //             driver_company_id: route.params.id,
+                //             driver_company_id_value: route.params.name,
+                //         },
+                //     },
+                // })
 
-                //make bank null if company is picked
-                dispatch({
-                    type: 'input',
-                    id: 'bank',
-                    input: null,
-                    isValid: true,
-                });
+                // //make bank null if company is picked
+                // dispatch({
+                //     type: 'input',
+                //     id: 'bank',
+                //     input: null,
+                //     isValid: true,
+                // });
 
-                getUserBank(route.params.id).then(response => {
-                    const state = {
-                        inputValues: {
-                            bank_id: response.id,
-                            bank_id_value: response.bank_name,
-                            ...response,
-                        },
-                        formIsValid: true,
-                    };
-                    dispatchBank({
-                        type: 'update',
-                        state: state,
-                    });
-                });
+                // getUserBank(route.params.id).then(response => {
+                //     const state = {
+                //         inputValues: {
+                //             bank_id: response.id,
+                //             bank_id_value: response.bank_name,
+                //             ...response,
+                //         },
+                //         formIsValid: true,
+                //     };
+                //     dispatchBank({
+                //         type: 'update',
+                //         state: state,
+                //     });
+                // });
             } else if (id == 'driver_partner_id') {
             } else if (id == 'bank_id') {
                 return;
@@ -850,8 +897,8 @@ const RegisterScreen = ({navigation, route}) => {
 
     return (
         <>
-            <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-                <StatusBar backgroundColor="white" barStyle="dark-content"/>
+            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+                <StatusBar backgroundColor="white" barStyle="dark-content" />
                 <NavBar
                     navigation={navigation}
                     title={isEdit ? translate('edit_profile') : translate('register_form')}
@@ -859,22 +906,22 @@ const RegisterScreen = ({navigation, route}) => {
                     onBackPress={showBackPrompt}
                 />
                 <KeyboardAvoidingView
-                    style={{flex: 1, zIndex: -1}}
+                    style={{ flex: 1, zIndex: -1 }}
                     behavior={Platform.OS == 'android' ? 'none' : 'padding'}>
                     <ScrollView style={styles.container}>
-                        <View style={{paddingBottom: 40}}>
+                        <View style={{ paddingBottom: 40 }}>
 
                             {!isEdit ? (
                                 <View>
                                     <LatoBold>{translate('register_form_title')}</LatoBold>
-                                    <LatoRegular containerStyle={{marginTop: 5}}>
+                                    <LatoRegular containerStyle={{ marginTop: 5 }}>
                                         {translate('register_form_desc')}
                                     </LatoRegular>
                                 </View>
                             ) : <></>}
 
                             <TouchableOpacity
-                                style={{alignItems: 'center', margin: 16}}
+                                style={{ alignItems: 'center', margin: 16 }}
                                 onPress={() => {
                                     !isVerified
                                         ? openImagePicker('profile_image', 'Detail', dispatchDetail)
@@ -898,11 +945,11 @@ const RegisterScreen = ({navigation, route}) => {
                                             }}
                                         />
                                     ) : (
-                                        <IconProfilePlaceholder/>
+                                        <IconProfilePlaceholder />
                                     )}
                                     {!isVerified ? (
                                         <IconProfileAddImage
-                                            style={{position: 'absolute', bottom: 0, right: 0}}
+                                            style={{ position: 'absolute', bottom: 0, right: 0 }}
                                         />
                                     ) : null}
                                 </View>
@@ -924,7 +971,7 @@ const RegisterScreen = ({navigation, route}) => {
                                 title={translate('phone_title')}
                                 placeholder={translate('phone_placeholder')}
                                 dispatcher={dispatch}
-                                containerStyle={{marginVertical: 16}}
+                                containerStyle={{ marginVertical: 16 }}
                                 value={formState.inputValues.phone1}
                                 isCheck={formState.isChecked}
                                 viewOnly={isVerified}
@@ -947,7 +994,7 @@ const RegisterScreen = ({navigation, route}) => {
                                 id={'email'}
                                 title={translate('email_title')}
                                 placeholder={translate('email_placeholder')}
-                                containerStyle={{marginVertical: 16}}
+                                containerStyle={{ marginVertical: 16 }}
                                 dispatcher={dispatch}
                                 value={formState.inputValues.email}
                                 isCheck={formState.isChecked}
@@ -955,23 +1002,40 @@ const RegisterScreen = ({navigation, route}) => {
                                 viewOnly={isVerified}
                             />
 
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <LatoBold>Anda tergabung di perusahaan?</LatoBold>
                                 <CustomCheckbox
                                     disabled={isVerified}
                                     onPress={() => {
-                                        dispatchDetail({
-                                            type: "update",
-                                            state: {
-                                                ...formStateDetail,
-                                                inputValues: {
-                                                    ...formStateDetail.inputValues,
-                                                    is_company: !formStateDetail.inputValues.is_company
+                                        if (formStateDetail?.inputValues?.is_company) {
+                                            dispatchDetail({
+                                                type: "update",
+                                                state: {
+                                                    ...formStateDetail,
+                                                    inputValues: {
+                                                        ...formStateDetail.inputValues,
+                                                        is_company: !formStateDetail.inputValues.is_company,
+                                                        account_type: AccountTypeEnum.INDIVIDUAL,
+                                                        driver_company_request: null,
+                                                        driver_company_id: null,
+                                                        driver_company_id_value: ''
+                                                    }
                                                 }
-                                            }
-                                        })
+                                            })
+                                        } else {
+                                            dispatchDetail({
+                                                type: "update",
+                                                state: {
+                                                    ...formStateDetail,
+                                                    inputValues: {
+                                                        ...formStateDetail.inputValues,
+                                                        is_company: !formStateDetail.inputValues.is_company
+                                                    }
+                                                }
+                                            })
+                                        }
                                     }}
-                                    isChecked={formStateDetail?.inputValues?.is_company}/>
+                                    isChecked={formStateDetail?.inputValues?.is_company} />
                             </View>
 
                             {
@@ -1022,7 +1086,7 @@ const RegisterScreen = ({navigation, route}) => {
 
                             <InfoMenu
                                 text={translate('company_bank_info')}
-                                containerStyle={{marginTop: 16}}
+                                containerStyle={{ marginTop: 16 }}
                             />
 
                             <PickerInput
@@ -1031,7 +1095,7 @@ const RegisterScreen = ({navigation, route}) => {
                                 placeholder={translate('partner_placeholder')}
                                 value={formStateDetail.inputValues.driver_partner_id_value}
                                 viewOnly={isVerified}
-                                containerStyle={{marginTop: 16}}
+                                containerStyle={{ marginTop: 16 }}
                                 disabled={isVerified}
                                 onPress={() => {
                                     openPicker(
@@ -1049,7 +1113,7 @@ const RegisterScreen = ({navigation, route}) => {
                                 title={translate('address_title')}
                                 placeholder={translate('address_placeholder')}
                                 value={formStateAddress.inputValues.address}
-                                containerStyle={{marginVertical: 16}}
+                                containerStyle={{ marginVertical: 16 }}
                                 dispatcher={dispatchAddress}
                                 isCheck={formState.isChecked}
                                 required
@@ -1078,7 +1142,7 @@ const RegisterScreen = ({navigation, route}) => {
                             <PickerInput
                                 id={'city_id'}
                                 title={translate('city_title')}
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 placeholder={translate('city_placeholder')}
                                 value={formStateAddress.inputValues.city_id_value}
                                 isCheck={formState.isChecked}
@@ -1135,7 +1199,7 @@ const RegisterScreen = ({navigation, route}) => {
                             <PickerInput
                                 id={'village_id'}
                                 title={translate('village_title')}
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 placeholder={translate('village_placeholder')}
                                 value={formStateAddress.inputValues.village_id_value}
                                 isCheck={formState.isChecked}
@@ -1166,7 +1230,7 @@ const RegisterScreen = ({navigation, route}) => {
                                     <CustomInput
                                         id={'village_name'}
                                         title={translate('manual_input')}
-                                        containerStyle={{paddingBottom: 16}}
+                                        containerStyle={{ paddingBottom: 16 }}
                                         placeholder={translate('village_placeholder')}
                                         value={formStateAddress.inputValues.village_name}
                                         isCheck={formState.isChecked}
@@ -1189,7 +1253,7 @@ const RegisterScreen = ({navigation, route}) => {
                             />
 
                             <GenderComponents
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 selectedId={formStateDetail.inputValues.gender}
                                 isCheck={formState.isChecked}
                                 disabled={isVerified}
@@ -1214,7 +1278,7 @@ const RegisterScreen = ({navigation, route}) => {
                                         id={'bank_id'}
                                         title={translate('bank_title')}
                                         placeholder={translate('bank_placeholder')}
-                                        containerStyle={{paddingVertical: 16}}
+                                        containerStyle={{ paddingVertical: 16 }}
                                         value={formStateBank.inputValues.bank_id_value}
                                         isCheck={formState.isChecked}
                                         required
@@ -1240,7 +1304,7 @@ const RegisterScreen = ({navigation, route}) => {
                                         id={'branch'}
                                         title={translate('branch_title')}
                                         placeholder={translate('branch_placeholder')}
-                                        containerStyle={{paddingVertical: 16}}
+                                        containerStyle={{ paddingVertical: 16 }}
                                         value={formStateBank.inputValues.branch}
                                         dispatcher={dispatchBank}
                                         isCheck={formState.isChecked}
@@ -1263,9 +1327,9 @@ const RegisterScreen = ({navigation, route}) => {
 
                             <CustomInput
                                 id={'ktp'}
-                                title={translate('number', {string: translate('ktp')})}
+                                title={translate('number', { string: translate('ktp') })}
                                 placeholder={translate('ktp_placeholder')}
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 value={formStateCard.inputValues.ktp}
                                 dispatcher={dispatchCard}
                                 viewOnly={isVerified}
@@ -1291,9 +1355,9 @@ const RegisterScreen = ({navigation, route}) => {
 
                             <CustomInput
                                 id={'sim_a'}
-                                title={translate('number', {string: translate('sim_a')})}
+                                title={translate('number', { string: translate('sim_a') })}
                                 placeholder={translate('sim_placeholder')}
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 value={formStateCard.inputValues.sim_a}
                                 dispatcher={dispatchCard}
                                 viewOnly={isVerified}
@@ -1318,9 +1382,9 @@ const RegisterScreen = ({navigation, route}) => {
 
                             <CustomInput
                                 id={'sim_b'}
-                                title={translate('number', {string: translate('sim_b')})}
+                                title={translate('number', { string: translate('sim_b') })}
                                 placeholder={translate('sim_placeholder')}
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 value={formStateCard.inputValues.sim_b}
                                 dispatcher={dispatchCard}
                                 viewOnly={isVerified}
@@ -1345,9 +1409,9 @@ const RegisterScreen = ({navigation, route}) => {
 
                             <CustomInput
                                 id={'sim_c'}
-                                title={translate('number', {string: translate('sim_c')})}
+                                title={translate('number', { string: translate('sim_c') })}
                                 placeholder={translate('sim_placeholder')}
-                                containerStyle={{paddingVertical: 16}}
+                                containerStyle={{ paddingVertical: 16 }}
                                 value={formStateCard.inputValues.sim_c}
                                 dispatcher={dispatchCard}
                                 viewOnly={isVerified}
@@ -1376,7 +1440,7 @@ const RegisterScreen = ({navigation, route}) => {
                                 <CustomButton
                                     types="primary"
                                     title={translate('next')}
-                                    containerStyle={{marginTop: 16}}
+                                    containerStyle={{ marginTop: 16 }}
                                     onPress={doRegister}
                                     isLoading={isLoading}
                                 />
@@ -1396,7 +1460,7 @@ const RegisterScreen = ({navigation, route}) => {
                     onCancel={() => setopenDate(false)}
                 />
 
-                <ModalActivityIndicator show={preloading}/>
+                <ModalActivityIndicator show={preloading} />
             </SafeAreaView>
 
 
