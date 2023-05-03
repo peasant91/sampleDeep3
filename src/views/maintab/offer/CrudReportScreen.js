@@ -72,7 +72,7 @@ const CrudReportScreen = ({ navigation, route }) => {
     const [formState, dispatch] = useReducer(formReducer, {
         inputValues: {
             desc: '',
-            odometer: '',
+            odometer: ' ',
             is_new_odometer: false
         },
         inputValidities: {
@@ -191,6 +191,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                     }
                 })
             } catch (e) {
+                setisloading(false)
                 hideLoadingDialog()
                 showErrorDialog({
                     error: e
@@ -362,6 +363,7 @@ const CrudReportScreen = ({ navigation, route }) => {
         });
     };
 
+    console.log(formState.inputValues)
     return <>
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <NavBar navigation={navigation} title={translate(isAdd ? 'create_report' : 'report_detail')} shadowEnabled />
