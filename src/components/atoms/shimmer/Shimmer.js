@@ -78,7 +78,6 @@ export const ShimmerIncome = ({containerStyle}) => {
     <ShimmerPlaceholder style={{width: 220, height: 20, marginTop: 16}}/>
     <ShimmerPlaceholder style={{width: 290, height: 20, marginTop: 16}}/>
     <ShimmerPlaceholder style={{width: 220, height: 20, marginTop: 16}}/>
-    <ShimmerPlaceholder style={{width: 250, height: 20, marginTop: 16}}/>
   </View>
 }
 

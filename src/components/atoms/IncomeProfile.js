@@ -9,7 +9,6 @@ import { LatoBold, LatoRegular } from './CustomText'
 
 
 const IncomeProfile = ({data, onPress}) => {
-
     return <Shadow viewStyle={{width: '100%', marginBottom: 10}} radius={8} distance={2} offset={[0,1]} startColor={Colors.divider}  >
             <View style={{borderRadius: 8, overflow: 'hidden'}}>
                 <View style={{backgroundColor: '#F5F6FF', padding: 10, justifyContent: 'center', alignItems: 'center'}}>
@@ -23,7 +22,7 @@ const IncomeProfile = ({data, onPress}) => {
                         return <View style={{padding: 5}}>
                             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                 <LatoRegular>{moment(value.date).format('DD MMMM yyyy')}</LatoRegular>
-                                <LatoRegular style={{color: Colors.primarySecondary}}>{'+' + toCurrency(value.income)}</LatoRegular>
+                                <LatoRegular style={{color: Colors.primarySecondary}}>{'+' + toCurrency(value.amount)}</LatoRegular>
                             </View>
                             <View style={{height: 1, backgroundColor: Colors.divider, marginTop: 5}}/>
                         </View>

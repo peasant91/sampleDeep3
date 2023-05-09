@@ -44,8 +44,8 @@ const IncomeDetailScreen = ({ navigation, route }) => {
         getIncomeList({
             year: year
         }).then(response => {
-            setisLoading(false)
             setdata(response)
+            setisLoading(false)
         }).catch(err => {
             setisLoading(false)
             showErrorDialog({
