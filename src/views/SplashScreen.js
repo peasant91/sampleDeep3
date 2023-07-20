@@ -21,6 +21,7 @@ import {
   dismissDialog,
   getCalendarYear,
   showLocationAlwaysDialog,
+  checkRemoteConfigVersion,
 } from '../actions/commonActions';
 import { Alert } from 'react-native';
 import { BackHandler } from 'react-native';
@@ -35,10 +36,11 @@ import { useIsFocused } from '@react-navigation/native';
 import IconLogo from '../assets/images/oto_logo.svg';
 import IconBgBottom from '../assets/images/splash_bottom_bg.svg'
 import IconBgTop from '../assets/images/splash_top_bg.svg'
-
+import remoteConfig from '@react-native-firebase/remote-config';
 
 import axios from 'axios';
 import { check, openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import Config from '../constants/Config';
 
 const SplashScreen = ({ navigation, route }) => {
   Splash.hide();
@@ -51,17 +53,17 @@ const SplashScreen = ({ navigation, route }) => {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
-  const showUpdateAlert = response => {
+  const showUpdateAlert = is_major => {
     Alert.alert(
       'Perhatian',
-      response.is_major === true
+      is_major === true
         ? 'Untuk melanjutkan penggunaan aplikasi, anda harus melakukan pembaruan.'
         : 'Untuk kenyamanan anda menggunakan aplikasi, kami telah melakukan pembaruan.\n\nApakah anda ingin memperbarui aplikasi sekarang?',
       [
         {
-          text: response.is_major === true ? 'Batal' : 'Lewati',
+          text: is_major === true ? 'Batal' : 'Lewati',
           onPress: () =>
-            response.is_major === true ? BackHandler.exitApp() : getProvinceApi(),
+            is_major === true ? BackHandler.exitApp() : getProvinceApi(),
         },
         {
           text: 'Unduh',
@@ -226,16 +228,24 @@ const SplashScreen = ({ navigation, route }) => {
 
   const checkVersion = async () => {
     try {
-      const response = await checkAppVersion(appVersion);
-      const token = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
-      if (response) {
-        if (response.need_update === true) {
-          showUpdateAlert(response);
-        } else {
-          requestBackgroundPermission()
-        }
-      }
+      remoteConfig().fetchAndActivate().then((fetchedRemotely) => {
+        remoteConfig().fetch(0).then((res) => {
+          const minVersion = remoteConfig().getString(
+            `${Platform.OS.toLowerCase()}_${Config.developmentMode}_version`
+          )
+          const isMajor = remoteConfig().getBoolean(
+            `${Platform.OS.toLowerCase()}_${Config.developmentMode}_is_major`
+          )
 
+          const { _isMajor: is_major, updateAvailable } = checkRemoteConfigVersion(minVersion, isMajor, appVersion)
+
+          if (updateAvailable) {
+            showUpdateAlert(is_major);
+          } else {
+            requestBackgroundPermission()
+          }
+        })
+      })
     } catch (err) {
       console.log('err', err)
       showDialog(
@@ -366,7 +376,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     padding: 16,
-    backgroundColor:'white'
+    backgroundColor: 'white'
   },
 });
 

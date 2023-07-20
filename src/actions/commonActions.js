@@ -1,6 +1,6 @@
-import {Alert, View, Text, StyleSheet} from 'react-native';
-import React, {useContext} from 'react';
-import {getBundleId} from 'react-native-device-info';
+import { Alert, View, Text, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { getBundleId } from 'react-native-device-info';
 import LottieView from 'lottie-react-native';
 
 export const ERROR = 'ACTION_ERROR';
@@ -12,17 +12,17 @@ import DialogManager, {
 } from 'react-native-dialog-component';
 import DialogComponent from 'react-native-dialog-component/dist/DialogComponent';
 import getClientVersioning from '../services/getClientVersioning';
-import CustomText, {LatoBold, LatoRegular, Subtitle1} from '../components/atoms/CustomText';
+import CustomText, { LatoBold, LatoRegular, Subtitle1 } from '../components/atoms/CustomText';
 import translate from '../locales/translate';
 import CustomButton from '../components/atoms/CustomButton';
-import {getErrorMessage} from '../services/baseApi';
-import {ModalPortal} from 'react-native-modals';
+import { getErrorMessage } from '../services/baseApi';
+import { ModalPortal } from 'react-native-modals';
 import moment from 'moment';
 
-import {showAlert, closeAlert} from 'react-native-customisable-alert';
+import { showAlert, closeAlert } from 'react-native-customisable-alert';
 import CustomUploadAlertComponent from '../components/molecules/CustomUploadAlertComponent';
 import CustomAlertComponent from "../components/molecules/CustomAlertComponent";
-import {AuthContext} from "../../App";
+import { AuthContext } from "../../App";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageKey from "../constants/StorageKey";
 
@@ -99,7 +99,7 @@ export const showLoadingDialog = message => {
                     }}
                     autoPlay
                     loop
-                    style={{width: 200, height: 100, alignSelf: 'center'}}
+                    style={{ width: 200, height: 100, alignSelf: 'center' }}
                     source={require('../assets/lottie/download.json')}
                 />
                 <Subtitle1
@@ -123,17 +123,17 @@ export const showLocationAlwaysDialog = (onConfirm) => {
             animationDuration: 0,
             ScaleAnimation: new ScaleAnimation(),
             width: '80%',
-            dialogStyle: {borderRadius: 16, width: '80%'},
+            dialogStyle: { borderRadius: 16, width: '80%' },
             dismissOnTouchOutside: false,
             children: (
-                <View style={{margin: 20}}>
+                <View style={{ margin: 20 }}>
                     <LottieView
                         ref={animation => {
                             this.animation = animation;
                         }}
                         autoPlay
                         loop
-                        style={{width: 200, height: 100, alignSelf: 'center'}}
+                        style={{ width: 200, height: 100, alignSelf: 'center' }}
                         source={require('../assets/lottie/location.json')}
                     />
                     <LatoBold style={{
@@ -141,7 +141,7 @@ export const showLocationAlwaysDialog = (onConfirm) => {
                         alignSelf: 'center'
                     }}>{translate('always_location_title')}</LatoBold>
                     <LatoRegular
-                        containerStyle={{marginVertical: 16}}
+                        containerStyle={{ marginVertical: 16 }}
                         style={{
                             fontFamily: 'Lato-Bold',
                             fontSize: 12,
@@ -174,17 +174,17 @@ export const showSuccessDialog = message => {
             animationDuration: 0,
             ScaleAnimation: new ScaleAnimation(),
             width: '80%',
-            dialogStyle: {borderRadius: 16, width: '80%'},
+            dialogStyle: { borderRadius: 16, width: '80%' },
             dismissOnTouchOutside: false,
             children: (
-                <View style={{margin: 20}}>
+                <View style={{ margin: 20 }}>
                     <LottieView
                         ref={animation => {
                             this.animation = animation;
                         }}
                         autoPlay
                         loop
-                        style={{width: 200, height: 100, alignSelf: 'center'}}
+                        style={{ width: 200, height: 100, alignSelf: 'center' }}
                         source={require('../assets/lottie/success.json')}
                     />
                     <CustomText
@@ -219,8 +219,30 @@ export const dismissDialog = () => {
 };
 
 export const clearError = () => {
-    return {type: CLEAR_ERROR};
+    return { type: CLEAR_ERROR };
 };
+
+export const checkRemoteConfigVersion = async (fbVersion, isMajor, appVersion) => {
+    const updateAvailable = compareVersion(fbVersion, appVersion) > 0;
+    const _isMajor = `${isMajor}` == 'true';
+
+    return { updateAvailable, _isMajor }
+}
+
+const compareVersion = (fbVersion, appVersion) => {
+    const v1Components = fbVersion.split('.').map(Number);
+    const v2Components = appVersion.split('.').map(Number);
+
+    for (let i = 0; i < v1Components.length; i++) {
+        if (v1Components[i] < v2Components[i]) {
+            return -1; // version1 is smaller
+        } else if (v1Components[i] > v2Components[i]) {
+            return 1; // version1 is larger
+        }
+    }
+
+    return 0; // versions are equal
+}
 
 export const checkAppVersion = async version => {
     try {
@@ -262,14 +284,14 @@ export const useCommonAction = () => {
     const authContext = useContext(AuthContext);
 
     const showErrorDialog = async ({
-                                 error,
-                                 positiveAction,
-                                 positiveTitle,
-                                 negativeAction,
-                                 negativeTitle,
-                                 isDoubleButton,
-                                 imageSrc
-                             }) => {
+        error,
+        positiveAction,
+        positiveTitle,
+        negativeAction,
+        negativeTitle,
+        isDoubleButton,
+        imageSrc
+    }) => {
         const title = error?.title
         console.log('error', JSON.stringify(error, null, 2))
         const description = error?.message
@@ -278,13 +300,13 @@ export const useCommonAction = () => {
         let usedPositiveAction = positiveAction
 
 
-        if(error?.status == 401){
+        if (error?.status == 401) {
             const token = await AsyncStorage.getItem(StorageKey.KEY_ACCESS_TOKEN);
             usedImageSrc = require("../assets/illusts/illust_nonactive_account/illust_nonactive_account.png")
-            usedPositiveTitle = token? "KEMBALI KE LOGIN":"BAIK, SAYA MENGERTI"
+            usedPositiveTitle = token ? "KEMBALI KE LOGIN" : "BAIK, SAYA MENGERTI"
             usedPositiveAction = () => {
                 dismissDialog()
-                if(token){
+                if (token) {
                     authContext?.signOut()
                 }
             }
@@ -325,14 +347,14 @@ export const useCommonAction = () => {
 
     const showLoadingDialog = ({
         title, description
-                               }) => {
+    }) => {
         showAlert({
             alertType: 'custom',
             animationIn: 'fadeIn',
             animationOut: 'fadeOut',
             customAlert: (
                 <CustomAlertComponent
-                    title={title?? "Mohon Tunggu"}
+                    title={title ?? "Mohon Tunggu"}
                     description={description ?? "Sedang memproses data"}
                     loading={true}
                 />
