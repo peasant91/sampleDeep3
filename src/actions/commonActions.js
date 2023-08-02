@@ -222,7 +222,7 @@ export const clearError = () => {
     return { type: CLEAR_ERROR };
 };
 
-export const checkRemoteConfigVersion = async (fbVersion, isMajor, appVersion) => {
+export const checkRemoteConfigVersion = (fbVersion, isMajor, appVersion) => {
     const updateAvailable = compareVersion(fbVersion, appVersion) > 0;
     const _isMajor = `${isMajor}` == 'true';
 
