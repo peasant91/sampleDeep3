@@ -199,11 +199,9 @@ const SplashScreen = ({ navigation, route }) => {
         }
       })
     } else {
-      console.log("MASUK SINI BOIS")
       const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
       console.log('result fine bois', result)
       if (result == RESULTS.DENIED) {
-        console.log("ANJENG TANAH BRANTEM SENE")
         // showOpenSetting()
         showLocationAlwaysDialog(() => {
           requestAndroidLocationPermission()

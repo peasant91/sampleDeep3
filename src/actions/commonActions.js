@@ -118,35 +118,12 @@ export const showLoadingDialog = message => {
 };
 
 export const showLocationAlwaysDialog = (onConfirm) => {
-    console.log("SHOW DIALOG BROTHER")
-    // showDialog(translate('please_allow_location_always'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
-    DialogManager.show({
-        title: 'Dialog',
-        titleAlign: 'center',
-        animationDuration: 200,
-        ScaleAnimation: new ScaleAnimation(),
-        children: (
-          <DialogContent>
-            <View>
-              <Text>
-                React Native Dialog Component
-              </Text>
-            </View>
-          </DialogContent>
-        ),
-      }, () => {
-        console.log('callback - show');
-      });
-      return
-    DialogManager.show(
-        {
-            animationDuration: 0,
-            ScaleAnimation: new ScaleAnimation(),
-            width: '80%',
-            dialogStyle: { borderRadius: 16, width: '80%' },
-            dismissOnTouchOutside: false,
-            children: (
-                <View style={{ margin: 20 }}>
+    showAlert({
+        alertType: 'custom',
+        animationIn: 'fadeIn',
+        animationOut: 'fadeOut',
+        customAlert: (
+                <View style={{ margin: 20, backgroundColor: 'white', padding: 20 }}>
                     <LottieView
                         ref={animation => {
                             this.animation = animation;
@@ -174,8 +151,8 @@ export const showLocationAlwaysDialog = (onConfirm) => {
                     <CustomButton
                         types="primary"
                         onPress={() => {
-                            DialogManager.dismiss();
                             onConfirm()
+                            dismissDialog()
                         }}
                         title={translate('understand')}
                     />
