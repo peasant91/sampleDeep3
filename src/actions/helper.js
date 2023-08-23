@@ -12,6 +12,7 @@ import {Linking, Platform} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import {check, PERMISSIONS} from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 
 export const getCurrentWeek = () => {
     currentdate = new Date();
@@ -267,3 +268,19 @@ export const checkIsFakeGPS = async (onLoad) => {
         onLoad(false)
     }
 };
+
+export const startGeolocationService = () => {
+    if (ReactNativeForegroundService.get_task("taskId" != null)) { return }
+    ReactNativeForegroundService.start({
+        id: 1244,
+        title: "Foreground Service",
+        message: "We are live World",
+        icon: "ic_launcher",
+        setOnlyAlertOnce: true,
+        color: "#000000",
+        });
+}
+
+export const stopGeolocationService = () => {
+    ReactNativeForegroundService.stop()
+}

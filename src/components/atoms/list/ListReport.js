@@ -6,8 +6,8 @@ import translate from '../../../locales/translate'
 import moment from 'moment'
 import Colors from '../../../constants/Colors'
 
-import IconNoReport from '../../../assets/images/ic_no_report'
-import IconEmptyReport from '../../../assets/images/ic_empty_report'
+// import IconNoReport from '../../../assets/images/ic_no_report'
+// import IconEmptyReport from '../../../assets/images/ic_empty_report'
 import { addDate, isBeforeDate } from '../../../actions/helper'
 
 const ListReport = ({data, onPress}) => {

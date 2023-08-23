@@ -7,17 +7,19 @@ import Divider from '../../../components/atoms/Divider';
 import NavBar from '../../../components/atoms/NavBar';
 import Colors from '../../../constants/Colors';
 import translate from '../../../locales/translate';
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 
 import IconStart from '../../../assets/images/ic_start.svg';
 import IconStop from '../../../assets/images/ic_stop.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../../../constants/StorageKey';
-import {average, calcDistance, getRealm, sum} from '../../../actions/helper';
+import {average, calcDistance, getRealm, startGeolocationService, stopGeolocationService, sum} from '../../../actions/helper';
 import speed, {DistanceSchema} from '../../../data/realm/speed';
 import {SpeedSchema} from '../../../data/realm/speed';
 import {getTrafficFlow, sendDistance} from '../../../services/contract';
 import DistanceChart from '../../../components/atoms/DistanceChart';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@darron1217/react-native-background-geolocation';
 import moment from 'moment';
 import {makeMutable} from 'react-native-reanimated';
 import {useFocusEffect} from '@react-navigation/native';
@@ -33,6 +35,7 @@ import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import InfoMenu from '../../../components/atoms/InfoMenu';
 import {showDialog} from '../../../actions/commonActions';
 import {showLocationAlwaysDialog} from '../../../actions/commonActions';
+import { err } from 'react-native-svg/lib/typescript/xml';
 
 const JobScreen = ({navigation, route}) => {
     const [time, settime] = useState(['00', '00', '00']);
@@ -316,7 +319,8 @@ const JobScreen = ({navigation, route}) => {
         AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(background => {
             console.log(background);
             if (!JSON.parse(background)) {
-                BackgroundGeolocation.start();
+                // BackgroundGeolocation.start();
+            startGeolocationService();
                 AsyncStorage.setItem(
                     StorageKey.KEY_BACKGROUND_ACTIVE,
                     JSON.stringify(true),
@@ -328,7 +332,8 @@ const JobScreen = ({navigation, route}) => {
     const stopBackgroundLocation = () => {
         AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(background => {
             if (background) {
-                BackgroundGeolocation.stop();
+                // BackgroundGeolocation.stop();
+                stopGeolocationService();
                 AsyncStorage.setItem(
                     StorageKey.KEY_BACKGROUND_ACTIVE,
                     JSON.stringify(false),
@@ -348,16 +353,28 @@ const JobScreen = ({navigation, route}) => {
         )
 
         const speeds = realm.objects('Speed')
-        if (speeds.length > 0) {
-            const averageSpeed = average(speeds.map(item => item.speed))
-            setSpeed(averageSpeed.toFixed(2))
+        try {
+            speeds.addListener(() => {
+                if (speeds.length > 0) {
+                    const averageSpeed = average(speeds.map(item => item.speed))
+                    setSpeed(averageSpeed.toFixed(2))
+                }
+            })
+        } catch (error) { 
+            console.warn(error)
         }
 
 
         const distances = realm.objects('Distance')
-        if (distances.length > 0) {
-            const sumDistance = sum(distances.map(item => item.distance))
-            setDistance(sumDistance.toFixed(2))
+        try {
+            distances.addListener(() => {
+                if (distances.length > 0) {
+                    const sumDistance = sum(distances.map(item => item.distance))
+                    setDistance(sumDistance.toFixed(2))
+                }
+            })
+        } catch (error) {
+            console.warn(error)
         }
 
     }
@@ -389,9 +406,9 @@ const JobScreen = ({navigation, route}) => {
 
             onLocationChange();
 
-            BackgroundGeolocation.on('location', location => {
-                onLocationChange();
-            });
+            // BackgroundGeolocation.on('location', location => {
+            //     onLocationChange();
+            // });
 
             return () => {
                 clearInterval(loop.current);

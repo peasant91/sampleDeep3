@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { View, Platform, Keyboard, Alert } from 'react-native';
 
 import {
@@ -21,12 +21,15 @@ import { initBackground } from '../../services/background';
 import Realm from 'realm';
 import moment from 'moment';
 import { DistanceSchema, SpeedSchema } from '../../data/realm/speed';
-import { calcDistance } from '../../actions/helper';
+import { calcDistance, startGeolocationService } from '../../actions/helper';
 import { getTrafficFlow, sendDistance } from '../../services/contract';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@darron1217/react-native-background-geolocation';
 import Config from '../../constants/Config';
 import { useToast } from 'react-native-toast-notifications';
 import { sum } from '../../actions/helper';
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
+import { useFocusEffect } from '@react-navigation/native';
 
 const CustomBottomTabBar = props => {
   const [visible, setVisible] = useState(true);
@@ -84,32 +87,60 @@ const MainTabScreen = ({ navigation, route }) => {
 
     initBackground();
 
-    BackgroundGeolocation.on('location', location => {
-      // handle your locations here
-      // to perform long running operation on iOS
-      // you need to create background task
+              //           ReactNativeForegroundService.start({
+              //   id: 1244,
+              //   title: "Foreground Service",
+              //   message: "We are live World",
+              //   icon: "ic_launcher",
+              //   button: true,
+              //   button2: true,
+              //   buttonText: "Button",
+              //   button2Text: "Anther Button",
+              //   buttonOnPress: "cray",
+              //   setOnlyAlertOnce: true,
+              //   color: "#000000",
+              // });
 
-      console.log('location', location);
-      BackgroundGeolocation.startTask(taskKey => {
-        // execute long running task
-        // eg. ajax post location
-        // IMPORTANT: task has to be ended by endTask
-        onLocationChange(location);
-        BackgroundGeolocation.endTask(taskKey);
-      });
-    });
+    // BackgroundGeolocation.on('location', location => {
+    //   // handle your locations here
+    //   // to perform long running operation on iOS
+    //   // you need to create background task
+
+    //   console.log('location', location);
+    //   BackgroundGeolocation.startTask(taskKey => {
+    //     // execute long running task
+    //     // eg. ajax post location
+    //     // IMPORTANT: task has to be ended by endTask
+    //     onLocationChange(location);
+    //     BackgroundGeolocation.endTask(taskKey);
+    //   });
+    // });
 
     AsyncStorage.getItem(StorageKey.KEY_BACKGROUND_ACTIVE).then(backround => {
       console.log('background anjeng', backround);
       if (JSON.parse(backround)) {
-        BackgroundGeolocation.start();
+        // BackgroundGeolocation.start();
       }
     });
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+        AsyncStorage.getItem(StorageKey.KEY_DO_JOB).then(job => {
+            const isDoingJob = JSON.parse(job);
+
+            if (isDoingJob) {
+        startGeolocationService()
+            }
+        });
+        return () => {
+        };
+    }, [])
+);
+
   useLayoutEffect(() => {
     return () => {
-      BackgroundGeolocation.removeAllListeners
+      // BackgroundGeolocation.removeAllListeners
     }
   }, [])
 

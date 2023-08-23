@@ -118,6 +118,26 @@ export const showLoadingDialog = message => {
 };
 
 export const showLocationAlwaysDialog = (onConfirm) => {
+    console.log("SHOW DIALOG BROTHER")
+    // showDialog(translate('please_allow_location_always'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+    DialogManager.show({
+        title: 'Dialog',
+        titleAlign: 'center',
+        animationDuration: 200,
+        ScaleAnimation: new ScaleAnimation(),
+        children: (
+          <DialogContent>
+            <View>
+              <Text>
+                React Native Dialog Component
+              </Text>
+            </View>
+          </DialogContent>
+        ),
+      }, () => {
+        console.log('callback - show');
+      });
+      return
     DialogManager.show(
         {
             animationDuration: 0,

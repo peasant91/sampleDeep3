@@ -26,7 +26,7 @@ import ReduxThunk from 'redux-thunk';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import StorageKey from './src/constants/StorageKey';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {default as Splash} from 'react-native-splash-screen';
+import Splash from 'react-native-splash-screen';
 import {ModalPortal} from 'react-native-modals';
 import {ToastProvider} from 'react-native-toast-notifications';
 import {navigationRef} from './src/navigation/RootNavigation';
@@ -71,13 +71,15 @@ import Config from './src/constants/Config';
 import MainTabScreen from './src/views/maintab/MainTabScreen';
 import {logout} from './src/services/user';
 import {showDialog} from './src/actions/commonActions';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@darron1217/react-native-background-geolocation';
 import notifee, {EventType} from '@notifee/react-native';
 import {DistanceSchema, SpeedSchema} from './src/data/realm/speed';
 import PickerCompanyScreen from "./src/views/PickerCompanyScreen";
 import FakeGPSLayer from "./src/views/layer/FakeGPSLayer";
 import PDFViewerScreen from "./src/views/PDFViewerScreen";
 import {Host} from "react-native-portalize";
+import * as pisang from "./src/backgroundlocation.js";
 
 //realm
 
@@ -111,6 +113,8 @@ const Stack = createNativeStackNavigator();
 export const AuthContext = React.createContext();
 
 const App = ({navigation, route}) => {
+    console.log(pisang);
+    
     const [state, dispatch] = React.useReducer(
         (prevState, action) => {
             console.log('App js action', action)
@@ -171,7 +175,7 @@ const App = ({navigation, route}) => {
             },
             signOut: async data => {
                 logout().then(response => {
-                    BackgroundGeolocation.stop()
+                    // BackgroundGeolocation.stop()
                     const schema = [SpeedSchema, DistanceSchema];
 
                     Realm.open({
@@ -187,7 +191,7 @@ const App = ({navigation, route}) => {
 
                     })
                 }).catch(err => {
-                    BackgroundGeolocation.stop()
+                    // BackgroundGeolocation.stop()
                     const schema = [SpeedSchema, DistanceSchema];
 
                     Realm.open({

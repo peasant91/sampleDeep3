@@ -1,10 +1,12 @@
 import React from 'react';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+// import BackgroundGeolocation from '@darron1217/react-native-background-geolocation';
 
 import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StorageKey from '../constants/StorageKey';
 import translate from '../locales/translate';
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 
 export const initBackground = () => {
   if (Platform.OS === 'ios') {
@@ -62,91 +64,91 @@ export const initBackground = () => {
       })
       .catch(error => {});
   }
-  BackgroundGeolocation.configure({
-    desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-    stationaryRadius: 50,
-    distanceFilter: 50,
-    interval: 10000,
-    fastestInterval: 10000,
-    activitiesInterval: 10000,
-    notificationTitle: translate('on_work_title'),
-    notificationText: translate('on_work_desc'),
-    notificationsEnabled: true,
-    debug: false,
-    startOnBoot: true,
-    stopOnTerminate: true,
-    locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
-    stopOnStillActivity: false,
-    startForeground: true,
-    // url: 'http://192.168.81.15:3000/location',
-    // httpHeaders: {
-    //   'X-FOO': 'bar'
-    // },
-    // customize post properties
-    // postTemplate: {
-    //   lat: '@latitude',
-    //   lon: '@longitude',
-    //   foo: 'bar' // you can also add your own properties
-    // }
-  });
+  // BackgroundGeolocation.configure({
+  //   desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+  //   stationaryRadius: 50,
+  //   distanceFilter: 50,
+  //   interval: 10000,
+  //   fastestInterval: 10000,
+  //   activitiesInterval: 10000,
+  //   notificationTitle: translate('on_work_title'),
+  //   notificationText: translate('on_work_desc'),
+  //   notificationsEnabled: true,
+  //   debug: false,
+  //   startOnBoot: true,
+  //   stopOnTerminate: true,
+  //   locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
+  //   stopOnStillActivity: false,
+  //   startForeground: true,
+  //   // url: 'http://192.168.81.15:3000/location',
+  //   // httpHeaders: {
+  //   //   'X-FOO': 'bar'
+  //   // },
+  //   // customize post properties
+  //   // postTemplate: {
+  //   //   lat: '@latitude',
+  //   //   lon: '@longitude',
+  //   //   foo: 'bar' // you can also add your own properties
+  //   // }
+  // });
 
-  BackgroundGeolocation.on('stationary', stationaryLocation => {
-    // handle stationary locations here
-    // Actions.sendLocation(stationaryLocation);
-    console.log('stationary', stationaryLocation);
-  });
+  // BackgroundGeolocation.on('stationary', stationaryLocation => {
+  //   // handle stationary locations here
+  //   // Actions.sendLocation(stationaryLocation);
+  //   console.log('stationary', stationaryLocation);
+  // });
 
-  BackgroundGeolocation.on('error', error => {
-    console.log('[ERROR] BackgroundGeolocation error:', error);
-  });
+  // BackgroundGeolocation.on('error', error => {
+  //   console.log('[ERROR] BackgroundGeolocation error:', error);
+  // });
 
-  BackgroundGeolocation.on('start', () => {
-    AsyncStorage.setItem(
-      StorageKey.KEY_BACKGROUND_ACTIVE,
-      JSON.stringify(true),
-    );
-    console.log('[INFO] BackgroundGeolocation service has been started');
-  });
+  // BackgroundGeolocation.on('start', () => {
+  //   AsyncStorage.setItem(
+  //     StorageKey.KEY_BACKGROUND_ACTIVE,
+  //     JSON.stringify(true),
+  //   );
+  //   console.log('[INFO] BackgroundGeolocation service has been started');
+  // });
 
-  BackgroundGeolocation.on('stop', () => {
-    AsyncStorage.setItem(
-      StorageKey.KEY_BACKGROUND_ACTIVE,
-      JSON.stringify(false),
-    );
-    console.log('[INFO] BackgroundGeolocation service has been stopped');
-  });
+  // BackgroundGeolocation.on('stop', () => {
+  //   AsyncStorage.setItem(
+  //     StorageKey.KEY_BACKGROUND_ACTIVE,
+  //     JSON.stringify(false),
+  //   );
+  //   console.log('[INFO] BackgroundGeolocation service has been stopped');
+  // });
 
-  BackgroundGeolocation.on('authorization', status => {
-    console.log('[INFO] BackgroundGeolocation authorization status: ' + status);
-    if (status !== BackgroundGeolocation.AUTHORIZED) {
-      // we need to set delay or otherwise alert may not be shown
-      setTimeout(
-        () =>
-          Alert.alert(
-            'App requires location tracking permission',
-            'Would you like to open app settings?',
-            [
-              {
-                text: 'Yes',
-                onPress: () => BackgroundGeolocation.showAppSettings(),
-              },
-              {
-                text: 'No',
-                onPress: () => console.log('No Pressed'),
-                style: 'cancel',
-              },
-            ],
-          ),
-        1000,
-      );
-    }
-  });
+  // BackgroundGeolocation.on('authorization', status => {
+  //   console.log('[INFO] BackgroundGeolocation authorization status: ' + status);
+  //   if (status !== BackgroundGeolocation.AUTHORIZED) {
+  //     // we need to set delay or otherwise alert may not be shown
+  //     setTimeout(
+  //       () =>
+  //         Alert.alert(
+  //           'App requires location tracking permission',
+  //           'Would you like to open app settings?',
+  //           [
+  //             {
+  //               text: 'Yes',
+  //               onPress: () => BackgroundGeolocation.showAppSettings(),
+  //             },
+  //             {
+  //               text: 'No',
+  //               onPress: () => console.log('No Pressed'),
+  //               style: 'cancel',
+  //             },
+  //           ],
+  //         ),
+  //       1000,
+  //     );
+  //   }
+  // });
 
-  BackgroundGeolocation.on('background', () => {
-    console.log('[INFO] App is in background');
-  });
+  // BackgroundGeolocation.on('background', () => {
+  //   console.log('[INFO] App is in background');
+  // });
 
-  BackgroundGeolocation.on('foreground', () => {
-    console.log('[INFO] App is in foreground');
-  });
+  // BackgroundGeolocation.on('foreground', () => {
+  //   console.log('[INFO] App is in foreground');
+  // });
 };

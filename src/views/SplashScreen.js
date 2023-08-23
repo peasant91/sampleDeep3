@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { LatoBold, Subtitle2 } from '../components/atoms/CustomText';
 import Colors from '../constants/Colors';
-import { default as Splash } from 'react-native-splash-screen';
+import Splash from 'react-native-splash-screen'
+
 import { getApplicationName, getVersion } from 'react-native-device-info';
 import {
   showErrorAlert,
@@ -198,9 +199,12 @@ const SplashScreen = ({ navigation, route }) => {
         }
       })
     } else {
+      console.log("MASUK SINI BOIS")
       const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-      console.log('result fine', result)
+      console.log('result fine bois', result)
       if (result == RESULTS.DENIED) {
+        console.log("ANJENG TANAH BRANTEM SENE")
+        // showOpenSetting()
         showLocationAlwaysDialog(() => {
           requestAndroidLocationPermission()
         })
