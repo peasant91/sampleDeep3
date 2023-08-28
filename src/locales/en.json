@@ -158,13 +158,13 @@
     "pick_delete": "Hapus Foto",
 
     "register_success": "Pendaftaran Berhasil",
-    "register_vehicle": "Daftar Kendaraan",
+    "register_vehicle": "Registrasi Kendaraan",
     "skip": "Lewati",
     "vehicle_owner_title": "Kepemilikan Kendaraan",
     "vehicle_owner_placeholder": "cth: Pribadi, Perusahaan",
     "vehicle_usage_title" : "Penggunaan Angkutan Kendaraan",
     "vehicle_usage_placeholder": "cth: Pribadi, Umum",
-    "vehicle_type_title": "Tipe Bodi",
+    "vehicle_type_title": "Tipe Kendaraan",
     "brand_title": "Brand",
     "brand_placeholder": "cth: Toyota, Honda, Suzuki",
     "model_title": "Model",
@@ -307,5 +307,10 @@
     "report_invalid_desc": "Anda bisa membuat laporan jika campaign sudah dimulai.",
     "rejected": "Verifikasi ditolak",
     "blocked": "Akun di nonaktifkan",
-    "change_report":"Ubah Report"
+    "change_report":"Ubah Report",
+    "registration_info": "Data yang dimasukan harus sesuai dengan STNK Kendaraan yang Anda daftarkan.",
+    "sisi_depan":"Sisi Depan",
+    "sisi_kiri":"Sisi Kiri",
+    "sisi_kanan":"Sisi Kanan",
+    "sisi_belakang":"Sisi Belakang"
 }

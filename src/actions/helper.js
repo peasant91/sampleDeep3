@@ -273,8 +273,8 @@ export const startGeolocationService = () => {
     if (ReactNativeForegroundService.get_task("taskId" != null)) { return }
     ReactNativeForegroundService.start({
         id: 1244,
-        title: "Foreground Service",
-        message: "We are live World",
+        title: "Otomedia Sedang Berjalan",
+        message: "Mohon jangan keluar dari aplikasi agar pekerjaan Anda tercatat secara maksimal",
         icon: "ic_launcher",
         setOnlyAlertOnce: true,
         color: "#000000",

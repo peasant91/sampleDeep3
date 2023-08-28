@@ -282,7 +282,7 @@ const SplashScreen = ({ navigation, route }) => {
         await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_STICKER, JSON.stringify(sticker))
         await AsyncStorage.setItem(StorageKey.KEY_VEHICLE_USAGE, JSON.stringify(usage))
         await AsyncStorage.setItem(StorageKey.KEY_COLOR, JSON.stringify(color))
-        print("saving done loading")
+        // print("saving done loading")
         doneLoading()
       }
     } catch (err) {

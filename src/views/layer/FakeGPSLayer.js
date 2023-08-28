@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {AppState, BackHandler} from "react-native";
-import {checkIsFakeGPS} from "../../actions/helper";
+import {checkIsFakeGPS, stopGeolocationService} from "../../actions/helper";
 import Geolocation from 'react-native-geolocation-service';
 import {useCommonAction} from "../../actions/commonActions";
 
@@ -43,6 +43,7 @@ export default function FakeGPSLayer(props){
                     },
                     positiveTitle: "BAIK, SAYA MENGERTI",
                     positiveAction: () => {
+                        stopGeolocationService();
                         BackHandler.exitApp()
                     },
                     imageSrc: require('../../assets/illusts/illust_fake_gps/illust_fake_gps.png')

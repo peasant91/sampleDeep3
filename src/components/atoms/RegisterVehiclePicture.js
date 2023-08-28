@@ -6,9 +6,9 @@ import IconAdd from '../../assets/images/ic_add_register_vehicle.svg'
 import IconDelete from '../../assets/images/ic_delete_register_vehicle.svg'
 import IconView from '../../assets/images/ic_image_view.svg';
 
-const RegisterVehiclePicture = ({imageUrl, onDelete, index, navigation, onAdd}) => {
+const RegisterVehiclePicture = ({imageUrl, onDelete, index, navigation, onAdd, fullWidth}) => {
 
-    return <View style={{ width: '48%'}}>
+    return <View style={{ width: (fullWidth) ? '100%' : '48%'}}>
         {imageUrl == ' ' ? 
         <TouchableOpacity onPress={() =>onAdd(index)} style={{flex: 1, backgroundColor: 'white'}}>
                 <Image source={require('../../assets/images/ic_add_vehicle_register.png')} style={{aspectRatio: 1.5}}/>

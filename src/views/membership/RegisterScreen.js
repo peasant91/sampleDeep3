@@ -146,8 +146,12 @@ const RegisterScreen = ({ navigation, route }) => {
             sim_b_image:
                 formStateCard?.inputValues?.sim_b?.length == undefined ||
                 formStateCard?.inputValues?.sim_b?.length <= 0,
-            sim_c: isEdit,
-            sim_c_image: isEdit,
+            sim_c: formStateCard?.inputValues?.sim_bc_image?.length <= 0,
+            sim_c_image:
+                formStateCard?.inputValues?.sim_c?.length == undefined ||
+                formStateCard?.inputValues?.sim_c?. length <= 0,
+            // sim_c: isEdit,
+            // sim_c_image: isEdit,
         },
         formIsValid: isEdit,
     });
@@ -1416,7 +1420,7 @@ const RegisterScreen = ({ navigation, route }) => {
                                 viewOnly={isVerified}
                                 isCheck={formState.isChecked}
                                 keyboardType={'number-pad'}
-                                required
+                                required={false}
                             />
 
 
@@ -1431,7 +1435,7 @@ const RegisterScreen = ({ navigation, route }) => {
                                 }
                                 imageUri={formStateCard.inputValues.sim_c_image_uri}
                                 isCheck={formState.isChecked}
-                                required
+                                required={formStateCard.inputValues.sim_c?.length > 0}
                             />
 
 

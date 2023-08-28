@@ -56,7 +56,7 @@ const CustomInput = ({
         if (text == undefined || text?.trim().length <= 0) {
           console.log('error', isCheck)
           isValid = false;
-          setError(translate('must_not_empty', {s: title.replaceAll('?', '')}));
+          setError(translate('must_not_empty', {s: title.replace('/?/g', '')}));
         }
       }
 
@@ -240,7 +240,7 @@ export const CurrencyInput = ({
 
   const formatCurrency = x => {
     if (x !== undefined) {
-      const cleanFormat = x.toString().replaceAll('.', '');
+      const cleanFormat = x.toString().replace('/./g', '');
       const formatted = parseInt(cleanFormat)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, '.');

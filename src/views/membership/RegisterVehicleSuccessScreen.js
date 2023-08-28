@@ -18,7 +18,7 @@ const RegisterVehicleSuccessScreen = ({navigation, route}) => {
         if (isRegister) {
             signIn()
         } else {
-            print("here register false")
+            // print("here register false")
             navigation.navigate('Home', {isUpdate: true}, true)
         }
     }

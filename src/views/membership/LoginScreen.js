@@ -26,6 +26,7 @@ import {getFirebaseToken, openWhatsapp} from '../../actions/helper';
 import IconLogo from '../../assets/images/oto_logo.svg';
 import IconBg from '../../assets/images/login_bg_top.svg';
 import {useCommonAction} from "../../actions/commonActions";
+import DeviceInfo from 'react-native-device-info';
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
@@ -138,6 +139,7 @@ const LoginScreen = ({navigation, route}) => {
                                     <IconLogo
                                         style={{marginTop: 16}}
                                     />
+                                    <LatoBold style={{color:Colors.primary}}>{DeviceInfo.getVersion()}</LatoBold>
                                 </View>
                                 {/* <Image
                   source={require('../../assets/images/ic_login.png')}

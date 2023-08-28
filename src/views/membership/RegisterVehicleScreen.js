@@ -28,6 +28,7 @@ import { getFullLink, getImageBase64FromUrl } from '../../actions/helper'
 import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
 import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
+import InfoMenu from '../../components/atoms/InfoMenu'
 
 
 const RegisterVehicleScreen = ({ navigation, route }) => {
@@ -510,13 +511,23 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
     checkIsEdited()
   }, [formState, formStateDetail])
 
-
-
+  const sisiFoto = {
+    0: "sisi_depan",
+    1: "sisi_kiri",
+    2: "sisi_kanan",
+    3: "sisi_belakang"
+  }
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
     <NavBar title={isEdit ? translate('edit_vehicle') : translate('register_vehicle')} navigation={navigation} onBackPress={showBackPrompt} />
     <ScrollView style={{ flex: 1, padding: 16 }}>
       <View style={{ paddingBottom: 16 }}>
+
+        <InfoMenu
+          text={translate("registration_info")}
+          containerStyle={{marginBottom: 16}}
+          actionButton={false}
+        />
 
         <PickerInput
           id={'vehicle_ownership'}
@@ -741,7 +752,10 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
             return <View style={{ padding: 6 }} />
           }}
           renderItem={({ item, index }) => {
-            return <RegisterVehiclePicture index={index} imageUrl={item} onDelete={onDeleteImage} navigation={navigation} onAdd={onAdd} />
+            return <View flex={1} style={{marginRight: (index % 2 == 0) ? 8 : 0}}>
+              <LatoBold>{translate(sisiFoto[index])}</LatoBold>
+              <RegisterVehiclePicture index={index} imageUrl={item} onDelete={onDeleteImage} navigation={navigation} onAdd={onAdd} fullWidth={true}/>
+            </View>
           }}
         />
 

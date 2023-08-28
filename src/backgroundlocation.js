@@ -5,11 +5,13 @@ import GetLocation, {
   LocationErrorCode,
   isLocationError,
 } from 'react-native-get-location';
-import { calcDistance, sum } from './actions/helper';
+import { calcDistance, checkIsFakeGPS, stopGeolocationService, sum } from './actions/helper';
 import { DistanceSchema, SpeedSchema } from './data/realm/speed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendDistance } from './services/contract';
 import StorageKey from './constants/StorageKey';
+import { BackHandler } from 'react-native';
+import RNExitApp from 'react-native-exit-app';
 
 let locationSubscription = null;
 let locationTimeout = null;
@@ -35,11 +37,19 @@ ReactNativeForegroundService.add_task(
     })
       .then(newLocation => {
         console.log("NEW LOCATION", newLocation)
-        onLocationChange(newLocation)
-        // setLoading(false);
-        // setLocation(newLocation);
+        checkIsFakeGPS((isFake) => {
+          if (isFake) {
+            stopGeolocationService()
+            stopTask()
+          } else {
+            onLocationChange(newLocation)
+            // setLoading(false);
+            // setLocation(newLocation);
+          }
+        })
       })
       .catch(ex => {
+        console.log("ANJENG TANAH", ex)
         if (isLocationError(ex)) {
           const {code, message} = ex;
           console.warn(code, message);
@@ -52,12 +62,24 @@ ReactNativeForegroundService.add_task(
       });
     },
   {
-    delay: 5000,
+    delay: 3000,
     onLoop: true,
     taskId: "taskid",
     onError: (e) => console.log('Error logging:', e),
   },
 );
+
+const stopTask = async () => {
+  await AsyncStorage.setItem(
+      StorageKey.KEY_BACKGROUND_ACTIVE,
+      JSON.stringify(false),
+  );
+  await AsyncStorage.setItem(
+      StorageKey.KEY_DO_JOB,
+      JSON.stringify(false),
+  );
+  RNExitApp.exitApp();
+}
 
   const onLocationChange = async location => {
     console.log(currentPosition.latitude);
