@@ -147,6 +147,24 @@ const JobScreen = ({navigation, route}) => {
         });
     };
 
+    const checkNotification = async () => {
+        const result = await check(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+        console.log('result fine', result);
+
+        if (result == RESULTS.DENIED) {
+            request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS).then(result => {
+            });
+            return;
+        }
+
+        if (result == RESULTS.BLOCKED) {
+            showOpenSetting();
+            return;
+        }
+    }
+    
+
+
     const checkBackroundLocation = async () => {
         const result = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
         console.log('result fine', result);
@@ -405,6 +423,7 @@ const JobScreen = ({navigation, route}) => {
             });
 
             onLocationChange();
+            checkNotification();
 
             // BackgroundGeolocation.on('location', location => {
             //     onLocationChange();
