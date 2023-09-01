@@ -383,7 +383,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                     stickerLayoutData?.map((value, index) => {
                         // console.log(value)
                         return <View style={{ marginBottom: 16 }}>
-                            <LatoBold>{translate('report_string', { body: translate(value.name) })}<LatoBold
+                            <LatoBold>{translate('report_string', { body: translate(value.value) })}<LatoBold
                                 style={{ color: 'red' }}>*</LatoBold></LatoBold>
                             <FlatList
                                 style={{ zIndex: -99 }}

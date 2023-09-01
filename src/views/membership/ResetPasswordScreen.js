@@ -51,6 +51,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
         <PasswordInput
           id={'password'}
           title={translate('new_password_title')}
+          placeholder={translate('password_placeholder')}
           password={translate('password_placeholder')}
           dispatcher={dispatch}
           value={formState.inputValues.password}
@@ -60,6 +61,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
           containerStyle={{marginTop: 16}}
           id={'password_confirmation'}
           title={translate('confirm_password_title')}
+          placeholder={translate('conf_password_placeholder')}
           password={translate('password_placeholder')}
           dispatcher={dispatch}
           isCheck={formState.isChecked}

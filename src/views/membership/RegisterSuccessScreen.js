@@ -27,7 +27,7 @@ const RegisterSuccessScreen = ({navigation, route}) => {
             source={require('../../assets/lottie/register_success.json')}
             autoPlay
             loop
-            style={{ width: '100%' }}
+            style={{ width: '100%', flex: 1 }}
         />
 
         <View style={{ flex: 1, padding: 16, alignItems: 'center', justifyContent: 'center' }}>

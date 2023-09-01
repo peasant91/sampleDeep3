@@ -616,6 +616,7 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
           placeholder={translate('vehicle_type_placeholder')}
           value={formState.inputValues.vehicle_type_value}
           isCheck={formState.isChecked}
+          containerStyle={{color: 'red'}}
           disabled={true}
           required
         />

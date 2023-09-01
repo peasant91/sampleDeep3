@@ -61,7 +61,7 @@ import RNLocalize from 'react-native-localize';
 
 const dummyContractData = {
   imageUrl: 'https://statik.tempo.co/?id=836405&width=650',
-  contractTitle: 'Full Body',
+  contractTitle: 'full_body',
   bankName: 'PT Bank Mega',
   address: 'Prov. Jawa Tengah',
   date: '31 Nov 2022',

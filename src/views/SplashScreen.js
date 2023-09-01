@@ -64,7 +64,7 @@ const SplashScreen = ({ navigation, route }) => {
         {
           text: is_major === true ? 'Batal' : 'Lewati',
           onPress: () =>
-            is_major === true ? BackHandler.exitApp() : getProvinceApi(),
+            is_major === true ? BackHandler.exitApp() : loadAllData(),
         },
         {
           text: 'Unduh',
@@ -265,14 +265,14 @@ const SplashScreen = ({ navigation, route }) => {
 
   const loadAllData = async () => {
     try {
-      var province = await getProvince()
-      var companies = await getCompanies()
-      var gender = await getGender()
-      var bank = await getBank()
       var ownership = await getVehicleOwnership()
       var sticker = await getVehicleSticker()
       var usage = await getVehicleUsage()
       var color = await getColor()
+      var province = await getProvince()
+      var companies = await getCompanies()
+      var gender = await getGender()
+      var bank = await getBank()
       if (province && companies && gender && bank && ownership && sticker && usage && color) {
         await AsyncStorage.setItem(StorageKey.KEY_PROVINCE, JSON.stringify(province))
         await AsyncStorage.setItem(StorageKey.KEY_COMPANY, JSON.stringify(companies))

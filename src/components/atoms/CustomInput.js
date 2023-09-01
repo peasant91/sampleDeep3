@@ -10,6 +10,7 @@ import {
 import {LatoBold} from './CustomText';
 import IndonesiaFlag from '../../assets/images/ic_indonesia_flag.svg';
 import ArrowDown from '../../assets/images/ic_arrow_dropdown.svg';
+import ArrowDownDisabled from '../../assets/images/ic_arrow_dropdown_disabled.svg';
 import PasswordHide from '../../assets/images/ic_password_hide.svg';
 import PasswordUnhide from '../../assets/images/ic_password_unhide.svg';
 import translate from '../../locales/translate';
@@ -159,7 +160,10 @@ export const PhoneInput = ({
 
     if (id === 'phone' || id === 'phone1' || id === 'phone2') {
       let reg = /^(\\+628|08|8|628)([0-9]{9,11})$/;
-      if (reg.test(text) !== true) {
+      if (text == "") {
+        isValid = false;
+        setError(translate('empty_phone'));
+      } else if (reg.test(text) !== true) {
         isValid = false;
         setError(translate('invalid_phone'));
       }
@@ -382,7 +386,7 @@ export const PickerInput = ({
   }, [isCheck, value]);
 
   return (
-    <View style={containerStyle} pointerEvents={viewOnly && !onPress ? 'none' : 'auto'}>
+    <View style={containerStyle} pointerEvents={(viewOnly || disabled) && !onPress ? 'none' : 'auto'}>
       <LatoBold style={{fontFamily: 'Lato-Bold'}}>
         {title}{required && <LatoBold style={{color: 'red' }}>*</LatoBold>}
       </LatoBold>
@@ -391,7 +395,7 @@ export const PickerInput = ({
           pointerEvents="none"
           style={[
             styles.pickerContainer,
-            {borderBottomWidth: viewOnly ? 0 : 1},
+            {borderBottomWidth: viewOnly ? 0 : 1 },
           ]}>
           <TextInput
             value={value}
@@ -407,7 +411,9 @@ export const PickerInput = ({
           ) : viewOnly ? (
             <View />
           ) : (
-            <ArrowDown style={{paddingVertical: 0}} />
+            disabled ?
+            <ArrowDownDisabled style={{paddingVertical: 0}} />
+            : <ArrowDown style={{paddingVertical: 0}} />
           )}
         </View>
       </TouchableOpacity>
