@@ -230,24 +230,25 @@ const SplashScreen = ({ navigation, route }) => {
 
   const checkVersion = async () => {
     try {
-      remoteConfig().fetchAndActivate().then((fetchedRemotely) => {
-        remoteConfig().fetch(0).then((res) => {
-          const minVersion = remoteConfig().getString(
-            `${Platform.OS.toLowerCase()}_${Config.developmentMode}_version`
-          )
-          const isMajor = remoteConfig().getBoolean(
-            `${Platform.OS.toLowerCase()}_${Config.developmentMode}_is_major`
-          )
-
-          const { _isMajor: is_major, updateAvailable } = checkRemoteConfigVersion(minVersion, isMajor, appVersion)
-
-          if (updateAvailable) {
-            showUpdateAlert(is_major);
-          } else {
             requestBackgroundPermission()
-          }
-        })
-      })
+      // remoteConfig().fetchAndActivate().then((fetchedRemotely) => {
+      //   remoteConfig().fetch(0).then((res) => {
+      //     const minVersion = remoteConfig().getString(
+      //       `${Platform.OS.toLowerCase()}_${Config.developmentMode}_version`
+      //     )
+      //     const isMajor = remoteConfig().getBoolean(
+      //       `${Platform.OS.toLowerCase()}_${Config.developmentMode}_is_major`
+      //     )
+
+      //     const { _isMajor: is_major, updateAvailable } = checkRemoteConfigVersion(minVersion, isMajor, appVersion)
+
+      //     if (updateAvailable) {
+      //       showUpdateAlert(is_major);
+      //     } else {
+      //       requestBackgroundPermission()
+      //     }
+      //   })
+      // })
     } catch (err) {
       console.log('err', err)
       showDialog(

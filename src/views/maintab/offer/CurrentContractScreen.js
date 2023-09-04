@@ -151,6 +151,7 @@ const CurrentContractScreen = ({navigation, route}) => {
     const handleCreateReport = () => {
         console.log("reportData", reportData)
         // goToCrudReport(true, 7);
+        // return
 
         if (reportData.length > 0) {
             //goto crud

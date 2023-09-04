@@ -26,13 +26,14 @@ const ReportImage = ({
 
     return <View style={[{ height: 120, width: '48%', justifyContent: 'space-between', marginTop: 16 }, containerStyle]}>
         {imageUri != ' ' ? (
-            <TouchableOpacity style={{ flex: 1 }} onPress={
+            <TouchableOpacity style={{ flex: 1 }} onPress={ () =>{
                 onPressEdit
-                    ? onPressEdit
-                    : () => navigation.navigate('ImageViewer', {
-                        imageUrl: imageUri?.includes('/storage/') ? getFullLink(imageUri) : item,
+                    ? onPressEdit()
+                    : navigation.navigate('ImageViewer', {
+                        imageUrl: imageUri?.includes('/storage/') ? getFullLink(imageUri) : (item.location) ? item.location : item,
                         title: title
                     })
+            }
             }>
                 <Image
                     source={{ uri: imageUri.includes('/storage/') ? getFullLink(imageUri) : imageUri }}

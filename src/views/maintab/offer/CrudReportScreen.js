@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect, useState, useRef } from 'react'
-import { FlatList, ScrollView, TouchableOpacity, View } from 'react-native'
+import { FlatList, PermissionsAndroid, ScrollView, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
     dismissDialog,
@@ -273,7 +273,8 @@ const CrudReportScreen = ({ navigation, route }) => {
                 const newItem = {
                     ...newStickerLayoutData[dataIndex].images[selected.index],
                     image: 'data:image/jpg;base64,' + result.assets[0].base64,
-                    is_new: true
+                    is_new: true,
+                    location: result.assets[0].uri
                 }
                 newStickerLayoutData[dataIndex].images[selected.index] = newItem
                 console.log("new sticker layout data", newStickerLayoutData[dataIndex].images[selected.index])
@@ -356,10 +357,15 @@ const CrudReportScreen = ({ navigation, route }) => {
         location,
         index
     }) => {
-        await openCameraPicker({
-            id,
-            location,
-            index
+        PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA).then(async response => { 
+            const reqPer = await PermissionsAndroid.request('android.permission.CAMERA');
+            if(reqPer == 'granted'){
+                await openCameraPicker({
+                    id,
+                    location,
+                    index
+                });
+              }
         });
     };
 
@@ -403,7 +409,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                                             index
                                         })}
                                         onPressEdit={
-                                            isEditState
+                                            isEditState || isAdd
                                                 ? () => {
                                                     handleOpenEditBS({
                                                         id: value.value,
@@ -413,7 +419,6 @@ const CrudReportScreen = ({ navigation, route }) => {
                                                         imageTitle: value.name,
                                                         index: index
                                                     })
-
                                                 }
                                                 : undefined
                                         }
@@ -440,7 +445,7 @@ const CrudReportScreen = ({ navigation, route }) => {
                         })}
                         navigation={navigation}
                         onPressEdit={
-                            isEditState
+                            isEditState || isAdd
                                 ? () => {
                                     handleOpenEditBS({
                                         id: "odometer",
