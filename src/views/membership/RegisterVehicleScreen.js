@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState, useRef } from 'react'
-import { BackHandler, FlatList, SafeAreaView, TouchableOpacity, View } from 'react-native'
+import { BackHandler, FlatList, Platform, SafeAreaView, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import NavBar from '../../components/atoms/NavBar'
@@ -27,7 +27,7 @@ import axios from 'axios'
 import { getFullLink, getImageBase64FromUrl } from '../../actions/helper'
 import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
-import {checkGalleryPermission, requestGalleryPermission} from "../../actions/permissionAction";
+import {checkCameraPermission, checkGalleryPermission, requestCameraPermission, requestGalleryPermission} from "../../actions/permissionAction";
 import InfoMenu from '../../components/atoms/InfoMenu'
 
 
@@ -47,11 +47,11 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
 
   const YesNoData = [
     {
-      id: 1,
+      id: '1',
       name: translate('yes'),
     },
     {
-      id: 0,
+      id: '0',
       name: translate('no'),
     },
   ]
@@ -179,6 +179,23 @@ const RegisterVehicleScreen = ({ navigation, route }) => {
   }
 
   const openCameraPicker = async () => {
+    if (Platform.OS == 'android') {
+      const permission = await checkCameraPermission()
+      console.log(permission)
+      if (permission == RESULTS.BLOCKED) {
+        showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+        return
+      }
+
+      if (permission == RESULTS.DENIED) {
+        const result = await requestCameraPermission()
+        console.log(result)
+        if (result != RESULTS.GRANTED) {
+          showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+          return
+        }
+      }
+    }
     const result = await launchCamera({
       quality: 0.5,
       includeBase64: true,

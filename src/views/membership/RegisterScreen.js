@@ -76,7 +76,7 @@ import ImageResizer from 'react-native-image-resizer';
 import ImgToBase64 from 'react-native-image-base64';
 import ModalActivityIndicator from '../../components/molecules/ModalActivityIndicator';
 import CustomCheckbox from "../../components/atoms/Checkbox";
-import { checkGalleryPermission, requestGalleryPermission } from "../../actions/permissionAction";
+import { checkCameraPermission, checkGalleryPermission, requestCameraPermission, requestGalleryPermission } from "../../actions/permissionAction";
 import { AccountTypeEnum } from "../../data/enums/AccountTypeEnum";
 import { useDeepEffect } from "../../hooks/useDeepEffect";
 import CustomRegisterImagePickerBS from "../../components/molecules/CustomRegisterImagePickerBS";
@@ -461,6 +461,23 @@ const RegisterScreen = ({ navigation, route }) => {
     };
     //
     const openCameraPicker = async () => {
+        if (Platform.OS == 'android') {
+            const permission = await checkCameraPermission()
+            console.log(permission)
+            if (permission == RESULTS.BLOCKED) {
+              showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+              return
+            }
+      
+            if (permission == RESULTS.DENIED) {
+              const result = await requestCameraPermission()
+              console.log(result)
+              if (result != RESULTS.GRANTED) {
+                showDialog(translate('please_allow_camera'), false, openSettings, () => navigation.pop(), translate('open_setting'), null, false)
+                return
+              }
+            }
+          }
         launchCamera(
             {
                 quality: 0.5,

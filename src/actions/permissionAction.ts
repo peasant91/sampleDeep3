@@ -13,10 +13,20 @@ export const checkGalleryPermission = () => {
     return check(permission)
 }
 
+export const checkCameraPermission = () => {
+    let permission: Permission = PERMISSIONS.ANDROID.CAMERA
+    return check(permission)
+}
+
 export const requestGalleryPermission = () => {
     let permission: Permission = PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE
     if (Platform.Version >= 33) {
         permission = PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
     }
+    return request(permission)
+}
+
+export const requestCameraPermission = () => {
+    let permission: Permission = PERMISSIONS.ANDROID.CAMERA
     return request(permission)
 }

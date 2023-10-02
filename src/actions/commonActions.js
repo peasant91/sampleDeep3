@@ -123,7 +123,7 @@ export const showLocationAlwaysDialog = (onConfirm) => {
         animationIn: 'fadeIn',
         animationOut: 'fadeOut',
         customAlert: (
-                <View style={{ margin: 20, backgroundColor: 'white', padding: 20 }}>
+                <View style={{ margin: 20, backgroundColor: 'white', padding: 20, alignItems: 'center'}}>
                     <LottieView
                         ref={animation => {
                             this.animation = animation;

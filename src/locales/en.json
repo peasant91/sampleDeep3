@@ -230,7 +230,7 @@
     "vehicle_brand": "Merek Kendaraan",
     "installation_location": "Lokasi Pemasangan",
     "created_at": "Dibuat %{date}",
-    "contract_offer_confirmation": "Apakah Anda yakin ingin menagajukan kontrak ini?",
+    "contract_offer_confirmation": "Apakah Anda yakin ingin mengajukan kontrak ini?",
     "from_": "Dari %{date}",
     "profit": "Penghasilan",
     "transferred": "Ditransfer",
