@@ -79,6 +79,11 @@ const OfferScreen = ({navigation, route}) => {
                     setisNotRegisterVehicle(true);
                 } else if (err.message.includes('belum ada')) {
                     setisNotRegisterVehicle(true);
+                } else if (err.title.includes('invalid')) {
+                    setdata([])
+                    showErrorDialog({
+                        error: err
+                    })
                 } else {
                     setisNotRegisterVehicle(false);
                     showErrorDialog({
