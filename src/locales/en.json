@@ -250,6 +250,8 @@
     "create_report": "Buat Report",
     "report_detail_placeholder": "cth: laporan Minggu ini..",
     "odometer_photo": "Foto Odometer",
+    "full_back_body": "Full Back Body",
+    "back_trunk": "Partial Back",
     "add_foto": "Tambah Foto",
     "report_string": "Foto Kendaraan (%{body})",
     "odometer": "Odometer",

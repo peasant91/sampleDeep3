@@ -11,10 +11,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendDistance } from './services/contract';
 import StorageKey from './constants/StorageKey';
 import { BackHandler } from 'react-native';
+import { getDistance } from 'geolib';
+
 import RNExitApp from 'react-native-exit-app';
 
 let locationSubscription = null;
 let locationTimeout = null;
+
+  var previousLocation = null
+  var currentTime = 0;
+  var previousTime = 0;
 
   var lastSendTraffic = 0;
   var lastSendTrafficTime = "";
@@ -85,6 +91,16 @@ const stopTask = async () => {
     console.log(currentPosition.latitude);
     const distance = currentPosition?.latitude == 0 ? 0 : calcDistance(location.latitude, location.longitude, currentPosition?.latitude, currentPosition?.longitude);
 
+    speed = location.speed;
+    if (previousLocation != null && speed == 0) {
+      speed = getDistance(location, previousLocation, 1) / ((new Date().getTime() / 1000) - previousTime)
+      speed *= 3.6
+    }
+    console.log("ANJENG SPEED", speed)
+
+    previousLocation = location
+    previousTime = new Date().getTime() / 1000
+
     const schema = [SpeedSchema, DistanceSchema];
     try {
       const realm = await Realm.open({
@@ -94,7 +110,7 @@ const stopTask = async () => {
       realm.write(() => {
         realm.create('Speed', {
           date: Date(),
-          speed: location.speed,
+          speed: speed,
         });
         realm.create('Distance', {
           date: Date(),
