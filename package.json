@@ -35,7 +35,7 @@
     "@supersami/rn-foreground-service": "^2.1.0",
     "@twotalltotems/react-native-otp-input": "^1.3.11",
     "android": "^0.0.8",
-    "axios": "^0.26.1",
+    "axios": "^1.8.3",
     "format-money-js": "^1.4.3",
     "geolib": "^3.3.4",
     "i18n-js": "^3.8.0",
