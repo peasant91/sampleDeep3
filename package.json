@@ -46,7 +46,7 @@
     "lottie-ios": "^3.2.3",
     "lottie-react-native": "^6.2.0",
     "moment": "^2.29.1",
-    "npm": "^8.5.4",
+    "npm": "^10.2.2",
     "react": "18.2.0",
     "react-localization": "^1.0.17",
     "react-native": "0.72.3",
@@ -93,7 +93,7 @@
     "react-native-vector-icons": "^9.1.0",
     "react-native-webview": "^11.23.1",
     "react-redux": "^7.2.2",
-    "realm": "^11.0.0-rc.0",
+    "realm": "^12.14.2",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "rn-fetch-blob": "^0.12.0"
